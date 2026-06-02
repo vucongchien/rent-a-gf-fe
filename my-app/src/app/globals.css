@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@theme {
+  /* =========================================
+     CORE TOKENS (Pastel Anime Collection)
+     ========================================= */
+  --color-chizuru-50: #FFF0F5;
+  --color-chizuru-100: #FFE4E1;
+  --color-chizuru-500: #FFB6C1;
+  --color-chizuru-600: #FF69B4;
+  --color-chizuru-light: #FFF5F6; /* Trắng ánh hồng Chizuru */
+  
+  --color-ruka-50: #F0FFF0;
+  --color-ruka-100: #E0FFFF;
+  --color-ruka-500: #88D8C0;
+  --color-ruka-600: #20B2AA;
+  --color-ruka-light: #F5FFFC; /* Trắng ánh mint Ruka */
+
+  --color-mami-50: #FFFFE0;
+  --color-mami-100: #FFFACD;
+  --color-mami-500: #FCE883;
+  --color-mami-600: #FFD700;
+  --color-mami-light: #FFFFF2; /* Trắng ánh vàng Mami */
+
+  --color-sumi-50: #FDF5E6;
+  --color-sumi-100: #FFC0CB;
+  --color-sumi-500: #FF91A4;
+  --color-sumi-600: #DB7093;
+  --color-sumi-light: #FFF5F7; /* Trắng ánh hồng Sumi */
+
+  /* Clean Neutrals for pure white backgrounds */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-500: #737373;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+
+  /* Pastel-friendly status colors */
+  --color-emerald-400: #34d399; /* Softer success */
+  --color-amber-400: #fbbf24;  /* Softer warning */
+  --color-rose-400: #fb7185;   /* Softer error */
+
+  /* =========================================
+     SEMANTIC TOKENS (Ý nghĩa / Theme)
+     Map thẳng vào Tailwind classes: text-brand, bg-surface, v.v.
+     ========================================= */
+  --color-brand: var(--color-chizuru-500);
+  --color-brand-hover: var(--color-chizuru-600);
+  --color-brand-muted: var(--color-chizuru-50);
+
+  /* Trắng tinh để làm nổi bật pastel */
+  --color-surface: #ffffff; 
+  --color-surface-muted: var(--color-neutral-50); /* Trắng xám cực nhẹ để phân biệt khối */
+  --color-surface-inverted: var(--color-neutral-900);
+
+  --color-text: var(--color-neutral-900);
+  --color-text-muted: var(--color-neutral-500);
+  --color-text-inverted: #ffffff;
+
+  --color-border: var(--color-neutral-200);
+
+  --color-success: var(--color-emerald-400);
+  --color-warning: var(--color-amber-400);
+  --color-error: var(--color-rose-400);
+
+  /* Character Specific Semantic Tokens */
+  --color-secondary: var(--color-ruka-500);
+  --color-accent: var(--color-mami-500);
+
+  /* =========================================
+     TYPOGRAPHY TOKENS
+     ========================================= */
+  --font-sans: var(--font-lora), ui-serif, serif;
+  --font-display: var(--font-cherry-bomb), cursive;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular;
+
+  /* =========================================
+     EFFECT TOKENS (Shadows / Radius)
+     ========================================= */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px; /* For capsule/pill buttons */
+  --shadow-premium: 0 8px 30px -4px rgba(255, 182, 193, 0.4); /* Chizuru pink shadow */
+
+  /* Additional tokens for compatibility with prototype style */
+  --color-lime-soft: #e3ecb5;
+  --color-cream: #fdf7ee;
+  --color-secondary-soft: #c9e3f5;
+
+  /* Custom animations */
+  --animate-voice-eq: voice-eq 0.6s ease-in-out infinite;
+  --animate-like-pop: like-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  @keyframes voice-eq {
+    0%, 100% { height: 4px; }
+    50% { height: 14px; }
+  }
+
+  @keyframes like-pop {
+    0% { transform: scale(0.8); }
+    100% { transform: scale(1); }
+  }
+}
+
+/* =========================================
+   BASE STYLES
+   ========================================= */
+@layer base {
+  :root {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+}
+
+/* =========================================
+   CUSTOM UTILITIES (Tailwind v4)
+   ========================================= */
+@utility text-stroke-black {
+  -webkit-text-stroke: 1.2px #171717; /* Rich black stroke */
+  paint-order: stroke fill;
+}
+
+@utility text-stroke-white {
+  -webkit-text-stroke: 1.5px #ffffff; /* White stroke for sticker glow effect */
+  paint-order: stroke fill;
+}
+
+@utility text-shadow-pop {
+  text-shadow: 2px 1px 0px #ffffff; /* Solid dark text shadow for 3D retro effect */
+}
+
+@utility text-stroke-dynamic {
+  -webkit-text-stroke: 1.2px color-mix(in srgb, currentColor, #000000 30%); /* Automatically darkens current text color by 30% for stroke */
+  paint-order: stroke fill;
+}
