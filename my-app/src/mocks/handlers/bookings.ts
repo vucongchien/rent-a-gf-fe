@@ -2,7 +2,7 @@ import { http, HttpResponse, delay } from 'msw'
 import { mockBookings, companions } from '../fixtures/data'
 
 // State mutable cho booking CRUD
-let bookings = [...mockBookings]
+const bookings = [...mockBookings]
 
 function createBooking(body: {
   companionId: string

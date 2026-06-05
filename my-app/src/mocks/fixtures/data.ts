@@ -171,7 +171,7 @@ export const companions = [
 ]
 
 // --- BOOKINGS ---
-export let mockBookings = [
+export const mockBookings = [
   {
     id: 'bk-1',
     companionId: 'comp-1',
