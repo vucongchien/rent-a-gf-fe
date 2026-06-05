@@ -5,7 +5,7 @@ export interface MediaSlotProps {
   alt?: string;
   placeholder?: string;
   aspectRatio?: "1/1" | "4/3.4" | "4/3" | "auto";
-  radius?: number; // border radius in px
+  radius?: "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "full";
   tint?: "pink" | "blue" | "lime" | "neutral";
   className?: string;
   children?: React.ReactNode;
@@ -16,34 +16,11 @@ export const MediaSlot: React.FC<MediaSlotProps> = ({
   alt = "Media Slot",
   placeholder = "No Image Available",
   aspectRatio = "1/1",
-  radius = 17,
+  radius = "xl",
   tint = "neutral",
   className = "",
   children,
 }) => {
-  // Map tint properties to repeating checkerboard background gradients
-  const getPlaceholderStyle = (): React.CSSProperties => {
-    switch (tint) {
-      case "pink":
-        return {
-          background: "repeating-linear-gradient(135deg, #fdeef4 0 14px, #fbe6ef 14px 28px)",
-        };
-      case "blue":
-        return {
-          background: "repeating-linear-gradient(135deg, #eef6f9 0 14px, #e7f1f6 14px 28px)",
-        };
-      case "lime":
-        return {
-          background: "repeating-linear-gradient(135deg, #f4f7e6 0 14px, #eef3da 14px 28px)",
-        };
-      case "neutral":
-      default:
-        return {
-          background: "repeating-linear-gradient(135deg, #f5f5f5 0 14px, #e5e5e5 14px 28px)",
-        };
-    }
-  };
-
   const getAspectClass = () => {
     switch (aspectRatio) {
       case "1/1":
@@ -58,21 +35,37 @@ export const MediaSlot: React.FC<MediaSlotProps> = ({
     }
   };
 
-  const containerStyle: React.CSSProperties = {
-    borderRadius: `${radius}px`,
+  const getRadiusClass = () => {
+    switch (radius) {
+      case "none": return "rounded-none";
+      case "xs": return "rounded-xs";
+      case "sm": return "rounded-sm";
+      case "md": return "rounded-md";
+      case "lg": return "rounded-lg";
+      case "xl": return "rounded-xl";
+      case "2xl": return "rounded-2xl";
+      case "full": return "rounded-full";
+      default: return "rounded-xl";
+    }
+  };
+
+  const getTintClass = () => {
+    if (src) return "";
+    switch (tint) {
+      case "pink": return "bg-checkerboard-pink";
+      case "blue": return "bg-checkerboard-blue";
+      case "lime": return "bg-checkerboard-lime";
+      case "neutral":
+      default:
+        return "bg-checkerboard-neutral";
+    }
   };
 
   return (
     <div
-      className={`relative overflow-hidden w-full select-none ${getAspectClass()} ${className}`}
-      style={{
-        ...containerStyle,
-        ...(!src ? getPlaceholderStyle() : {}),
-      }}
+      className={`relative overflow-hidden w-full select-none ${getAspectClass()} ${getRadiusClass()} ${getTintClass()} ${className}`}
     >
       {src ? (
-        // Using native <img> to avoid SSR domain whitelist limitations for external third-party URLs.
-        // Can be easily migrated to next/image once domains are finalized.
         <img
           src={src}
           alt={alt}
@@ -80,7 +73,7 @@ export const MediaSlot: React.FC<MediaSlotProps> = ({
           loading="lazy"
         />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <div className="absolute inset-0 flex items-center justify-center p-4 text-center" role="img" aria-label={placeholder}>
           <span className="font-mono text-xs uppercase tracking-wider text-neutral-500 font-medium">
             {placeholder}
           </span>
