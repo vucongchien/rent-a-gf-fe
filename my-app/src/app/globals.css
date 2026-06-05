@@ -77,9 +77,14 @@
 
   /* =========================================
      EFFECT TOKENS (Shadows / Radius)
+     Rule: height / 4 = radius (e.g. h-8 (32px/2rem) -> radius 8px/0.5rem (md))
      ========================================= */
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
+  --radius-xs: 0.25rem;  /* For h-4 (16px) */
+  --radius-sm: 0.375rem; /* For h-6 (24px) */
+  --radius-md: 0.5rem;   /* For h-8 (32px) */
+  --radius-lg: 0.75rem;  /* For h-12 (48px) */
+  --radius-xl: 1rem;     /* For h-16 (64px) */
+  --radius-2xl: 1.5rem;  /* For h-24 (96px) */
   --radius-full: 9999px; /* For capsule/pill buttons */
   --shadow-premium: 0 8px 30px -4px rgba(255, 182, 193, 0.4); /* Chizuru pink shadow */
 
@@ -117,20 +122,20 @@
    CUSTOM UTILITIES (Tailwind v4)
    ========================================= */
 @utility text-stroke-black {
-  -webkit-text-stroke: 1.2px #171717; /* Rich black stroke */
+  -webkit-text-stroke: 1.2px var(--color-neutral-900); /* Rich black stroke */
   paint-order: stroke fill;
 }
 
 @utility text-stroke-white {
-  -webkit-text-stroke: 1.5px #ffffff; /* White stroke for sticker glow effect */
+  -webkit-text-stroke: 1.5px var(--color-surface); /* White stroke for sticker glow effect */
   paint-order: stroke fill;
 }
 
 @utility text-shadow-pop {
-  text-shadow: 2px 1px 0px #ffffff; /* Solid dark text shadow for 3D retro effect */
+  text-shadow: 2px 1px 0px var(--color-surface); /* Solid dark text shadow for 3D retro effect */
 }
 
 @utility text-stroke-dynamic {
-  -webkit-text-stroke: 1.2px color-mix(in srgb, currentColor, #000000 30%); /* Automatically darkens current text color by 30% for stroke */
+  -webkit-text-stroke: 1.2px color-mix(in oklab, currentColor, var(--color-neutral-900) 30%); /* Automatically darkens current text color by 30% for stroke */
   paint-order: stroke fill;
 }
