@@ -69,12 +69,12 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       {/* Toast Notification Container */}
       <div
-        className={`fixed left-1/2 bottom-[26px] -translate-x-1/2 z-50 px-6 py-3 rounded-[14px] bg-neutral-900 text-white text-sm font-medium shadow-[0_14px_30px_-12px_rgba(0,0,0,0.4)] pointer-events-none transition-all duration-300 ease-out select-none ${
+        className={`fixed left-1/2 bottom-6 -translate-x-1/2 z-50 px-6 py-3 rounded-xl bg-neutral-900 text-white text-sm font-medium shadow-[0_14px_30px_-12px_rgba(0,0,0,0.4)] transition-all duration-300 ease-out select-none ${
           visible
-            ? "opacity-100 translate-y-0 scale-100"
-            : "opacity-0 translate-y-5 scale-95"
+            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+            : "opacity-0 translate-y-5 scale-95 pointer-events-none"
         }`}
-        role="alert"
+        role="status"
         aria-live="polite"
       >
         <span className="flex items-center gap-1.5 whitespace-nowrap">

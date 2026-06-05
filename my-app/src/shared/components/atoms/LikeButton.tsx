@@ -4,8 +4,6 @@ export interface LikeButtonProps {
   isLiked?: boolean;
   defaultLiked?: boolean;
   onToggle?: (liked: boolean) => void;
-  size?: number; // width and height of button in px
-  "aria-label"?: string;
   className?: string;
 }
 
@@ -13,8 +11,6 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   isLiked,
   defaultLiked = false,
   onToggle,
-  size = 38,
-  "aria-label": ariaLabel = "Like profile",
   className = "",
 }) => {
   const isControlled = isLiked !== undefined;
@@ -48,26 +44,14 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
     setIsPopAnimating(false);
   };
 
-  const buttonStyle: React.CSSProperties = {
-    width: `${size}px`,
-    height: `${size}px`,
-  };
-
-  const svgStyle: React.CSSProperties = {
-    width: `${Math.round(size * 0.47)}px`,
-    height: `${Math.round(size * 0.47)}px`,
-  };
+  // Dynamic label for Screen Readers: "Like profile" when not liked, "Unlike profile" when liked
+  const ariaLabel = liked ? "Unlike profile" : "Like profile";
 
   return (
     <button
       onClick={handleClick}
       onAnimationEnd={handleAnimationEnd}
-      style={buttonStyle}
-      className={`inline-flex items-center justify-center rounded-full border border-neutral-900 bg-white/92 backdrop-blur-sm cursor-pointer select-none transition-all duration-100 ease-out 
-        
-        
-        
-        shadow-[1px_2px_0_var(--color-neutral-900)] hover:translate-y-px hover:shadow-[1px_1px_0_var(--color-neutral-900)] active:translate-y-3px active:shadow-none ${
+      className={`btn-like ${
         isPopAnimating ? "animate-like-pop" : ""
       } ${className}`}
       aria-label={ariaLabel}
@@ -75,8 +59,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
     >
       <svg
         viewBox="0 0 24 24"
-        style={svgStyle}
-        className={`transition-all duration-200 ${
+        className={`w-[18px] h-[18px] transition-all duration-200 ${
           liked
             ? "fill-chizuru-600 stroke-chizuru-600 scale-110"
             : "fill-none stroke-neutral-900 stroke-2"

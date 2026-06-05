@@ -28,20 +28,16 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
   };
 
   const isMini = size === "mini";
-
-  // Base sizing and typography
-  const sizeClasses = isMini
-    ? "h-10 px-3.5 pl-3 text-xs shadow-[0_3px_0_theme(colors.neutral.900)] hover:translate-y-[1px] hover:shadow-[0_2px_0_theme(colors.neutral.900)] active:translate-y-[3px] active:shadow-none"
-    : "h-12 px-[18px] pl-3.5 text-sm shadow-[0_4px_0_theme(colors.neutral.900)] hover:translate-y-[2px] hover:shadow-[0_2px_0_theme(colors.neutral.900)] active:translate-y-[4px] active:shadow-none";
+  const sizeClass = isMini ? "btn-voice-mini" : "btn-voice-default";
 
   return (
     <button
       onClick={handleClick}
-      className={`inline-flex items-center gap-2 border-2 border-neutral-900 bg-white font-bold select-none cursor-pointer text-neutral-900 rounded-full font-sans transition-all duration-100 ease-out hover:bg-[var(--color-cream)] ${sizeClasses} ${className}`}
+      className={`btn-voice-base ${sizeClass} ${className}`}
       aria-label={isPlaying ? "Stop audio" : `Play audio: ${label}`}
     >
-      {/* Visual EQ Audio Wave Indicator */}
-      <span className="flex-none flex items-center justify-center w-6 h-6">
+      {/* Visual EQ Audio Wave Indicator - Hidden from screen readers */}
+      <span className="flex-none flex items-center justify-center w-6 h-6" aria-hidden="true">
         <span className="flex items-center gap-[2px] h-4">
           <b
             className={`w-[3px] h-[5px] rounded-[2px] bg-neutral-900 block ${
