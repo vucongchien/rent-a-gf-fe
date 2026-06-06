@@ -44,7 +44,11 @@ export function useSoundEngine(): UseSoundEngineResult {
     }
   }, []);
 
-  const play = useCallback(async (url: string) => {
+  const play = useCallback(async (url: string | null | undefined) => {
+    if (!url || url === "null") {
+      console.warn("useSoundEngine: Invalid URL provided:", url);
+      return;
+    }
     const ctx = getAudioContext();
     if (!ctx) return;
 
