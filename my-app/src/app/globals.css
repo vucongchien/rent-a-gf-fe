@@ -139,3 +139,269 @@
   -webkit-text-stroke: 1.2px color-mix(in oklab, currentColor, var(--color-neutral-900) 30%); /* Automatically darkens current text color by 30% for stroke */
   paint-order: stroke fill;
 }
+
+/* =========================================
+   BUTTON SYSTEM UTILITIES (Tailwind v4)
+   ========================================= */
+@utility btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  transition-property: all;
+  transition-duration: 100ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  
+  &:disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+@utility btn-primary {
+  background-color: var(--color-brand);
+  color: var(--color-text);
+  border: 1px solid var(--color-brand-hover);
+  box-shadow: 0 4px 0 var(--color-brand-hover);
+  
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--color-brand-hover);
+      filter: brightness(1.05);
+    }
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+}
+
+@utility btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-text);
+  border: 1px solid var(--color-ruka-600);
+  box-shadow: 0 4px 0 var(--color-ruka-600);
+  
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--color-ruka-600);
+      filter: brightness(1.05);
+    }
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+}
+
+@utility btn-accent {
+  background-color: var(--color-accent);
+  color: var(--color-text);
+  border: 1px solid var(--color-mami-600);
+  box-shadow: 0 4px 0 var(--color-mami-600);
+  
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--color-mami-600);
+      filter: brightness(1.05);
+    }
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+}
+
+@utility btn-outline {
+  background-color: #ffffff;
+  color: var(--color-text);
+  border: 2px solid var(--color-neutral-900);
+  box-shadow: 0 4px 0 var(--color-neutral-900);
+  
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--color-neutral-900);
+      background-color: var(--color-cream);
+    }
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+}
+
+@utility btn-ghost {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text);
+  border: 1px solid transparent;
+  
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: var(--color-neutral-100);
+    }
+  }
+  
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+}
+
+/* Button Sizes: Dùng em và logical properties, bo góc theo height/4 = radius */
+@utility btn-sm {
+  font-size: 0.875rem;
+  line-height: 1.25;
+  padding-block: 0.45em;
+  padding-inline: 1.25em;
+  border-radius: var(--radius-md);
+}
+
+@utility btn-md {
+  font-size: 1rem;
+  line-height: 1.5;
+  padding-block: 0.6em;
+  padding-inline: 1.75em;
+  border-radius: var(--radius-lg);
+}
+
+@utility btn-lg {
+  font-size: 1.125rem;
+  line-height: 1.5;
+  padding-block: 0.8em;
+  padding-inline: 2.25em;
+  border-radius: var(--radius-xl);
+}
+
+/* =========================================
+   VOICE BUTTON UTILITIES
+   ========================================= */
+@utility btn-voice-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid var(--color-neutral-900);
+  background-color: #ffffff;
+  font-weight: 700;
+  user-select: none;
+  cursor: pointer;
+  color: var(--color-neutral-900);
+  border-radius: var(--radius-full);
+  transition-property: all;
+  transition-duration: 100ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-cream);
+    }
+  }
+}
+
+@utility btn-voice-default {
+  padding-block: 0.6em;
+  padding-inline-start: 0.875em;
+  padding-inline-end: 1.125em;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 0 var(--color-neutral-900);
+  
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--color-neutral-900);
+    }
+  }
+  
+  &:active {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+}
+
+@utility btn-voice-mini {
+  padding-block: 0.5em;
+  padding-inline-start: 0.75em;
+  padding-inline-end: 0.875em;
+  font-size: 0.75rem;
+  box-shadow: 0 3px 0 var(--color-neutral-900);
+  
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 var(--color-neutral-900);
+    }
+  }
+  
+  &:active {
+    transform: translateY(3px);
+    box-shadow: none;
+  }
+}
+
+/* =========================================
+   MEDIA SLOT CHECKERBOARD PATTERNS
+   ========================================= */
+@utility bg-checkerboard-pink {
+  background: repeating-linear-gradient(135deg, var(--color-chizuru-50) 0 14px, var(--color-chizuru-100) 14px 28px);
+}
+
+@utility bg-checkerboard-blue {
+  background: repeating-linear-gradient(135deg, var(--color-ruka-50) 0 14px, var(--color-ruka-100) 14px 28px);
+}
+
+@utility bg-checkerboard-lime {
+  background: repeating-linear-gradient(135deg, var(--color-mami-50) 0 14px, var(--color-mami-100) 14px 28px);
+}
+
+@utility bg-checkerboard-neutral {
+  background: repeating-linear-gradient(135deg, var(--color-neutral-50) 0 14px, var(--color-neutral-200) 14px 28px);
+}
+
+/* =========================================
+   LIKE BUTTON UTILITY
+   ========================================= */
+@utility btn-like {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-neutral-900);
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  user-select: none;
+  transition-property: all;
+  transition-duration: 100ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 1px 2px 0 var(--color-neutral-900);
+  
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(1px);
+      box-shadow: 1px 1px 0 var(--color-neutral-900);
+    }
+  }
+  
+  &:active {
+    transform: translateY(3px);
+    box-shadow: none;
+  }
+  
+  @media (pointer: coarse) {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
