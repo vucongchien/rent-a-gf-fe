@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 
 interface WalletContextType {
@@ -26,7 +26,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const open = () => setIsOpen(true);
   const close = () => setIsOpen(false);
 
-  const fetchWallet = async () => {
+  const fetchWallet = useCallback(async () => {
     if (!user) {
       setBalance(0);
       setFrozenBalance(0);
@@ -45,12 +45,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
   // Tự động tải lại thông tin ví khi user thay đổi (đăng nhập/đăng xuất)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchWallet();
-  }, [user]);
+  }, [fetchWallet]);
 
   const topup = async (amountInCoin: number): Promise<boolean> => {
     if (!user) return false;

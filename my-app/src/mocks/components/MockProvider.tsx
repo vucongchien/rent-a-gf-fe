@@ -9,6 +9,7 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
 
     if (process.env.NEXT_PUBLIC_MOCK_ENABLED !== 'true') {
