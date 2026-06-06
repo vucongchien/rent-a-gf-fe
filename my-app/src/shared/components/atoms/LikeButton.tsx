@@ -1,37 +1,24 @@
 import * as React from "react";
 
 export interface LikeButtonProps {
-  isLiked?: boolean;
-  defaultLiked?: boolean;
-  onToggle?: (liked: boolean) => void;
+  isLiked: boolean;
+  onToggle: (liked: boolean) => void;
   className?: string;
 }
 
 export const LikeButton: React.FC<LikeButtonProps> = ({
   isLiked,
-  defaultLiked = false,
   onToggle,
   className = "",
 }) => {
-  const isControlled = isLiked !== undefined;
-  const [localLiked, setLocalLiked] = React.useState(defaultLiked);
   const [isPopAnimating, setIsPopAnimating] = React.useState(false);
-
-  const liked = isControlled ? isLiked : localLiked;
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const nextLiked = !liked;
-
-    if (!isControlled) {
-      setLocalLiked(nextLiked);
-    }
-
-    if (onToggle) {
-      onToggle(nextLiked);
-    }
+    const nextLiked = !isLiked;
+    onToggle(nextLiked);
 
     // Trigger spring animation only when transitioning to liked state
     if (nextLiked) {
@@ -45,7 +32,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   };
 
   // Dynamic label for Screen Readers: "Like profile" when not liked, "Unlike profile" when liked
-  const ariaLabel = liked ? "Unlike profile" : "Like profile";
+  const ariaLabel = isLiked ? "Unlike profile" : "Like profile";
 
   return (
     <button
@@ -55,12 +42,12 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
         isPopAnimating ? "animate-like-pop" : ""
       } ${className}`}
       aria-label={ariaLabel}
-      aria-pressed={liked}
+      aria-pressed={isLiked}
     >
       <svg
         viewBox="0 0 24 24"
         className={`w-[18px] h-[18px] transition-all duration-200 ${
-          liked
+          isLiked
             ? "fill-chizuru-600 stroke-chizuru-600 scale-110"
             : "fill-none stroke-neutral-900 stroke-2"
         }`}

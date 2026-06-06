@@ -12,6 +12,7 @@ import { ToastProvider, useToast } from "@/shared/components/atoms/ToastNotifica
 function DesignSystemContent() {
   const { toast } = useToast();
   const [isLikedDemo, setIsLikedDemo] = React.useState(false);
+  const [isLikedDemoUncontrolled, setIsLikedDemoUncontrolled] = React.useState(false);
 
   const handleShowToast = () => {
     toast({
@@ -227,7 +228,7 @@ function DesignSystemContent() {
                 <div className="flex items-center gap-6">
                   <div>
                     <span className="text-xs text-neutral-400 block mb-1">Uncontrolled (Click me)</span>
-                    <LikeButton defaultLiked={false} />
+                    <LikeButton isLiked={isLikedDemoUncontrolled} onToggle={setIsLikedDemoUncontrolled} />
                   </div>
                   <div>
                     <span className="text-xs text-neutral-400 block mb-1">Controlled (Sync state)</span>

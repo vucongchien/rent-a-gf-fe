@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useSoundEngine } from "../../lib/useSoundEngine";
+import { VoiceEqualizer } from "./VoiceEqualizer";
 
 export interface VoiceButtonProps {
   soundUrl: string;
@@ -27,8 +28,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
     }
   };
 
-  const isMini = size === "mini";
-  const sizeClass = isMini ? "btn-voice-mini" : "btn-voice-default";
+  const sizeClass = size === "mini" ? "btn-voice-mini" : "btn-voice-default";
 
   return (
     <button
@@ -36,32 +36,8 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
       className={`btn-voice-base ${sizeClass} ${className}`}
       aria-label={isPlaying ? "Stop audio" : `Play audio: ${label}`}
     >
-      {/* Visual EQ Audio Wave Indicator - Hidden from screen readers */}
-      <span className="flex-none flex items-center justify-center w-6 h-6" aria-hidden="true">
-        <span className="flex items-center gap-[2px] h-4">
-          <b
-            className={`w-[3px] h-[5px] rounded-[2px] bg-neutral-900 block ${
-              isPlaying ? "animate-voice-eq" : "h-[5px]"
-            }`}
-          />
-          <b
-            className={`w-[3px] h-[5px] rounded-[2px] bg-neutral-900 block [animation-delay:0.12s] ${
-              isPlaying ? "animate-voice-eq" : "h-[5px]"
-            }`}
-          />
-          <b
-            className={`w-[3px] h-[5px] rounded-[2px] bg-neutral-900 block [animation-delay:0.24s] ${
-              isPlaying ? "animate-voice-eq" : "h-[5px]"
-            }`}
-          />
-          <b
-            className={`w-[3px] h-[5px] rounded-[2px] bg-neutral-900 block [animation-delay:0.36s] ${
-              isPlaying ? "animate-voice-eq" : "h-[5px]"
-            }`}
-          />
-        </span>
-      </span>
-      <span>{label}</span>
+      <VoiceEqualizer isPlaying={isPlaying} />
+      {label && <span>{label}</span>}
     </button>
   );
 };
