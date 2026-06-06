@@ -51,6 +51,10 @@ interface User {
   companionApplicationStatus: 'idle' | 'pending' | 'approved' | 'rejected'
 }
 
+const getFutureScheduledAt = () => {
+  return new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+}
+
 export default function Home() {
   // States
   const [user, setUser] = useState<User | null>(null)
@@ -91,8 +95,9 @@ export default function Home() {
         setUser(null)
         addLog('User is currently a Guest (401 from /api/auth/me)')
       }
-    } catch (err: any) {
-      addLog(`Failed to fetch /api/auth/me: ${err.message}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      addLog(`Failed to fetch /api/auth/me: ${msg}`)
     } finally {
       setLoadingUser(false)
     }
@@ -104,8 +109,9 @@ export default function Home() {
       const json = await res.json()
       setCompanions(json.data.items)
       addLog(`Loaded ${json.data.items.length} companions from /api/companions`)
-    } catch (err: any) {
-      addLog(`Failed to fetch companions: ${err.message}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      addLog(`Failed to fetch companions: ${msg}`)
     } finally {
       setLoadingCompanions(false)
     }
@@ -117,8 +123,9 @@ export default function Home() {
       const json = await res.json()
       setBookings(json.data.items)
       addLog(`Loaded ${json.data.items.length} bookings from /api/bookings`)
-    } catch (err: any) {
-      addLog(`Failed to fetch bookings: ${err.message}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      addLog(`Failed to fetch bookings: ${msg}`)
     } finally {
       setLoadingBookings(false)
     }
@@ -130,8 +137,9 @@ export default function Home() {
       const json = await res.json()
       setWallet(json.data)
       addLog(`Loaded wallet: ${json.data.balance} KC from /api/wallet`)
-    } catch (err: any) {
-      addLog(`Failed to fetch wallet: ${err.message}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      addLog(`Failed to fetch wallet: ${msg}`)
     } finally {
       setLoadingWallet(false)
     }
@@ -159,8 +167,9 @@ export default function Home() {
         addLog(`Role successfully switched to: ${role}. Refetching state...`)
         fetchData()
       }
-    } catch (err: any) {
-      addLog(`Failed to switch role: ${err.message}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      addLog(`Failed to switch role: ${msg}`)
     }
   }
 
@@ -181,8 +190,9 @@ export default function Home() {
         const errJson = await res.json()
         addLog(`Failed to cancel booking: ${errJson.error.message}`)
       }
-    } catch (err: any) {
-      addLog(`Error cancelling booking: ${err.message}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      addLog(`Error cancelling booking: ${msg}`)
     } finally {
       setActionLoadingId(null)
     }
@@ -199,8 +209,9 @@ export default function Home() {
         addLog(`Booking ${bookingId} accepted! Opening chat...`)
         fetchData()
       }
-    } catch (err: any) {
-      addLog(`Error accepting booking: ${err.message}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      addLog(`Error accepting booking: ${msg}`)
     } finally {
       setActionLoadingId(null)
     }
@@ -217,8 +228,9 @@ export default function Home() {
         addLog(`Booking ${bookingId} rejected!`)
         fetchData()
       }
-    } catch (err: any) {
-      addLog(`Error rejecting booking: ${err.message}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      addLog(`Error rejecting booking: ${msg}`)
     } finally {
       setActionLoadingId(null)
     }
@@ -234,7 +246,7 @@ export default function Home() {
         body: JSON.stringify({
           companionId,
           scenarioId,
-          scheduledAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+          scheduledAt: getFutureScheduledAt(),
         }),
       })
       if (res.ok) {
@@ -245,8 +257,9 @@ export default function Home() {
         const errJson = await res.json()
         addLog(`Failed to create booking: ${errJson.error.message}`)
       }
-    } catch (err: any) {
-      addLog(`Error creating booking: ${err.message}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      addLog(`Error creating booking: ${msg}`)
     }
   }
 

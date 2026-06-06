@@ -9,7 +9,8 @@ const _bufferCache = new Map<string, AudioBuffer>();
 function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
   if (!_ac) {
-    _ac = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const WebkitAudioContext = (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    _ac = new (window.AudioContext || WebkitAudioContext)();
   }
   if (_ac.state === "suspended") {
     _ac.resume();
@@ -32,7 +33,7 @@ export function useSoundEngine(): UseSoundEngineResult {
     if (_currentSource) {
       try {
         _currentSource.stop();
-      } catch (e) {
+      } catch {
         // Source might have already stopped
       }
       _currentSource = null;
@@ -104,7 +105,7 @@ export function useSoundEngine(): UseSoundEngineResult {
         _currentStopCallback = null;
       }
     }
-  }, [stop]);
+  }, []);
 
   // Cleanup on unmount if this instance is the one currently playing
   useEffect(() => {
