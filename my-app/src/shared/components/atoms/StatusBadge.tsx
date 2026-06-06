@@ -41,9 +41,9 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   const getVariantStyles = (): string => {
     switch (variant) {
       case "sale":
-        return "bg-[var(--color-secondary-soft)] text-neutral-900";
+        return "bg-secondary-soft text-neutral-900";
       case "adopt":
-        return "bg-[var(--color-lime-soft)] text-neutral-900";
+        return "bg-lime-soft text-neutral-900";
       case "online":
         return "bg-success text-neutral-900";
       case "offline":
@@ -61,10 +61,10 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center justify-center font-sans font-bold text-[10px] tracking-wider px-2 py-0.5 rounded-full select-none ${getVariantStyles()} ${className} border border-neutral-900 shadow-[0_2px_0_var(--color-neutral-900)] `} 
+      className={`inline-flex items-center justify-center font-sans font-bold text-[10px] tracking-wider px-2 py-0.5 rounded-full select-none ${getVariantStyles()} ${className} border border-neutral-900 shadow-[0_2px_0_var(--color-neutral-900)]`} 
     >
       {variant === "online" && (
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5 animate-pulse" />
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5 animate-pulse" aria-hidden="true" />
       )}
       {displayLabel}
     </span>
