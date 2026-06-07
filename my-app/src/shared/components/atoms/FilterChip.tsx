@@ -16,7 +16,8 @@ export const FilterChip: React.FC<FilterChipProps> = ({
       type="button"
       className={`
         inline-flex items-center justify-center font-sans font-medium text-[13.5px] leading-none 
-        px-[16px] py-[10px] rounded-full border transition-colors duration-150 cursor-pointer
+        px-4 py-2.5 rounded-full border transition-colors duration-150 cursor-pointer
+        whitespace-nowrap truncate max-w-[150px] sm:max-w-none
         ${active 
           ? 'bg-neutral-900 text-white border-neutral-900' 
           : 'bg-white text-neutral-500 border-neutral-200 hover:text-neutral-900 hover:border-neutral-400'

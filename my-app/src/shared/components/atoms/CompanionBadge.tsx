@@ -11,7 +11,7 @@ const traitDictionary: Record<CompanionTrait, { label: string; bgClass: string }
   new: { label: 'Mới', bgClass: 'bg-[var(--color-chizuru-500)]' },
   hot: { label: 'Hot', bgClass: 'bg-[var(--color-mami-500)]' },
   verified: { label: 'Verified', bgClass: 'bg-[var(--color-ruka-500)]' },
-  top: { label: 'Top', bgClass: 'bg-[#fbbf24]' }, // amber-400
+  top: { label: 'Top', bgClass: 'bg-[var(--color-warning)]' }, // amber-400
 };
 
 export const CompanionBadge: React.FC<CompanionBadgeProps> = ({ traits, className = '' }) => {

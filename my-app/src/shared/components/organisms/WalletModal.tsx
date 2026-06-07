@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useWallet } from '@/shared/contexts/WalletContext';
 import { useAnimatedNumber } from '@/shared/hooks/useAnimatedNumber';
 import { Button } from '../atoms/Button';
-import { XIcon } from '../atoms/Icons';
+import { CloseButton } from '../atoms/CloseButton';
+import { SpinnerIcon } from '../atoms/Icons';
 
 export const WalletModal: React.FC = () => {
   const { isOpen, close, balance, frozenBalance, topup } = useWallet();
@@ -114,13 +115,13 @@ export const WalletModal: React.FC = () => {
       <div className="bg-white border border-neutral-900 rounded-[28px] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.25)] p-[24px] font-sans text-neutral-900 overflow-hidden relative">
         
         {/* Nút đóng */}
-        <button
-          onClick={close}
+        <CloseButton
+          onClose={close}
+          variant="outline"
+          size={16}
           aria-label="Đóng"
-          className="absolute top-[20px] right-[20px] w-[36px] h-[36px] rounded-full border border-neutral-200 flex items-center justify-center text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 transition-colors duration-150 z-10"
-        >
-          <XIcon size={16} />
-        </button>
+          className="absolute top-5 right-5 z-10"
+        />
 
         {showSuccess ? (
           /* GIAO DIỆN NẠP TIỀN THÀNH CÔNG */
@@ -243,10 +244,7 @@ export const WalletModal: React.FC = () => {
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-[8px]">
-                    <svg className="animate-spin h-5 w-5 text-current" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
+                    <SpinnerIcon size={20} className="text-current" />
                     Đang kết nối cổng thanh toán an toàn...
                   </span>
                 ) : (
