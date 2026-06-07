@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from "react";
 import { useSoundEngine } from "../../lib/useSoundEngine";
 import { VoiceEqualizer } from "./VoiceEqualizer";

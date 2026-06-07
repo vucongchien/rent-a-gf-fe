@@ -1,5 +1,14 @@
 # AGENTS.md
 
+## Component Design.
+- Hãy mặc định: mọi component đều là Server Component
+- Cho đến khi có lý do bắt buộc phải là Client Component:
+    + Có event của browser
+    + Dùng React Hooks phía client
+    + event handler của user (onclick, onchange, ...)
+    + Truy cập Browser API
+    + Thư viện yêu cầu DOM
+
 ## TECHSTACK
 
 - Nextjs 16 with SSR, CSR, RSC, Server Actions, Middleware, Route Handlers, App Router, Suspense, ..., use all features of nextjs 16

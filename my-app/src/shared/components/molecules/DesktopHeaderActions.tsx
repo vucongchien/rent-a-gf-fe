@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { SearchInput } from '../atoms/SearchInput';
 import { WalletButton } from '../atoms/WalletButton';

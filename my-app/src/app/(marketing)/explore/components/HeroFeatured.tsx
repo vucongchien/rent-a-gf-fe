@@ -47,19 +47,12 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ featuredCompanion })
             </div>
 
             {featuredCompanion.voiceUrl && (
-              <div
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              >
-                <VoiceButton 
-                  soundUrl={featuredCompanion.voiceUrl} 
-                  size="default" 
-                  label="Hi!" 
-                  className="shadow-[0_3px_0_var(--color-neutral-900)] flex-none h-[40px] px-[14px] text-[13.5px] rounded-full"
-                />
-              </div>
+              <VoiceButton 
+                soundUrl={featuredCompanion.voiceUrl} 
+                size="default" 
+                label="Hi!" 
+                className="shadow-[0_3px_0_var(--color-neutral-900)] flex-none h-[40px] px-[14px] text-[13.5px] rounded-full"
+              />
             )}
           </div>
         </MediaSlot>

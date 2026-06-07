@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Companion } from '../hooks/useCompanions';
+import type { Companion } from '@/shared/types';
+
 
 export interface FeaturedCompanion {
   id: string;

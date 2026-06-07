@@ -6,6 +6,7 @@ import { WalletProvider } from "@/shared/contexts/WalletContext";
 import { SidebarProvider } from "@/shared/contexts/SidebarContext";
 import { MobileSidebar } from "@/shared/components/organisms/MobileSidebar";
 import { WalletModal } from "@/shared/components/organisms/WalletModal";
+import { authService } from "@/shared/services/authService";
 import "./globals.css";
 
 const lora = Lora({
@@ -29,11 +30,17 @@ export const metadata: Metadata = {
   description: "Companion booking platform",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const userResponse = await authService.getMe().catch((err) => {
+    console.error("[RootLayout] Lỗi lấy thông tin user me từ server:", err);
+    return { data: null };
+  });
+  const user = userResponse?.data || null;
+
   return (
     <html
       lang="vi"
@@ -41,7 +48,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-surface text-text">
         <MockProvider>
-          <AuthProvider>
+          <AuthProvider initialUser={user}>
             <WalletProvider>
               <SidebarProvider>
                 {/* MobileSidebar là fixed overlay — render 1 lần ở root, CSS ẩn trên desktop */}

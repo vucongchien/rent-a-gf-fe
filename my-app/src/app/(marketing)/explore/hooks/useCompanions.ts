@@ -1,18 +1,10 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import type { Companion } from '@/shared/types';
 
-export interface Companion {
-  id: string;
-  displayName: string;
-  city: string;
-  ratingAvg: number;
-  reviewCount: number;
-  avatarUrl: string;
-  voiceIntroUrl: string | null;
-  featuredScenario: { name: string; priceInCoin: number } | null;
-  metadata?: string[];
-}
+// Re-export để các file trong feature này không cần import lại từ shared/types
+export type { Companion };
 
 export function useCompanions(allCompanions: Companion[]) {
   const [activeCity, setActiveCity] = useState('all');

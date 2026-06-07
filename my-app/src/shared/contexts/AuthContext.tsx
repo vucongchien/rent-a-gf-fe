@@ -1,17 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import type { User, UserRole } from '@/shared/types';
 
-export type UserRole = 'client' | 'companion' | 'admin';
-
-export interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  avatarUrl: string;
-  role: UserRole;
-  companionApplicationStatus: 'idle' | 'pending' | 'approved' | 'rejected';
-}
+// Re-export cho backward compatibility
+export type { User, UserRole };
 
 interface AuthContextType {
   user: User | null;
@@ -22,9 +15,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function AuthProvider({ children, initialUser }: { children: ReactNode; initialUser?: User | null }) {
+  const [user, setUser] = useState<User | null>(initialUser !== undefined ? initialUser : null);
+  const [isLoading, setIsLoading] = useState(initialUser === undefined);
 
   const fetchUser = async () => {
     try {
@@ -44,9 +37,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchUser();
-  }, []);
+    if (initialUser === undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchUser();
+    }
+  }, [initialUser]);
 
   const login = async (role: 'client' | 'companion' | 'admin' = 'client') => {
     try {
