@@ -5,6 +5,8 @@ import ExplorePage from './page';
 import { setupServer } from 'msw/node';
 import { handlers } from '@/mocks/handlers';
 import { AuthProvider } from '@/shared/contexts/AuthContext';
+import { SidebarProvider } from '@/shared/contexts/SidebarContext';
+import { WalletProvider } from '@/shared/contexts/WalletContext';
 
 // Mock matchMedia for View Transitions if not supported in JSDOM
 if (typeof document !== 'undefined') {
@@ -36,9 +38,13 @@ afterAll(() => server.close());
 describe('ExplorePage Integration', () => {
   it('loads companions and displays them on mount', async () => {
     render(
-      <AuthProvider>
-        <ExplorePage />
-      </AuthProvider>
+      <SidebarProvider>
+        <AuthProvider>
+          <WalletProvider>
+            <ExplorePage />
+          </WalletProvider>
+        </AuthProvider>
+      </SidebarProvider>
     );
 
     // Dữ liệu mock ban đầu phải hiển thị danh sách trang đầu tiên (limit 6)
@@ -53,9 +59,13 @@ describe('ExplorePage Integration', () => {
   it('filters list when clicking city filter chips', async () => {
     const user = userEvent.setup();
     render(
-      <AuthProvider>
-        <ExplorePage />
-      </AuthProvider>
+      <SidebarProvider>
+        <AuthProvider>
+          <WalletProvider>
+            <ExplorePage />
+          </WalletProvider>
+        </AuthProvider>
+      </SidebarProvider>
     );
 
     await waitFor(() => {
@@ -80,9 +90,13 @@ describe('ExplorePage Integration', () => {
   it('loads more companions when load more button is clicked', async () => {
     const user = userEvent.setup();
     render(
-      <AuthProvider>
-        <ExplorePage />
-      </AuthProvider>
+      <SidebarProvider>
+        <AuthProvider>
+          <WalletProvider>
+            <ExplorePage />
+          </WalletProvider>
+        </AuthProvider>
+      </SidebarProvider>
     );
 
     await waitFor(() => {

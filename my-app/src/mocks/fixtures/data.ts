@@ -3,6 +3,36 @@
 // Dùng cho MSW handlers trong development
 // ============================================================
 
+// --- PINTEREST IMAGES ---
+export const MOCK_PINTEREST_IMAGES = [
+  'https://i.pinimg.com/736x/4e/97/ae/4e97aec9a4a5b042060f478a5893419c.jpg',
+  'https://i.pinimg.com/736x/d4/98/da/d498dabc6f61e109499b2b46d9e77bdb.jpg',
+  'https://i.pinimg.com/736x/85/17/50/851750b42d8ed0ee05925eeba43cf3c1.jpg',
+  'https://i.pinimg.com/736x/fc/59/58/fc595833faedd0288d5c67f7025b6e25.jpg',
+  'https://i.pinimg.com/1200x/7d/a7/01/7da701e55f053ee6308b0998af8df927.jpg',
+  'https://i.pinimg.com/736x/2a/5e/1a/2a5e1a9595d93214e7fd7de97d1697a0.jpg',
+  'https://i.pinimg.com/1200x/d7/82/50/d7825054ba17af3c2b44510ab188ce4a.jpg',
+  'https://i.pinimg.com/736x/dc/53/11/dc53111fdf93a00b4b86a635c64fcedd.jpg',
+  'https://i.pinimg.com/736x/4b/bf/2a/4bbf2abfeaf34b9a222b2ddc7b131721.jpg',
+  'https://i.pinimg.com/736x/cc/54/46/cc5446561f3cf927d87dd13757d01685.jpg',
+  'https://i.pinimg.com/736x/5f/d2/c4/5fd2c4743e737da3a16a047ea5b857ba.jpg',
+  'https://i.pinimg.com/736x/cd/b0/8e/cdb08e3c67a920541797d982ce34b648.jpg',
+];
+
+export function getMockAvatarUrl(id: string): string {
+  const numMatch = id.match(/\d+/);
+  const index = numMatch ? parseInt(numMatch[0], 10) : 0;
+  return MOCK_PINTEREST_IMAGES[index % MOCK_PINTEREST_IMAGES.length];
+}
+
+export function getMockAlbumUrls(id: string): string[] {
+  const numMatch = id.match(/\d+/);
+  const index = numMatch ? parseInt(numMatch[0], 10) : 0;
+  const album1 = MOCK_PINTEREST_IMAGES[(index + 1) % MOCK_PINTEREST_IMAGES.length];
+  const album2 = MOCK_PINTEREST_IMAGES[(index + 2) % MOCK_PINTEREST_IMAGES.length];
+  return [album1, album2];
+}
+
 // --- AUTH ---
 export const mockUsers = {
   guest: null,
@@ -10,7 +40,7 @@ export const mockUsers = {
     id: 'u-client-1',
     email: 'minh.khach@example.com',
     displayName: 'Minh Khách',
-    avatarUrl: 'https://i.pravatar.cc/100?u=client1',
+    avatarUrl: getMockAvatarUrl('u-client-1'),
     role: 'client' as const,
     companionApplicationStatus: 'idle' as const,
   },
@@ -18,7 +48,7 @@ export const mockUsers = {
     id: 'u-comp-1',
     email: 'linh.companion@example.com',
     displayName: 'Nguyễn Thị Linh',
-    avatarUrl: 'https://i.pravatar.cc/100?u=comp1',
+    avatarUrl: getMockAvatarUrl('u-comp-1'),
     role: 'companion' as const,
     companionApplicationStatus: 'approved' as const,
   },
@@ -26,7 +56,7 @@ export const mockUsers = {
     id: 'u-admin-1',
     email: 'admin@example.com',
     displayName: 'Admin',
-    avatarUrl: 'https://i.pravatar.cc/100?u=admin1',
+    avatarUrl: getMockAvatarUrl('u-admin-1'),
     role: 'admin' as const,
     companionApplicationStatus: 'idle' as const,
   },
@@ -40,7 +70,7 @@ export function setMockUser(role: keyof typeof mockUsers) {
 }
 
 // --- COMPANIONS ---
-export const companions = [
+const rawCompanions = [
   {
     id: 'comp-1',
     displayName: 'Nguyễn Thị Linh',
@@ -498,8 +528,18 @@ export const companions = [
   },
 ]
 
+export const companions = rawCompanions.map(c => ({
+  ...c,
+  avatarUrl: getMockAvatarUrl(c.id),
+  albumUrls: c.albumUrls && c.albumUrls.length > 0 ? getMockAlbumUrls(c.id) : [],
+  recentReviews: c.recentReviews.map(r => ({
+    ...r,
+    authorAvatarUrl: getMockAvatarUrl(r.id || 'rv-1'),
+  }))
+}));
+
 // --- BOOKINGS ---
-export const mockBookings = [
+const rawBookings = [
   {
     id: 'bk-1',
     companionId: 'comp-1',
@@ -544,6 +584,11 @@ export const mockBookings = [
   },
 ]
 
+export const mockBookings = rawBookings.map(b => ({
+  ...b,
+  companionAvatarUrl: getMockAvatarUrl(b.companionId),
+}));
+
 // --- WALLET ---
 export const mockWallet = {
   balance: 1200,
@@ -557,7 +602,7 @@ export const mockWallet = {
 }
 
 // --- CHAT ---
-export const mockChatRooms = [
+const rawChatRooms = [
   {
     id: 'room-bk-1',
     bookingId: 'bk-1',
@@ -579,6 +624,15 @@ export const mockChatRooms = [
     unreadCount: 0,
   },
 ]
+
+export const mockChatRooms = rawChatRooms.map(r => {
+  const booking = rawBookings.find(b => b.id === r.bookingId);
+  const companionId = booking ? booking.companionId : 'comp-1';
+  return {
+    ...r,
+    participantAvatarUrl: getMockAvatarUrl(companionId),
+  };
+});
 
 export const mockMessages: Record<string, Array<{
   id: string; senderId: string; senderName: string;
