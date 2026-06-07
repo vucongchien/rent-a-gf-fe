@@ -87,6 +87,13 @@
   --radius-2xl: 1.5rem;  /* For h-24 (96px) */
   --radius-full: 9999px; /* For capsule/pill buttons */
   --shadow-premium: 0 8px 30px -4px rgba(255, 182, 193, 0.4); /* Chizuru pink shadow */
+  --shadow-hero: 0 30px 60px -34px rgba(251, 105, 153, 0.45);
+  
+  /* Companion Card Specific Tokens to avoid hardcoding */
+  --shadow-companion-card: 0 18px 40px -30px rgba(251, 105, 153, 0.4);
+  --shadow-companion-card-hover: 0 28px 50px -28px rgba(251, 105, 153, 0.5);
+  --text-companion-title: 1.3125rem; /* 21px */
+  --color-border-card-dashed: #e3d7ca;
 
   /* Additional tokens for compatibility with prototype style */
   --color-lime-soft: #e3ecb5;
@@ -402,6 +409,69 @@
   @media (pointer: coarse) {
     width: 2.75rem;
     height: 2.75rem;
+  }
+}
+
+/* =========================================
+   SCROLLBAR UTILITIES
+   ========================================= */
+@utility scrollbar-none {
+  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none;      /* IE/Edge */
+  &::-webkit-scrollbar {
+    display: none;               /* Chrome/Safari/Opera */
+  }
+}
+
+/* =========================================
+   NATIVE DIALOG TRANSITIONS (Modern Web Guidance)
+   ========================================= */
+dialog.modern-dialog[open] {
+  opacity: 1;
+  transform: scale(1);
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+dialog.modern-dialog {
+  opacity: 0;
+  transform: scale(0.95);
+  transition-property: opacity, transform, display, overlay;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-behavior: allow-discrete;
+}
+
+dialog.modern-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0);
+  transition:
+    display 250ms allow-discrete,
+    overlay 250ms allow-discrete,
+    background-color 200ms ease-out;
+}
+
+dialog.modern-dialog[open]::backdrop {
+  background-color: rgba(23, 23, 23, 0.45);
+  backdrop-filter: blur(2px);
+
+  @starting-style {
+    background-color: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.modern-dialog {
+    transform: none;
+    transition-duration: 100ms;
+  }
+  @starting-style {
+    dialog.modern-dialog[open] {
+      transform: none;
+    }
   }
 }
 

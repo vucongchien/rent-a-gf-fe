@@ -48,6 +48,9 @@ jobs:
       - name: Run Lint
         run: pnpm lint
 
+      - name: Run UI Lint
+        run: pnpm lint:ui
+
       - name: Run Typecheck
         run: pnpm typecheck
 

@@ -2,19 +2,30 @@ import { http, HttpResponse, delay } from 'msw'
 import { companions } from '../fixtures/data'
 
 export const companionHandlers = [
-  // GET /api/companions — list với filter + pagination
+  // GET /api/companions — list với filter + cursor-based pagination
   http.get('/api/companions', async ({ request }) => {
     await delay(600)
     const url = new URL(request.url)
     const city = url.searchParams.get('city')
-    const page = Number(url.searchParams.get('page') ?? 1)
-    const limit = 6
+    const cursor = url.searchParams.get('cursor')
+    const limit = url.searchParams.get('limit') ? Number(url.searchParams.get('limit')) : 6
 
     let items = companions
-    if (city) items = items.filter(c => c.city === city)
+    if (city && city !== 'all') {
+      items = items.filter(c => c.city === city)
+    }
 
-    const start = (page - 1) * limit
-    const sliced = items.slice(start, start + limit)
+    let startIndex = 0
+    if (cursor) {
+      const idx = items.findIndex(c => c.id === cursor)
+      if (idx !== -1) {
+        startIndex = idx + 1
+      }
+    }
+
+    const sliced = items.slice(startIndex, startIndex + limit)
+    const hasNextPage = startIndex + limit < items.length
+    const nextCursor = hasNextPage && sliced.length > 0 ? sliced[sliced.length - 1].id : null
 
     return HttpResponse.json({
       data: {
@@ -27,12 +38,14 @@ export const companionHandlers = [
           reviewCount: c.reviewCount,
           featuredScenario: c.featuredScenario,
           voiceIntroUrl: c.voiceIntroUrl,
+          metadata: c.metadata || [],
         })),
         meta: {
-          page,
+          cursor,
           limit,
           total: items.length,
-          hasNextPage: start + limit < items.length,
+          nextCursor,
+          hasNextPage,
         },
       },
     })

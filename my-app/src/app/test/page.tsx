@@ -1,7 +1,7 @@
 'use client'
+/* eslint-disable @next/next/no-img-element */
 
 import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
 
 // Type definitions to keep TypeScript happy
 interface Companion {
@@ -63,7 +63,7 @@ export default function Home() {
   const [wallet, setWallet] = useState<Wallet | null>(null)
   
   // Loading states
-  const [loadingUser, setLoadingUser] = useState(true)
+  const [, setLoadingUser] = useState(true)
   const [loadingCompanions, setLoadingCompanions] = useState(true)
   const [loadingBookings, setLoadingBookings] = useState(true)
   const [loadingWallet, setLoadingWallet] = useState(true)
@@ -152,6 +152,7 @@ export default function Home() {
       fetchData()
     }, 500)
     return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Switch role handler

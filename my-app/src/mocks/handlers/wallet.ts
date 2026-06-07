@@ -10,7 +10,7 @@ export const walletHandlers = [
 
   // POST /api/wallet/topup/initiate
   http.post('/api/wallet/topup/initiate', async ({ request }) => {
-    await delay(800)
+    await delay(1200) // tạo khoảng trễ giả lập xử lý ngân hàng mượt mà
     const body = await request.json() as { amountInCoin: number }
     if (!body.amountInCoin || body.amountInCoin < 100) {
       return HttpResponse.json(
@@ -18,11 +18,25 @@ export const walletHandlers = [
         { status: 400 }
       )
     }
+    
+    // Cộng tiền trực tiếp vào database mock client-side
+    mockWallet.balance += body.amountInCoin
+    
     const txId = `tx-topup-${Date.now()}`
+    mockWallet.transactions.unshift({
+      id: txId,
+      label: 'Nạp tiền Kano-Coin',
+      amountInCoin: body.amountInCoin,
+      type: 'credit',
+      status: 'completed',
+      createdAt: new Date().toISOString()
+    })
+
     return HttpResponse.json({
       data: {
+        success: true,
         transactionId: txId,
-        paymentUrl: `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?mock=true&txId=${txId}`,
+        newBalance: mockWallet.balance,
       },
     })
   }),
