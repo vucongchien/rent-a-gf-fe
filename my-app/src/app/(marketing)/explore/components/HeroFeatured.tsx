@@ -3,7 +3,16 @@ import Link from 'next/link';
 import { MediaSlot } from '@/shared/components/atoms/MediaSlot';
 import { VoiceButton } from '@/shared/components/atoms/VoiceButton';
 import { FeaturedBadge } from '@/shared/components/atoms/FeaturedBadge';
-import { FeaturedCompanion } from '../contexts/ExploreContext';
+// Type định nghĩa tại đây — không phụ thuộc vào ExploreContext
+export interface FeaturedCompanion {
+  id: string;
+  name: string;
+  location: string;
+  price: string;
+  avatarUrl?: string;
+  voiceUrl?: string | null;
+  metadata?: string[];
+}
 
 export interface HeroFeaturedProps {
   featuredCompanion: FeaturedCompanion;
