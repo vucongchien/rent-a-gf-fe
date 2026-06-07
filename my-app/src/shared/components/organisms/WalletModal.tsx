@@ -95,7 +95,7 @@ export const WalletModal: React.FC = () => {
       } else {
         setErrorMsg('Giao dịch nạp tiền thất bại. Vui lòng thử lại sau.');
       }
-    } catch (err) {
+    } catch {
       setErrorMsg('Có lỗi mạng xảy ra. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);

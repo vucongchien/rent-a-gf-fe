@@ -37,7 +37,6 @@ export const CompanionGrid: React.FC<CompanionGridProps> = ({
                 voiceUrl={comp.voiceIntroUrl}
                 traits={comp.reviewCount === 0 ? ['new'] : undefined}
                 metadata={comp.metadata && comp.metadata.length > 0 ? comp.metadata : [comp.featuredScenario?.name || 'Friendly chat']}
-                onMeet={() => alert(`We'll set up a meet-and-greet with ${comp.displayName} 🐾`)}
               />
             ))}
       </div>

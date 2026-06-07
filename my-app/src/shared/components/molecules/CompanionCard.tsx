@@ -6,7 +6,6 @@ import { CompanionBadge, CompanionTrait } from '../atoms/CompanionBadge';
 import { LikeButton } from '../atoms/LikeButton';
 import { VoiceButton } from '../atoms/VoiceButton';
 import { MediaSlot } from '../atoms/MediaSlot';
-import { Button } from '../atoms/Button';
 
 export interface CompanionCardProps {
   id: string;
@@ -19,7 +18,6 @@ export interface CompanionCardProps {
   metadata?: string[]; // e.g., ["Sinh viên", "20 tuổi", "Nữ"]
   isLiked?: boolean;
   onLike?: (isLiked: boolean) => void;
-  onMeet?: () => void;
   className?: string;
 }
 
@@ -34,7 +32,6 @@ export const CompanionCard: React.FC<CompanionCardProps> = ({
   metadata = [],
   isLiked = false,
   onLike,
-  onMeet,
   className = '',
 }) => {
   const detailHref = `/explore/${id}`;

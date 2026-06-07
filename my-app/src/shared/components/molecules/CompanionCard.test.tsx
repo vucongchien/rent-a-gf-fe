@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { CompanionCard } from './CompanionCard';
 import { CompanionTrait } from '../atoms/CompanionBadge';
@@ -13,7 +12,6 @@ describe('CompanionCard', () => {
     metadata: ['Sinh viên', '20 tuổi', 'Nữ'],
     traits: ['new', 'hot'] as CompanionTrait[],
     voiceUrl: '/test-audio.mp3',
-    onMeet: vi.fn(),
     onLike: vi.fn(),
   };
 
