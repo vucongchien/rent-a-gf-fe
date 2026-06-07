@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FilterBar } from '@/shared/components/molecules/FilterBar';
 import { CompanionGrid } from './CompanionGrid';
 import { EXPLORE_FILTERS } from '../constants';
@@ -20,7 +20,7 @@ export const ExploreGridClient: React.FC<ExploreGridClientProps> = ({
   const [limit, setLimit] = useState(6);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const [isLoading, setIsLoading] = useState(false);
-  const [isFirstRender, setIsFirstRender] = useState(true);
+  const isFirstRender = useRef(true);
 
   const fetchCompanions = useCallback(async (city: string, currentLimit: number) => {
     setIsLoading(true);
@@ -42,8 +42,8 @@ export const ExploreGridClient: React.FC<ExploreGridClientProps> = ({
   }, []);
 
   useEffect(() => {
-    if (isFirstRender) {
-      setIsFirstRender(false);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
       return;
     }
     fetchCompanions(activeCity, limit);

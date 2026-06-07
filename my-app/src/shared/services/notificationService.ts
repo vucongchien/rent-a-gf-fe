@@ -1,6 +1,6 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { mockNotifications } from '@/mocks/fixtures/data';
-import type { Notification, ApiResponse } from '@/shared/types';
+import type { Notification, NotificationType, ApiResponse, ServiceRequestOptions } from '@/shared/types';
 import { cookies } from 'next/headers';
 
 async function getRequestCookieHeader(req?: { headers: { get(name: string): string | null } }) {
@@ -26,8 +26,7 @@ export const notificationService = {
   /**
    * Lấy danh sách thông báo của user
    */
-  async getNotifications(options?: {
-    req?: any;
+  async getNotifications(options?: ServiceRequestOptions & {
     searchParams?: URLSearchParams;
   }): Promise<ApiResponse<{
     items: Notification[];
@@ -36,9 +35,18 @@ export const notificationService = {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
+      const items: Notification[] = mockNotifications.map(n => ({
+        id: n.id,
+        title: n.title,
+        body: n.body,
+        type: (n.variant === 'booking' ? 'BOOKING_ACCEPTED' : 'SYSTEM') as NotificationType,
+        isRead: n.isRead,
+        createdAt: n.receivedAt,
+        actionUrl: n.actionUrl,
+      }));
       return {
         data: {
-          items: mockNotifications as any[],
+          items,
           meta: {
             page: 1,
             limit: 20,
@@ -68,18 +76,18 @@ export const notificationService = {
   /**
    * Đánh dấu đã đọc một thông báo
    */
-  async markAsRead(notifId: string, options?: { req?: any }): Promise<any> {
+  async markAsRead(notifId: string, options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean }>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
       const found = mockNotifications.find(n => n.id === notifId);
       if (found) found.isRead = true;
-      return { success: true };
+      return { data: { success: true } };
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
-    return serverFetch(`/notifications/${notifId}/read`, {
+    return serverFetch<ApiResponse<{ success: boolean }>>(`/notifications/${notifId}/read`, {
       req,
       method: 'PATCH',
     });
@@ -88,17 +96,17 @@ export const notificationService = {
   /**
    * Đánh dấu đã đọc tất cả thông báo
    */
-  async markAllAsRead(options?: { req?: any }): Promise<any> {
+  async markAllAsRead(options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean }>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
       mockNotifications.forEach(n => { n.isRead = true; });
-      return { success: true };
+      return { data: { success: true } };
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
-    return serverFetch('/notifications/read-all', {
+    return serverFetch<ApiResponse<{ success: boolean }>>('/notifications/read-all', {
       req,
       method: 'PATCH',
     });

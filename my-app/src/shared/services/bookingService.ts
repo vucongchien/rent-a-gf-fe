@@ -1,6 +1,6 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { mockBookings } from '@/mocks/fixtures/data';
-import type { Booking, CreateBookingBody, CreateBookingResult } from '@/shared/types';
+import type { Booking, CreateBookingBody, CreateBookingResult, ServiceRequestOptions, ApiResponse } from '@/shared/types';
 import { cookies } from 'next/headers';
 
 // Helper tự động lấy cookie header từ next/headers nếu không truyền req từ Route Handler
@@ -27,8 +27,7 @@ export const bookingService = {
   /**
    * Lấy danh sách booking của user hiện tại
    */
-  async getBookings(options?: {
-    req?: any;
+  async getBookings(options?: ServiceRequestOptions & {
     searchParams?: URLSearchParams;
   }): Promise<{
     items: Booking[];
@@ -73,7 +72,7 @@ export const bookingService = {
   /**
    * Lấy chi tiết một lịch hẹn
    */
-  async getBookingDetail(bookingId: string, options?: { req?: any }): Promise<Booking | null> {
+  async getBookingDetail(bookingId: string, options?: ServiceRequestOptions): Promise<Booking | null> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
@@ -95,7 +94,7 @@ export const bookingService = {
   /**
    * Tạo lịch hẹn mới
    */
-  async createBooking(body: CreateBookingBody, options?: { req?: any }): Promise<CreateBookingResult> {
+  async createBooking(body: CreateBookingBody, options?: ServiceRequestOptions): Promise<CreateBookingResult> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
@@ -131,16 +130,16 @@ export const bookingService = {
   /**
    * Chấp nhận đặt lịch (cho Companion)
    */
-  async acceptBooking(bookingId: string, options?: { req?: any }): Promise<any> {
+  async acceptBooking(bookingId: string, options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean; status: string }>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      return { success: true, status: 'ACCEPTED' };
+      return { data: { success: true, status: 'ACCEPTED' } };
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
-    return serverFetch(`/bookings/${bookingId}/accept`, {
+    return serverFetch<ApiResponse<{ success: boolean; status: string }>>(`/bookings/${bookingId}/accept`, {
       req,
       method: 'PATCH',
     });
@@ -149,16 +148,16 @@ export const bookingService = {
   /**
    * Từ chối đặt lịch (cho Companion)
    */
-  async rejectBooking(bookingId: string, options?: { req?: any }): Promise<any> {
+  async rejectBooking(bookingId: string, options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean; status: string }>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      return { success: true, status: 'REJECTED' };
+      return { data: { success: true, status: 'REJECTED' } };
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
-    return serverFetch(`/bookings/${bookingId}/reject`, {
+    return serverFetch<ApiResponse<{ success: boolean; status: string }>>(`/bookings/${bookingId}/reject`, {
       req,
       method: 'PATCH',
     });
@@ -167,16 +166,16 @@ export const bookingService = {
   /**
    * Hủy đặt lịch (cho Client/Companion)
    */
-  async cancelBooking(bookingId: string, options?: { req?: any }): Promise<any> {
+  async cancelBooking(bookingId: string, options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean; status: string }>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      return { success: true, status: 'CANCELLED' };
+      return { data: { success: true, status: 'CANCELLED' } };
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
-    return serverFetch(`/bookings/${bookingId}/cancel`, {
+    return serverFetch<ApiResponse<{ success: boolean; status: string }>>(`/bookings/${bookingId}/cancel`, {
       req,
       method: 'PATCH',
     });

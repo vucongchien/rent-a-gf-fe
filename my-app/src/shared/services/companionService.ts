@@ -140,13 +140,13 @@ export const companionService = {
 
     if (isMock) {
       const items = mockCompanions;
-      const found = items.find(c => c.id === companionId);
+      const found = items.find(c => c.id === companionId) as CompanionDetail | undefined;
       if (!found) return null;
       
       const detail: CompanionDetail = {
         ...found,
-        bio: (found as any).bio || 'Đây là bio mặc định cho mock.',
-        scenarios: (found as any).scenarios || [],
+        bio: found.bio || 'Đây là bio mặc định cho mock.',
+        scenarios: found.scenarios || [],
       };
       
       return {

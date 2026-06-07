@@ -1,6 +1,6 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { mockWallet } from '@/mocks/fixtures/data';
-import type { Wallet, TopupResult, TopupStatus, ApiResponse } from '@/shared/types';
+import type { Wallet, TopupResult, TopupStatus, ApiResponse, ServiceRequestOptions } from '@/shared/types';
 import { cookies } from 'next/headers';
 
 async function getRequestCookieHeader(req?: { headers: { get(name: string): string | null } }) {
@@ -26,7 +26,7 @@ export const walletService = {
   /**
    * Lấy thông tin ví và lịch sử giao dịch
    */
-  async getWallet(options?: { req?: any }): Promise<ApiResponse<Wallet>> {
+  async getWallet(options?: ServiceRequestOptions): Promise<ApiResponse<Wallet>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
@@ -48,7 +48,7 @@ export const walletService = {
   /**
    * Khởi tạo nạp tiền qua VNPay
    */
-  async initiateTopup(body: { amountInCoin: number }, options?: { req?: any }): Promise<ApiResponse<TopupResult>> {
+  async initiateTopup(body: { amountInCoin: number }, options?: ServiceRequestOptions): Promise<ApiResponse<TopupResult>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
@@ -78,7 +78,7 @@ export const walletService = {
   /**
    * Poll trạng thái thanh toán VNPay
    */
-  async getTopupStatus(txId: string, options?: { req?: any }): Promise<ApiResponse<TopupStatus>> {
+  async getTopupStatus(txId: string, options?: ServiceRequestOptions): Promise<ApiResponse<TopupStatus>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {

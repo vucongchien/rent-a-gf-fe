@@ -1,6 +1,6 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { currentMockUser } from '@/mocks/fixtures/data';
-import type { User, ApiResponse } from '@/shared/types';
+import type { User, ApiResponse, ServiceRequestOptions } from '@/shared/types';
 import { cookies } from 'next/headers';
 
 async function getRequestCookieHeader(req?: { headers: { get(name: string): string | null } }) {
@@ -26,12 +26,12 @@ export const authService = {
   /**
    * Lấy thông tin user hiện tại từ session
    */
-  async getMe(options?: { req?: any }): Promise<ApiResponse<User>> {
+  async getMe(options?: ServiceRequestOptions): Promise<ApiResponse<User>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
       return {
-        data: currentMockUser as any,
+        data: currentMockUser as User,
       };
     }
 
@@ -48,17 +48,17 @@ export const authService = {
   /**
    * Đăng xuất khỏi hệ thống
    */
-  async logout(options?: { req?: any }): Promise<any> {
+  async logout(options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean }>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      return { success: true };
+      return { data: { success: true } };
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
     try {
-      return await serverFetch('/auth/logout', { req, method: 'POST' });
+      return await serverFetch<ApiResponse<{ success: boolean }>>('/auth/logout', { req, method: 'POST' });
     } catch (err) {
       console.error('[authService] Lỗi logout:', err);
       throw err;

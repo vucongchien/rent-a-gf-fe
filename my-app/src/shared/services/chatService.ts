@@ -1,6 +1,6 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { mockChatRooms, mockMessages } from '@/mocks/fixtures/data';
-import type { ChatRoom, ChatMessage, MessagePage, ApiResponse } from '@/shared/types';
+import type { ChatRoom, ChatMessage, MessagePage, ApiResponse, ServiceRequestOptions } from '@/shared/types';
 import { cookies } from 'next/headers';
 
 async function getRequestCookieHeader(req?: { headers: { get(name: string): string | null } }) {
@@ -26,11 +26,11 @@ export const chatService = {
   /**
    * Lấy danh sách phòng chat của user hiện tại
    */
-  async getChatRooms(options?: { req?: any }): Promise<ApiResponse<{ rooms: ChatRoom[] }>> {
+  async getChatRooms(options?: ServiceRequestOptions): Promise<ApiResponse<{ rooms: ChatRoom[] }>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      const rooms: ChatRoom[] = mockChatRooms.map((r: any) => ({
+      const rooms: ChatRoom[] = mockChatRooms.map((r) => ({
         id: r.id,
         bookingId: r.bookingId,
         companionId: r.bookingId === 'bk-1' ? 'comp-1' : 'comp-2',
@@ -61,7 +61,7 @@ export const chatService = {
    */
   async getChatMessages(
     roomId: string,
-    options?: { req?: any; searchParams?: URLSearchParams }
+    options?: ServiceRequestOptions & { searchParams?: URLSearchParams }
   ): Promise<{ data: MessagePage }> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
@@ -94,7 +94,7 @@ export const chatService = {
   async sendChatMessage(
     roomId: string,
     body: { content: string },
-    options?: { req?: any }
+    options?: ServiceRequestOptions
   ): Promise<{ data: ChatMessage }> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
@@ -111,7 +111,7 @@ export const chatService = {
       if (!mockMessages[roomId]) {
         mockMessages[roomId] = [];
       }
-      mockMessages[roomId].push(newMessage as any);
+      mockMessages[roomId].push(newMessage);
 
       return {
         data: newMessage,

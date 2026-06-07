@@ -3,6 +3,8 @@
 // Dùng cho MSW handlers trong development
 // ============================================================
 
+import type { User, ChatMessage } from '@/shared/types';
+
 // --- PINTEREST IMAGES ---
 export const MOCK_PINTEREST_IMAGES = [
   'https://i.pinimg.com/736x/4e/97/ae/4e97aec9a4a5b042060f478a5893419c.jpg',
@@ -62,7 +64,7 @@ export const mockUsers = {
   },
 }
 
-export let currentMockUser: typeof mockUsers[keyof typeof mockUsers] = mockUsers.client
+export let currentMockUser: User | null = mockUsers.client
 
 export function setMockUser(role: keyof typeof mockUsers) {
   currentMockUser = mockUsers[role]
@@ -634,10 +636,7 @@ export const mockChatRooms = rawChatRooms.map(r => {
   };
 });
 
-export const mockMessages: Record<string, Array<{
-  id: string; senderId: string; senderName: string;
-  content: string; sentAt: string; status: 'sent' | 'failed'
-}>> = {
+export const mockMessages: Record<string, ChatMessage[]> = {
   'room-bk-1': [
     { id: 'msg-1', senderId: 'u-comp-1', senderName: 'Nguyễn Thị Linh', content: 'Xin chào! Mình rất vui được gặp bạn 😊', sentAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(), status: 'sent' },
     { id: 'msg-2', senderId: 'u-client-1', senderName: 'Minh Khách', content: 'Chào Linh! Mình cũng vậy. Hẹn gặp bạn ngày mai nhé', sentAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(), status: 'sent' },

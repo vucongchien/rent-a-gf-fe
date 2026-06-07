@@ -43,3 +43,8 @@ export interface ApiErrorResponse {
   code: string
   message: string
 }
+
+/** Options truyền vào service từ Server Components / Route Handlers */
+export interface ServiceRequestOptions {
+  req?: { headers: { get(name: string): string | null } }
+}
