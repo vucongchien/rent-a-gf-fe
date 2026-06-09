@@ -109,4 +109,183 @@ export const CoinIcon: React.FC<IconProps> = ({ size = 16, className = '', ...pr
   </svg>
 );
 
+export const StarIcon: React.FC<IconProps & { fill?: string }> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`starGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fff9d6" />
+          <stop offset="60%" stopColor="#ffd3dc" />
+          <stop offset="100%" stopColor="#ffb6c1" />
+        </linearGradient>
+      </defs>
+      {/* Watercolor color wash */}
+      <path
+        d="M12 3.3c.5 2 2 3.8 4.6 4.2-2 1.2-2.3 3.5-2.8 5.8-.7-2-1.8-2.6-4.2-3.1 2.1-.8 2.5-3.5 2.8-5.4z"
+        fill={`url(#starGrad-${gradId})`}
+        opacity="0.95"
+      />
+      {/* Sketchy brown ink outline */}
+      <path
+        d="M12 2.5 C12.8 5.5 15.5 6.5 19 7 C16 9 15.5 12.5 17 16 C14 14.5 10 14.5 7 16 C8.5 12.5 8 9 5 7 C8.5 6.5 11.2 5.5 12 2.5 Z"
+        fill="none"
+        stroke="#5c4a42"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* White painted highlight */}
+      <ellipse cx="10" cy="7.5" rx="0.8" ry="1.2" transform="rotate(-30 10 7.5)" fill="#ffffff" opacity="0.85" />
+    </svg>
+  );
+};
+
+export const MapPinIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`pinGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#c5f0e3" />
+          <stop offset="100%" stopColor="#ffd5e1" />
+        </linearGradient>
+      </defs>
+      {/* Color Wash */}
+      <path
+        d="M11.8 3.2 C7.2 3.2 3.8 6.8 3.8 11.2 C3.8 15 7.5 18.5 11.8 20.2 C16 18.5 19.5 15 19.5 11.2 C19.5 6.8 16.2 3.2 11.8 3.2 Z"
+        fill={`url(#pinGrad-${gradId})`}
+        opacity="0.9"
+      />
+      {/* Outline */}
+      <path
+        d="M12 2.5 C6.8 2.5 3 6.3 3 11.5 C3 16 7.5 19.8 12 21.8 C16.5 19.8 21 16 21 11.5 C21 6.3 17.2 2.5 12 2.5 Z"
+        fill="none"
+        stroke="#5c4a42"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Center dot */}
+      <circle cx="12" cy="11" r="2.8" fill="#5c4a42" opacity="0.85" />
+      {/* Glossy highlight */}
+      <circle cx="9" cy="7.2" r="1" fill="#ffffff" opacity="0.8" />
+    </svg>
+  );
+};
+
+export const ClockIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`clockGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#d2ebf7" />
+          <stop offset="100%" stopColor="#fadfe5" />
+        </linearGradient>
+      </defs>
+      {/* Color Wash */}
+      <circle cx="12.2" cy="12.2" r="8.2" fill={`url(#clockGrad-${gradId})`} opacity="0.9" />
+      {/* Outline */}
+      <circle cx="12" cy="12" r="9" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Hands */}
+      <circle cx="12" cy="12" r="1.8" fill="#5c4a42" />
+      <path d="M12 12 L12 7.5" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 12 L15 14" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
+      {/* Highlight */}
+      <ellipse cx="8.5" cy="8.5" rx="0.8" ry="1.2" transform="rotate(-30 8.5 8.5)" fill="#ffffff" opacity="0.8" />
+    </svg>
+  );
+};
+
+export const CalendarIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`calGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fffcee" />
+          <stop offset="100%" stopColor="#ffcbd6" />
+        </linearGradient>
+      </defs>
+      {/* Color Wash */}
+      <rect x="3.2" y="5.2" width="17.6" height="14.6" rx="3.5" ry="3.5" fill={`url(#calGrad-${gradId})`} opacity="0.9" />
+      {/* Outline */}
+      <rect x="3" y="5" width="18" height="15" rx="4" ry="4" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 10 L21 10" stroke="#5c4a42" strokeWidth="1.8" />
+      {/* Binders */}
+      <path d="M8 2.5 L8 6.5" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
+      <path d="M16 2.5 L16 6.5" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
+      {/* Days */}
+      <circle cx="8" cy="14" r="1" fill="#5c4a42" />
+      <circle cx="12" cy="14" r="1" fill="#5c4a42" />
+      <circle cx="16" cy="14" r="1" fill="#5c4a42" />
+      <circle cx="8" cy="17" r="1" fill="#5c4a42" />
+      <circle cx="12" cy="17" r="1" fill="#5c4a42" />
+      <circle cx="16" cy="17" r="1" fill="#5c4a42" />
+      {/* Highlight */}
+      <ellipse cx="6" cy="7.5" rx="0.6" ry="1" fill="#ffffff" opacity="0.8" />
+    </svg>
+  );
+};
+
+export const InfoIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`infoGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fef9e7" />
+          <stop offset="100%" stopColor="#ffdcc7" />
+        </linearGradient>
+      </defs>
+      {/* Color Wash */}
+      <circle cx="12.2" cy="12.2" r="8.2" fill={`url(#infoGrad-${gradId})`} opacity="0.9" />
+      {/* Outline */}
+      <circle cx="12" cy="12" r="9" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Letter i */}
+      <path d="M12 11.5 L12 16" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="8" r="1.2" fill="#5c4a42" />
+      {/* Highlight */}
+      <ellipse cx="8.5" cy="8.5" rx="0.8" ry="1.2" transform="rotate(-30 8.5 8.5)" fill="#ffffff" opacity="0.8" />
+    </svg>
+  );
+};
+
+export const CheckIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`checkGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ebf7ce" />
+          <stop offset="100%" stopColor="#b5e8b0" />
+        </linearGradient>
+      </defs>
+      {/* Color wash */}
+      <path
+        d="M4 12.5 C6.5 14.5 9 17.5 9 17.5 C9 17.5 15.5 10.5 19 6.5"
+        fill="none"
+        stroke={`url(#checkGrad-${gradId})`}
+        strokeWidth="6.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.85"
+      />
+      {/* Ink Outline */}
+      <path
+        d="M4.5 12.5 L9.5 17.5 L19.5 6.5"
+        fill="none"
+        stroke="#5c4a42"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Highlight */}
+      <circle cx="17.2" cy="8" r="0.8" fill="#ffffff" opacity="0.8" />
+    </svg>
+  );
+};
+
+
 
