@@ -81,7 +81,7 @@ const rawCompanions = [
     city: 'TP.HCM',
     ratingAvg: 4.8,
     reviewCount: 23,
-    voiceIntroUrl: null,
+    voiceIntroUrl: 'https://www.w3schools.com/html/horse.mp3',
     albumUrls: [
       'https://i.pravatar.cc/600?u=comp-1a',
       'https://i.pravatar.cc/600?u=comp-1b',

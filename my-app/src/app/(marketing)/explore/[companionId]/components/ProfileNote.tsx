@@ -72,17 +72,6 @@ export function ProfileNote({ companion }: { companion: CompanionDetail }) {
               </div>
             </div>
           </div>
-
-          {/* Voice button intro */}
-          {companion.voiceIntroUrl && (
-            <div className="sm:shrink-0">
-              <VoiceButton 
-                soundUrl={companion.voiceIntroUrl} 
-                label="Nghe giới thiệu" 
-                size="default" 
-              />
-            </div>
-          )}
         </div>
       </div>
 
@@ -119,11 +108,18 @@ export function ProfileNote({ companion }: { companion: CompanionDetail }) {
         </div>
       )}
 
-      {/* CTA Button Link to scenarios */}
       <div className="pt-6 border-t border-neutral-100/60 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-xs text-neutral-400 font-sans text-center sm:text-left">
-          Đảm bảo an toàn 100% · Kano-Coin
-        </div>
+        {companion.voiceIntroUrl ? (
+          <VoiceButton 
+            soundUrl={companion.voiceIntroUrl} 
+            label="Nghe giới thiệu" 
+            size="default" 
+          />
+        ) : (
+          <div className="text-xs text-neutral-400 font-sans text-center sm:text-left">
+            Đảm bảo an toàn 100% · Kano-Coin
+          </div>
+        )}
         <ScrollToScenesButton />
       </div>
     </div>
