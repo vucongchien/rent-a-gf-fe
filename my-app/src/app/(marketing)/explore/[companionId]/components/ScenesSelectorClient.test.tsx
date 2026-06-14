@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { ScenesSelectorClient } from './ScenesSelectorClient'
 
@@ -15,6 +15,19 @@ vi.mock('next/link', () => ({
   default: ({ href, children, ...props }: { href: string; children: React.ReactNode; [key: string]: unknown }) => (
     <a href={href} {...props}>{children}</a>
   ),
+}))
+
+// Mock BookingModal để tránh crash do thiếu Providers trong component con
+vi.mock('./BookingModal', () => ({
+  BookingModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+    if (!isOpen) return null
+    return (
+      <div data-testid="mock-booking-modal">
+        Mock Booking Modal
+        <button onClick={onClose}>Close</button>
+      </div>
+    )
+  }
 }))
 
 const mockScenarios = [
@@ -65,15 +78,28 @@ describe('ScenesSelectorClient', () => {
     expect(screen.getByText(/300 Coin/i)).toBeInTheDocument()
   })
 
-  it('renders booking buttons with correct URLs inside cards', () => {
+  it('renders booking buttons and opens/closes modal on click', () => {
     render(<ScenesSelectorClient {...defaultProps} />)
 
-    // Tìm tất cả các link
-    const bookingLinks = screen.getAllByRole('link', { name: /Đặt hẹn với Mochi/i })
-    expect(bookingLinks.length).toBe(2)
+    // Tìm tất cả các button đặt hẹn
+    const bookingButtons = screen.getAllByRole('button', { name: /Đặt hẹn với Mochi/i })
+    expect(bookingButtons.length).toBe(2)
 
-    // Kiểm tra URL tương ứng của từng nút
-    expect(bookingLinks[0]).toHaveAttribute('href', '/explore/comp-1/booking?scenarioId=sc-1')
-    expect(bookingLinks[1]).toHaveAttribute('href', '/explore/comp-1/booking?scenarioId=sc-2')
+    // Đảm bảo ban đầu modal đóng (không tồn tại trong DOM)
+    expect(screen.queryByTestId('mock-booking-modal')).not.toBeInTheDocument()
+
+    // Click button đầu tiên để mở modal
+    fireEvent.click(bookingButtons[0])
+
+    // Đảm bảo modal đã được mở
+    expect(screen.getByTestId('mock-booking-modal')).toBeInTheDocument()
+    expect(screen.getByText('Mock Booking Modal')).toBeInTheDocument()
+
+    // Click nút Close trong mock modal để đóng
+    const closeBtn = screen.getByRole('button', { name: /close/i })
+    fireEvent.click(closeBtn)
+
+    // Đảm bảo modal đã được đóng (biến mất khỏi DOM)
+    expect(screen.queryByTestId('mock-booking-modal')).not.toBeInTheDocument()
   })
 })

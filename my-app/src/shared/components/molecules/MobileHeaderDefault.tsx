@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { MenuIcon, SearchIcon } from '../atoms/Icons';
 import { Button } from '../atoms/Button';

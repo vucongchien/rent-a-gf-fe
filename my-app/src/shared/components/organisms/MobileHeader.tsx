@@ -8,7 +8,7 @@ export const MobileHeader: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <header className="md:hidden relative h-[52px] flex items-center overflow-hidden">
+    <header className="md:hidden w-full relative h-[52px] flex items-center overflow-hidden">
       {/* Giao diện mặc định */}
       <MobileHeaderDefault onSearchTrigger={() => setSearchOpen(true)} />
 

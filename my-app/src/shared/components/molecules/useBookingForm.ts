@@ -2,10 +2,10 @@
 
 import { useActionState, useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { createBookingAction } from '@/app/(marketing)/explore/[companionId]/booking/actions'
+import { createBookingAction } from '@/app/(marketing)/explore/[companionId]/actions'
 import { useWallet } from '@/shared/contexts/WalletContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
-import type { BookingActionState } from '@/app/(marketing)/explore/[companionId]/booking/types'
+import type { BookingActionState } from '@/app/(marketing)/explore/[companionId]/types'
 
 const IS_MOCK = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true'
 
@@ -32,7 +32,7 @@ export function formatLocalDatetime(date: Date): string {
 }
 
 export function useBookingForm(props: UseBookingFormProps) {
-  const { companionId, priceInCoin, scenarioId } = props
+  const { companionId, scenarioId } = props
   const router = useRouter()
   const { balance, open: openWallet, fetchWallet } = useWallet()
   const { user, login } = useAuth()
@@ -67,10 +67,15 @@ export function useBookingForm(props: UseBookingFormProps) {
   }, [state.status, fetchWallet])
 
   // Giá trị tối thiểu cho input datetime-local: Hiện tại + 1 tiếng (local time)
-  const getMinDatetimeLocal = () => {
-    const oneHourLater = new Date(Date.now() + 3600 * 1000)
-    return formatLocalDatetime(oneHourLater)
-  }
+  const [minDatetimeLocal, setMinDatetimeLocal] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const oneHourLater = new Date(Date.now() + 3600 * 1000)
+      setMinDatetimeLocal(formatLocalDatetime(oneHourLater))
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Chuyển sang bước 2 (đối soát ví & xác nhận)
   const handleNextStep = () => {
@@ -153,7 +158,7 @@ export function useBookingForm(props: UseBookingFormProps) {
     openWallet,
     user,
     login,
-    minDatetimeLocal: getMinDatetimeLocal(),
+    minDatetimeLocal,
     router,
   }
 }

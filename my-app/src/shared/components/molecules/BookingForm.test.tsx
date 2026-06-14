@@ -35,8 +35,9 @@ vi.mock('@/shared/contexts/AuthContext', () => ({
 // Mock Server Action
 let mockActionStatus: 'idle' | 'success' | 'error' = 'idle'
 let mockActionMessage = ''
-vi.mock('@/app/(marketing)/explore/[companionId]/booking/actions', () => ({
-  createBookingAction: vi.fn(async (prevState: any, formData: FormData) => {
+vi.mock('@/app/(marketing)/explore/[companionId]/actions', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  createBookingAction: vi.fn(async (_prevState: unknown, _formData: FormData) => {
     if (mockActionStatus === 'success') {
       return { status: 'success' }
     }

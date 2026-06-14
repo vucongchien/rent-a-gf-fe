@@ -18,7 +18,7 @@ function DesignSystemContent() {
   const [isLikedDemo, setIsLikedDemo] = React.useState(false);
   const [isLikedDemoUncontrolled, setIsLikedDemoUncontrolled] = React.useState(false);
   
-  const { balance, topup, fetchWallet } = useWallet();
+  const { balance, topup } = useWallet();
   const { user, login, logout } = useAuth();
 
   const handleShowToast = () => {

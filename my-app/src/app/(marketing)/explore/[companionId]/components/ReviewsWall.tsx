@@ -32,7 +32,7 @@ function ReviewCard({ review }: { review: CompanionReview }) {
         </div>
       </div>
       <p className="text-sm text-neutral-600 leading-relaxed italic font-medium">
-        "{review.comment}"
+        {"\""}{review.comment}{"\""}
       </p>
       <div className="text-xs text-neutral-400 font-mono mt-3 pt-2.5 border-t border-neutral-100/60 flex justify-between items-center">
         <span>Đã xác thực hẹn hò</span>

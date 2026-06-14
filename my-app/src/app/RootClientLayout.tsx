@@ -7,7 +7,6 @@ import { WalletProvider } from '@/shared/contexts/WalletContext';
 import { SidebarProvider } from '@/shared/contexts/SidebarContext';
 import { MobileSidebar } from '@/shared/components/organisms/MobileSidebar';
 import { WalletModal } from '@/shared/components/organisms/WalletModal';
-import { SiteHeader } from '@/shared/components/organisms/SiteHeader';
 import type { User } from '@/shared/types';
 
 interface RootClientLayoutProps {
@@ -22,6 +21,7 @@ export function RootClientLayout({ children, initialUser }: RootClientLayoutProp
         <WalletProvider>
           <SidebarProvider>
             <WalletModal />
+            <MobileSidebar />
             {children}
           </SidebarProvider>
         </WalletProvider>

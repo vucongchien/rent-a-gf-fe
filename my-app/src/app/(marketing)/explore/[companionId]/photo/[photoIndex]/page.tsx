@@ -41,7 +41,7 @@ export default async function StandalonePhotoPage({ params }: StandalonePhotoPag
           className="inline-flex items-center gap-2 font-sans font-bold text-sm text-neutral-400 hover:text-white px-4 py-2 border-2 border-neutral-800 bg-neutral-900 rounded-[12px] shadow-[2px_2px_0_rgba(255,255,255,0.1)] transition-all"
         >
           <ChevronRightIcon size={16} className="rotate-180 stroke-[2.5px]" />
-          Back to {companion.displayName}'s Profile
+          Back to {companion.displayName}&apos;s Profile
         </Link>
       </header>
 

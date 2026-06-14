@@ -1,16 +1,17 @@
 'use client'
 
-import Link from 'next/link'
+import React, { useState } from 'react'
 import { ClockIcon, CoinIcon, CalendarIcon } from '@/shared/components/atoms/Icons'
 import type { CompanionScenario } from '@/shared/types'
+import { BookingModal } from './BookingModal'
 
 interface SceneCardProps {
-  companionId: string
   companionName: string
   sc: CompanionScenario
+  onSelect: (scenario: CompanionScenario) => void
 }
 
-function SceneCard({ companionId, companionName, sc }: SceneCardProps) {
+function SceneCard({ companionName, sc, onSelect }: SceneCardProps) {
   return (
     <article
       id={`scene-${sc.id}`}
@@ -48,13 +49,12 @@ function SceneCard({ companionId, companionName, sc }: SceneCardProps) {
       </div>
 
       <div className="pt-3.5">
-        <Link
-          href={`/explore/${companionId}/booking?scenarioId=${sc.id}`}
-          scroll={false}
-          className="btn-base btn-primary btn-md rounded-full w-full justify-center whitespace-nowrap text-xs font-semibold"
+        <button
+          onClick={() => onSelect(sc)}
+          className="btn-base btn-primary btn-md rounded-full w-full justify-center whitespace-nowrap text-xs font-semibold cursor-pointer"
         >
           Đặt hẹn với {companionName} ♡
-        </Link>
+        </button>
       </div>
     </article>
   )
@@ -71,6 +71,9 @@ export function ScenesSelectorClient({
   companionName,
   scenarios,
 }: ScenesSelectorClientProps) {
+  const [isBookingOpen, setIsBookingOpen] = useState(false)
+  const [selectedScenario, setSelectedScenario] = useState<CompanionScenario | null>(null)
+
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-4 mb-4">
@@ -89,12 +92,28 @@ export function ScenesSelectorClient({
         {scenarios.filter(s => s.isActive).map((sc) => (
           <SceneCard 
             key={sc.id} 
-            companionId={companionId}
             companionName={companionName}
             sc={sc} 
+            onSelect={(selected) => {
+              setSelectedScenario(selected)
+              setIsBookingOpen(true)
+            }}
           />
         ))}
       </div>
+
+      {selectedScenario && (
+        <BookingModal
+          isOpen={isBookingOpen}
+          onClose={() => {
+            setIsBookingOpen(false)
+            setSelectedScenario(null)
+          }}
+          companionId={companionId}
+          companionName={companionName}
+          scenario={selectedScenario}
+        />
+      )}
     </div>
   )
 }

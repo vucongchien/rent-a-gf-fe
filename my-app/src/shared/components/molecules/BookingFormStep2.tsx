@@ -3,6 +3,7 @@
 import { useFormStatus } from 'react-dom'
 import { CoinIcon, SpinnerIcon } from '@/shared/components/atoms/Icons'
 import { Button } from '@/shared/components/atoms/Button'
+import type { User } from '@/shared/contexts/AuthContext'
 
 export interface BookingFormStep2Props {
   companionName: string
@@ -10,7 +11,7 @@ export interface BookingFormStep2Props {
   priceInCoin: number
   scheduledAt: string
   balance: number
-  user: any // Kiểu từ AuthContext
+  user: User | null // Kiểu từ AuthContext
   isPending: boolean
   login: (provider: 'client') => void
   openWallet: () => void

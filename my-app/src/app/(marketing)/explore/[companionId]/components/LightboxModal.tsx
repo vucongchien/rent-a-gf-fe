@@ -26,13 +26,14 @@ export const LightboxModal: React.FC<LightboxModalProps> = ({
   const router = useRouter();
   const modalRef = React.useRef<HTMLDivElement>(null);
 
-  // Quản lý index hiện tại bằng client state
+  // Quản lý index hiện tại bằng client state và đồng bộ khi prop photoIndex thay đổi
+  const [prevPhotoIndex, setPrevPhotoIndex] = React.useState(photoIndex);
   const [currentIndex, setCurrentIndex] = React.useState(photoIndex);
 
-  // Cập nhật currentIndex khi photoIndex từ props thay đổi
-  React.useEffect(() => {
+  if (photoIndex !== prevPhotoIndex) {
+    setPrevPhotoIndex(photoIndex);
     setCurrentIndex(photoIndex);
-  }, [photoIndex]);
+  }
 
   const activeUrl = albumUrls[currentIndex] || "/placeholder.png";
   const hasPrev = currentIndex > 0;
