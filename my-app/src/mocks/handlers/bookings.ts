@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from 'msw'
-import { mockBookings, companions } from '../fixtures/data'
+import { mockBookings, companions, mockWallet } from '../fixtures/data'
 
 // State mutable cho booking CRUD
 const bookings = [...mockBookings]
@@ -68,7 +68,24 @@ export const bookingHandlers = [
     const body = await request.json() as Parameters<typeof createBooking>[0]
     const newBooking = createBooking(body)
     bookings.unshift(newBooking)
-    return HttpResponse.json({ data: { id: newBooking.id, status: 'PENDING', frozenCoin: newBooking.priceInCoin } }, { status: 201 })
+
+    // Trừ coin khỏi ví mock (escrow/freeze)
+    const price = newBooking.priceInCoin
+    mockWallet.balance = Math.max(0, mockWallet.balance - price)
+    mockWallet.frozenBalance = (mockWallet.frozenBalance || 0) + price
+    mockWallet.transactions.unshift({
+      id: `tx-booking-${newBooking.id}`,
+      label: `Đặt lịch · ${newBooking.scenarioName}`,
+      amountInCoin: -price,
+      type: 'debit',
+      status: 'frozen',
+      createdAt: new Date().toISOString(),
+    })
+
+    return HttpResponse.json(
+      { data: { bookingId: newBooking.id, status: 'PENDING', frozenCoin: price } },
+      { status: 201 }
+    )
   }),
 
   // PATCH /api/bookings/:id/cancel

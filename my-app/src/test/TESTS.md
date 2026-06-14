@@ -35,3 +35,11 @@ Dự án sử dụng `vitest` kết hợp với `@testing-library/react`.
 | Tên Page | File Test | Ý nghĩa kiểm thử |
 |---|---|---|
 | **ExplorePage** | `src/app/(marketing)/explore/page.test.tsx` | Integration testing mô phỏng thao tác fetch companions lúc mounted, click trên FilterChip có cập nhật URL params và làm mới grid chính xác theo cơ chế MSW. |
+
+### Companion Detail Page Components (Phases 5, 6, 7, 8)
+| Tên Component | File Test | Ý nghĩa kiểm thử |
+|---|---|---|
+| **ScenesSelectorClient** | `src/app/(marketing)/explore/[companionId]/components/ScenesSelectorClient.test.tsx` | Đảm bảo hiển thị đúng tất cả các kịch bản hẹn hò, thời lượng, chi phí Kano-Coin, và link Đặt lịch với companion. |
+| **PolaroidGallery** | `src/app/(marketing)/explore/[companionId]/components/PolaroidGallery.test.tsx` | Kiểm tra render ảnh chính, các ảnh thu nhỏ thumbnail dưới dạng khung Polaroid, xử lý fallback ảnh trống. |
+| **ProfileNote** | `src/app/(marketing)/explore/[companionId]/components/ProfileNote.test.tsx` | Kiểm tra render chi tiết bio, rating, reviews, thành phố, các tags đặc trưng, nút phát audio giới thiệu VoiceButton, và nút CTA cuộn trang `#scenes`. |
+| **ReviewsWall** | `src/app/(marketing)/explore/[companionId]/components/ReviewsWall.test.tsx` | Kiểm tra render danh sách reviews của bạn gái dưới dạng masonry, hiển thị thông tin rating trung bình, avatar, nội dung đánh giá và trạng thái rỗng. |

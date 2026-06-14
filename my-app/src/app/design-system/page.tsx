@@ -8,11 +8,18 @@ import { VoiceButton } from "@/shared/components/atoms/VoiceButton";
 import { LikeButton } from "@/shared/components/atoms/LikeButton";
 import { StatusBadge } from "@/shared/components/atoms/StatusBadge";
 import { ToastProvider, useToast } from "@/shared/components/atoms/ToastNotification";
+import { BookingForm } from "@/shared/components/molecules/BookingForm";
+import { ScenesSelectorClient } from "@/app/(marketing)/explore/[companionId]/components/ScenesSelectorClient";
+import { useWallet } from "@/shared/contexts/WalletContext";
+import { useAuth } from "@/shared/contexts/AuthContext";
 
 function DesignSystemContent() {
   const { toast } = useToast();
   const [isLikedDemo, setIsLikedDemo] = React.useState(false);
   const [isLikedDemoUncontrolled, setIsLikedDemoUncontrolled] = React.useState(false);
+  
+  const { balance, topup, fetchWallet } = useWallet();
+  const { user, login, logout } = useAuth();
 
   const handleShowToast = () => {
     toast({
@@ -318,10 +325,150 @@ function DesignSystemContent() {
           </div>
         </section>
 
+        {/* 6. Booking Form Interactive Test */}
+        <section className="space-y-6">
+          <div className="flex items-center space-x-3 border-b border-neutral-100 pb-3">
+            <span className="w-2.5 h-6 bg-rose-500 rounded-full"></span>
+            <Typography variant="h3" className="text-neutral-900 font-bold">
+              6. Demo Đặt Lịch Hẹn (Interactive Booking Form Test)
+            </Typography>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_350px] gap-8 items-start">
+            {/* Form Demo */}
+            <div className="bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm space-y-6">
+              <Typography variant="body2" font="mono" className="text-neutral-400 uppercase tracking-wider text-xs mb-4">
+                Interactive Booking Form (Step 1 &rarr; Step 2)
+              </Typography>
+              
+              <div className="max-w-md mx-auto p-8 rounded-2xl bg-[--color-cream] shadow-[0_6px_18px_rgba(74,54,30,0.12)] border border-neutral-100/50">
+                <BookingForm
+                  companionId="comp-demo"
+                  companionName="Chizuru Ichinose"
+                  scenarioId="sc-demo"
+                  scenarioName="Hẹn hò công viên hoàng hôn 🌅"
+                  priceInCoin={150}
+                  durationMinutes={60}
+                />
+              </div>
+            </div>
+
+            {/* Wallet & Auth Control Panel */}
+            <div className="bg-neutral-50 p-6 rounded-3xl border border-neutral-100 space-y-6">
+              <Typography variant="body2" font="mono" className="text-neutral-700 font-bold uppercase tracking-wider text-xs">
+                ⚙️ Bảng điều khiển Mock (Test Tool)
+              </Typography>
+
+              {/* Wallet Info */}
+              <div className="space-y-3 bg-white p-4 rounded-2xl border border-neutral-100 shadow-sm">
+                <h4 className="font-sans font-bold text-xs text-neutral-500">THÔNG TIN VÍ TIỀN</h4>
+                <div className="flex justify-between text-sm">
+                  <span>Số dư:</span>
+                  <span className="font-bold text-brand">{balance} Coin</span>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="w-full text-xs py-1" onClick={() => topup(100)}>
+                    +100 Coin
+                  </Button>
+                  <Button variant="outline" size="sm" className="w-full text-xs py-1" onClick={() => topup(500)}>
+                    +500 Coin
+                  </Button>
+                </div>
+              </div>
+
+              {/* Auth Info */}
+              <div className="space-y-3 bg-white p-4 rounded-2xl border border-neutral-100 shadow-sm">
+                <h4 className="font-sans font-bold text-xs text-neutral-500">THÔNG TIN TÀI KHOẢN</h4>
+                <div className="text-sm">
+                  {user ? (
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>User:</span>
+                        <span className="font-bold text-neutral-800">{user.displayName}</span>
+                      </div>
+                      <Button variant="ghost" size="sm" className="w-full text-xs text-rose-500" onClick={() => logout()}>
+                        Đăng xuất (Logout)
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="text-neutral-400 italic text-xs">Chưa đăng nhập tài khoản</div>
+                      <Button variant="primary" size="sm" className="w-full text-xs" onClick={() => login('client')}>
+                        Đăng nhập (Google OAuth)
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="text-[11px] text-neutral-400 leading-relaxed bg-neutral-100/50 p-3 rounded-xl border border-dashed border-neutral-200">
+                💡 <b>Mẹo test:</b> Hãy nạp thử Coin hoặc Đăng xuất để xem Booking Form tự động thay đổi giao diện ở bước 2 dựa theo trạng thái tài khoản của bạn.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 7. Scenes Selector Interactive Test */}
+        <section className="space-y-6 pb-24">
+          <div className="flex items-center space-x-3 border-b border-neutral-100 pb-3">
+            <span className="w-2.5 h-6 bg-teal-500 rounded-full"></span>
+            <Typography variant="h3" className="text-neutral-900 font-bold">
+              7. Demo Bộ Chọn Kịch Bản (ScenesSelectorClient Test)
+            </Typography>
+          </div>
+
+          <div className="bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm space-y-6">
+            <Typography variant="body2" font="mono" className="text-neutral-400 uppercase tracking-wider text-xs mb-4">
+              Interactive Scenes Selector (Click chọn kịch bản để thấy BookingBar ở dưới)
+            </Typography>
+            
+            <div className="p-6 rounded-3xl bg-[--color-cream] border border-neutral-100/50">
+              <ScenesSelectorClient
+                companionId="comp-demo"
+                companionName="Chizuru Ichinose"
+                scenarios={mockScenariosForDemo}
+              />
+            </div>
+          </div>
+        </section>
+
       </div>
     </div>
   );
 }
+
+const mockScenariosForDemo = [
+  {
+    id: "sc-ds-1",
+    name: "Cà phê buổi sáng yên tĩnh ☕",
+    description: "Nhâm nhi tách cà phê thơm và cùng nhau trò chuyện về sở thích của cả hai.",
+    durationMinutes: 60,
+    priceInCoin: 100,
+    location: "Khu Thảo Điền, Quận 2",
+    isActive: true,
+    isFeatured: false,
+  },
+  {
+    id: "sc-ds-2",
+    name: "Dạo quanh Hồ Gươm chiều thu 🍂",
+    description: "Cùng đi dạo dưới làn gió thu dịu mát, ngắm nhìn tháp Rùa và thưởng thức kem Tràng Tiền.",
+    durationMinutes: 120,
+    priceInCoin: 250,
+    location: "Hoàn Kiếm, Hà Nội",
+    isActive: true,
+    isFeatured: true,
+  },
+  {
+    id: "sc-ds-3",
+    name: "Hẹn hò rạp chiếu phim lãng mạn 🍿",
+    description: "Cùng xem một bộ phim tình cảm hot nhất, chia sẻ hộp bắp rang bơ ngọt ngào.",
+    durationMinutes: 150,
+    priceInCoin: 350,
+    location: "CGV Vincom Landmark 81",
+    isActive: true,
+    isFeatured: false,
+  }
+];
 
 export default function DesignSystemPage() {
   return (

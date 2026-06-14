@@ -15,6 +15,7 @@ export interface Companion {
   voiceIntroUrl: string | null
   featuredScenario: CompanionScenarioSummary | null
   metadata: string[]
+  albumUrls: string[]
 }
 
 /** Scenario tóm tắt hiển thị trên card */
@@ -31,6 +32,17 @@ export interface CompanionScenario {
   durationMinutes: number
   priceInCoin: number
   location: string
+  isActive: boolean
+  isFeatured: boolean
+}
+
+/** Review của khách hàng */
+export interface CompanionReview {
+  id: string
+  authorName: string
+  rating: number
+  comment: string
+  postedAt: string
 }
 
 /** Companion chi tiết (detail page) */
@@ -38,4 +50,5 @@ export interface CompanionDetail extends Companion {
   bio: string
   scenarios: CompanionScenario[]
   reviewCount: number
+  recentReviews?: CompanionReview[]
 }

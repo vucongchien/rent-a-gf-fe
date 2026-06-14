@@ -91,7 +91,11 @@ const rawCompanions = [
       { id: 'sc-1-2', name: 'Dạo phố Sài Gòn', description: 'Khám phá các con phố đẹp cùng nhau', durationMinutes: 120, priceInCoin: 300, location: 'Bến Nhà Rồng, TP.HCM', isActive: true, isFeatured: false },
     ],
     recentReviews: [
-      { id: 'rv-1', authorName: 'Minh K.', authorAvatarUrl: 'https://i.pravatar.cc/50?u=rv1', rating: 5, comment: 'Rất thân thiện và vui tính!', postedAt: '2 ngày trước', isHidden: false },
+      { id: 'rv-1', authorName: 'Minh K.', authorAvatarUrl: 'https://i.pravatar.cc/50?u=rv1', rating: 5, comment: 'Rất thân thiện và vui tính! Linh nói chuyện rất có duyên, cả buổi cà phê trôi qua nhanh không ngờ. Sẽ đặt lịch lại lần sau!', postedAt: '2 ngày trước', isHidden: false },
+      { id: 'rv-2', authorName: 'Tuấn A.', authorAvatarUrl: 'https://i.pravatar.cc/50?u=rv2', rating: 5, comment: 'Đúng giờ, lịch sự và rất biết cách tạo không khí thoải mái. Hẹn Linh ở quán cà phê view đẹp, ảnh check-in cũng ra xịn lắm 📸', postedAt: '5 ngày trước', isHidden: false },
+      { id: 'rv-3', authorName: 'Long H.', authorAvatarUrl: 'https://i.pravatar.cc/50?u=rv3', rating: 4, comment: 'Khá oke, buổi gặp gỡ nhẹ nhàng và thú vị. Linh nghe nhiều hơn nói, đúng kiểu mình cần sau tuần làm việc mệt mỏi.', postedAt: '1 tuần trước', isHidden: false },
+      { id: 'rv-4', authorName: 'Khoa B.', authorAvatarUrl: 'https://i.pravatar.cc/50?u=rv4', rating: 5, comment: 'Top!', postedAt: '2 tuần trước', isHidden: false },
+      { id: 'rv-5', authorName: 'Phú N.', authorAvatarUrl: 'https://i.pravatar.cc/50?u=rv5', rating: 4, comment: 'Linh khá dễ thương và hay cười. Mình hơi shy lúc đầu nhưng Linh chủ động mở chuyện rất tự nhiên, không gượng gạo chút nào. Trải nghiệm tốt hơn mong đợi!', postedAt: '3 tuần trước', isHidden: false },
     ],
     featuredScenario: { name: 'Cà phê & trò chuyện', priceInCoin: 150 },
     metadata: ['Sinh viên', '21 tuổi', 'Nữ'],

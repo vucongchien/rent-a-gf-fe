@@ -98,8 +98,12 @@ export const bookingService = {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
+      // NOTE: Không modify mockWallet ở đây - Server Action chạy trong Node.js,
+      // còn MSW (source of truth cho wallet) chạy trong Browser Service Worker.
+      // Đây là 2 process/module instance riêng biệt - mutation server-side vô nghĩa.
+      // Việc trừ coin được xử lý bởi MSW POST /api/bookings handler (browser-side).
       return {
-        id: `bk-${Math.floor(Math.random() * 1000)}`,
+        id: `bk-${Date.now()}`,
         status: 'PENDING',
         frozenCoin: 150,
       };

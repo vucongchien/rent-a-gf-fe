@@ -147,6 +147,11 @@ export const companionService = {
         ...found,
         bio: found.bio || 'Đây là bio mặc định cho mock.',
         scenarios: found.scenarios || [],
+        // BFF normalize: avatarUrl luôn là ảnh đầu của album
+        // → consistent với CompanionCard ở trang grid
+        albumUrls: found.avatarUrl
+          ? [found.avatarUrl, ...(found.albumUrls ?? []).filter(u => u !== found.avatarUrl)]
+          : (found.albumUrls ?? []),
       };
       
       return {

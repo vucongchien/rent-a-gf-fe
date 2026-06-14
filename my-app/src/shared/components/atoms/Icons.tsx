@@ -287,5 +287,99 @@ export const CheckIcon: React.FC<IconProps> = ({ size = 20, className = '', ...p
   );
 };
 
+export const NotebookIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`noteGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fff2e6" />
+          <stop offset="100%" stopColor="#ffd6e8" />
+        </linearGradient>
+      </defs>
+      <rect x="4.5" y="3.5" width="15" height="17" rx="3" fill={`url(#noteGrad-${gradId})`} opacity="0.9" />
+      <rect x="4" y="3" width="16" height="18" rx="3" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 6.5 h-2 M4 11.5 h-2 M4 16.5 h-2" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
+      <path d="M8 7 h8 M8 11 h8 M8 15 h8" stroke="#5c4a42" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
+      <path d="M12 12c.5-.5 1-.2 1 .3 0 .5-.7.9-1 .9-.3 0-1-.4-1-.9 0-.5.5-.8 1-.3z" fill="#ffb6c1" stroke="#5c4a42" strokeWidth="1" />
+      <ellipse cx="7" cy="5.5" rx="0.6" ry="1" fill="#ffffff" opacity="0.8" />
+    </svg>
+  );
+};
+
+export const GraduationIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`gradIcon-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#e3f2fd" />
+          <stop offset="100%" stopColor="#bbdefb" />
+        </linearGradient>
+      </defs>
+      <path d="M12 4 L21 8 L12 12 L3 8 Z" fill={`url(#gradIcon-${gradId})`} opacity="0.9" />
+      <path d="M12 4 L21 8 L12 12 L3 8 Z" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 10.5 V15.5 C6 17.5 8.7 19 12 19 C15.3 19 18 17.5 18 15.5 V10.5" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M21 8.5 V14.5" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="21" cy="14.5" r="1.5" fill="#ffd5e1" stroke="#5c4a42" strokeWidth="1" />
+    </svg>
+  );
+};
+
+export const CakeIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`cakeGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fff9db" />
+          <stop offset="100%" stopColor="#ffd8a8" />
+        </linearGradient>
+      </defs>
+      <rect x="4.2" y="11.2" width="15.6" height="8.6" rx="2" fill={`url(#cakeGrad-${gradId})`} opacity="0.9" />
+      <rect x="4" y="11" width="16" height="9" rx="2" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 7 V11 M12 6 V11 M16 7 V11" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="8" cy="5.5" r="1" fill="#ff922b" />
+      <circle cx="12" cy="4.5" r="1" fill="#ff922b" />
+      <circle cx="16" cy="5.5" r="1" fill="#ff922b" />
+    </svg>
+  );
+};
+
+export const GenderFemaleIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`femGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fff0f6" />
+          <stop offset="100%" stopColor="#ffdeeb" />
+        </linearGradient>
+      </defs>
+      <circle cx="12" cy="8.2" r="5.2" fill={`url(#femGrad-${gradId})`} opacity="0.9" />
+      <circle cx="12" cy="8" r="5.5" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 13.5 V21.5 M8.5 17.5 H15.5" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+};
+
+export const GenderMaleIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
+      <defs>
+        <linearGradient id={`maleGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#e3fafc" />
+          <stop offset="100%" stopColor="#c5f6fa" />
+        </linearGradient>
+      </defs>
+      <circle cx="9.2" cy="14.8" r="5.2" fill={`url(#maleGrad-${gradId})`} opacity="0.9" />
+      <circle cx="9" cy="15" r="5.5" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13.5 10.5 L19.5 4.5 M15 4.5 H19.5 V9" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+};
+
+
 
 
