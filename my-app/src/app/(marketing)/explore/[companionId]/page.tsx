@@ -81,6 +81,13 @@ export default async function CompanionDetailPage({ params }: PageProps) {
           </Suspense>
         </section>
 
+        {/* Bạn đồng hành liên quan */}
+        <section className="scroll-mt-6">
+          <Suspense fallback={<RelatedCompanionsSkeleton />}>
+            <RelatedCompanions currentId={companionId} city={companion.city} />
+          </Suspense>
+        </section>
+
         {/* Hỏi đáp FAQ */}
         <section className="space-y-6 pt-10 border-t border-neutral-200">
           <div className="space-y-2">
@@ -113,13 +120,6 @@ export default async function CompanionDetailPage({ params }: PageProps) {
               </p>
             </div>
           </div>
-        </section>
-
-        {/* Bạn đồng hành liên quan */}
-        <section className="scroll-mt-6">
-          <Suspense fallback={<RelatedCompanionsSkeleton />}>
-            <RelatedCompanions currentId={companionId} city={companion.city} />
-          </Suspense>
         </section>
 
       </main>
