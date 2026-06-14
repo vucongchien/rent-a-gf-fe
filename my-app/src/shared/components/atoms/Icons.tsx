@@ -115,9 +115,9 @@ export const StarIcon: React.FC<IconProps & { fill?: string }> = ({ size = 20, c
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`starGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#fff9d6" />
-          <stop offset="60%" stopColor="#ffd3dc" />
-          <stop offset="100%" stopColor="#ffb6c1" />
+          <stop offset="0%" stopColor="var(--color-icon-star-stop-1)" />
+          <stop offset="60%" stopColor="var(--color-icon-star-stop-2)" />
+          <stop offset="100%" stopColor="var(--color-chizuru-500)" />
         </linearGradient>
       </defs>
       {/* Watercolor color wash */}
@@ -130,7 +130,7 @@ export const StarIcon: React.FC<IconProps & { fill?: string }> = ({ size = 20, c
       <path
         d="M12 2.5 C12.8 5.5 15.5 6.5 19 7 C16 9 15.5 12.5 17 16 C14 14.5 10 14.5 7 16 C8.5 12.5 8 9 5 7 C8.5 6.5 11.2 5.5 12 2.5 Z"
         fill="none"
-        stroke="#5c4a42"
+        stroke="var(--color-sketch-outline)"
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -147,8 +147,8 @@ export const MapPinIcon: React.FC<IconProps> = ({ size = 20, className = '', ...
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`pinGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#c5f0e3" />
-          <stop offset="100%" stopColor="#ffd5e1" />
+          <stop offset="0%" stopColor="var(--color-icon-pin-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-pin-stop-2)" />
         </linearGradient>
       </defs>
       {/* Color Wash */}
@@ -161,13 +161,13 @@ export const MapPinIcon: React.FC<IconProps> = ({ size = 20, className = '', ...
       <path
         d="M12 2.5 C6.8 2.5 3 6.3 3 11.5 C3 16 7.5 19.8 12 21.8 C16.5 19.8 21 16 21 11.5 C21 6.3 17.2 2.5 12 2.5 Z"
         fill="none"
-        stroke="#5c4a42"
+        stroke="var(--color-sketch-outline)"
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       {/* Center dot */}
-      <circle cx="12" cy="11" r="2.8" fill="#5c4a42" opacity="0.85" />
+      <circle cx="12" cy="11" r="2.8" fill="var(--color-sketch-outline)" opacity="0.85" />
       {/* Glossy highlight */}
       <circle cx="9" cy="7.2" r="1" fill="#ffffff" opacity="0.8" />
     </svg>
@@ -180,18 +180,18 @@ export const ClockIcon: React.FC<IconProps> = ({ size = 20, className = '', ...p
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`clockGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#d2ebf7" />
-          <stop offset="100%" stopColor="#fadfe5" />
+          <stop offset="0%" stopColor="var(--color-icon-clock-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-clock-stop-2)" />
         </linearGradient>
       </defs>
       {/* Color Wash */}
       <circle cx="12.2" cy="12.2" r="8.2" fill={`url(#clockGrad-${gradId})`} opacity="0.9" />
       {/* Outline */}
-      <circle cx="12" cy="12" r="9" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="9" fill="none" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       {/* Hands */}
-      <circle cx="12" cy="12" r="1.8" fill="#5c4a42" />
-      <path d="M12 12 L12 7.5" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
-      <path d="M12 12 L15 14" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="1.8" fill="var(--color-sketch-outline)" />
+      <path d="M12 12 L12 7.5" stroke="var(--color-sketch-outline)" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 12 L15 14" stroke="var(--color-sketch-outline)" strokeWidth="2" strokeLinecap="round" />
       {/* Highlight */}
       <ellipse cx="8.5" cy="8.5" rx="0.8" ry="1.2" transform="rotate(-30 8.5 8.5)" fill="#ffffff" opacity="0.8" />
     </svg>
@@ -204,25 +204,25 @@ export const CalendarIcon: React.FC<IconProps> = ({ size = 20, className = '', .
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`calGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#fffcee" />
-          <stop offset="100%" stopColor="#ffcbd6" />
+          <stop offset="0%" stopColor="var(--color-icon-cal-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-cal-stop-2)" />
         </linearGradient>
       </defs>
       {/* Color Wash */}
       <rect x="3.2" y="5.2" width="17.6" height="14.6" rx="3.5" ry="3.5" fill={`url(#calGrad-${gradId})`} opacity="0.9" />
       {/* Outline */}
-      <rect x="3" y="5" width="18" height="15" rx="4" ry="4" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M3 10 L21 10" stroke="#5c4a42" strokeWidth="1.8" />
+      <rect x="3" y="5" width="18" height="15" rx="4" ry="4" fill="none" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 10 L21 10" stroke="var(--color-sketch-outline)" strokeWidth="1.8" />
       {/* Binders */}
-      <path d="M8 2.5 L8 6.5" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
-      <path d="M16 2.5 L16 6.5" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
+      <path d="M8 2.5 L8 6.5" stroke="var(--color-sketch-outline)" strokeWidth="2" strokeLinecap="round" />
+      <path d="M16 2.5 L16 6.5" stroke="var(--color-sketch-outline)" strokeWidth="2" strokeLinecap="round" />
       {/* Days */}
-      <circle cx="8" cy="14" r="1" fill="#5c4a42" />
-      <circle cx="12" cy="14" r="1" fill="#5c4a42" />
-      <circle cx="16" cy="14" r="1" fill="#5c4a42" />
-      <circle cx="8" cy="17" r="1" fill="#5c4a42" />
-      <circle cx="12" cy="17" r="1" fill="#5c4a42" />
-      <circle cx="16" cy="17" r="1" fill="#5c4a42" />
+      <circle cx="8" cy="14" r="1" fill="var(--color-sketch-outline)" />
+      <circle cx="12" cy="14" r="1" fill="var(--color-sketch-outline)" />
+      <circle cx="16" cy="14" r="1" fill="var(--color-sketch-outline)" />
+      <circle cx="8" cy="17" r="1" fill="var(--color-sketch-outline)" />
+      <circle cx="12" cy="17" r="1" fill="var(--color-sketch-outline)" />
+      <circle cx="16" cy="17" r="1" fill="var(--color-sketch-outline)" />
       {/* Highlight */}
       <ellipse cx="6" cy="7.5" rx="0.6" ry="1" fill="#ffffff" opacity="0.8" />
     </svg>
@@ -235,17 +235,17 @@ export const InfoIcon: React.FC<IconProps> = ({ size = 20, className = '', ...pr
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`infoGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#fef9e7" />
-          <stop offset="100%" stopColor="#ffdcc7" />
+          <stop offset="0%" stopColor="var(--color-icon-info-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-info-stop-2)" />
         </linearGradient>
       </defs>
       {/* Color Wash */}
       <circle cx="12.2" cy="12.2" r="8.2" fill={`url(#infoGrad-${gradId})`} opacity="0.9" />
       {/* Outline */}
-      <circle cx="12" cy="12" r="9" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="9" fill="none" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       {/* Letter i */}
-      <path d="M12 11.5 L12 16" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="12" cy="8" r="1.2" fill="#5c4a42" />
+      <path d="M12 11.5 L12 16" stroke="var(--color-sketch-outline)" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="8" r="1.2" fill="var(--color-sketch-outline)" />
       {/* Highlight */}
       <ellipse cx="8.5" cy="8.5" rx="0.8" ry="1.2" transform="rotate(-30 8.5 8.5)" fill="#ffffff" opacity="0.8" />
     </svg>
@@ -258,8 +258,8 @@ export const CheckIcon: React.FC<IconProps> = ({ size = 20, className = '', ...p
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`checkGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#ebf7ce" />
-          <stop offset="100%" stopColor="#b5e8b0" />
+          <stop offset="0%" stopColor="var(--color-icon-check-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-check-stop-2)" />
         </linearGradient>
       </defs>
       {/* Color wash */}
@@ -276,7 +276,7 @@ export const CheckIcon: React.FC<IconProps> = ({ size = 20, className = '', ...p
       <path
         d="M4.5 12.5 L9.5 17.5 L19.5 6.5"
         fill="none"
-        stroke="#5c4a42"
+        stroke="var(--color-sketch-outline)"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -293,15 +293,15 @@ export const NotebookIcon: React.FC<IconProps> = ({ size = 20, className = '', .
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`noteGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#fff2e6" />
-          <stop offset="100%" stopColor="#ffd6e8" />
+          <stop offset="0%" stopColor="var(--color-icon-note-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-note-stop-2)" />
         </linearGradient>
       </defs>
       <rect x="4.5" y="3.5" width="15" height="17" rx="3" fill={`url(#noteGrad-${gradId})`} opacity="0.9" />
-      <rect x="4" y="3" width="16" height="18" rx="3" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M4 6.5 h-2 M4 11.5 h-2 M4 16.5 h-2" stroke="#5c4a42" strokeWidth="2" strokeLinecap="round" />
-      <path d="M8 7 h8 M8 11 h8 M8 15 h8" stroke="#5c4a42" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-      <path d="M12 12c.5-.5 1-.2 1 .3 0 .5-.7.9-1 .9-.3 0-1-.4-1-.9 0-.5.5-.8 1-.3z" fill="#ffb6c1" stroke="#5c4a42" strokeWidth="1" />
+      <rect x="4" y="3" width="16" height="18" rx="3" fill="none" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 6.5 h-2 M4 11.5 h-2 M4 16.5 h-2" stroke="var(--color-sketch-outline)" strokeWidth="2" strokeLinecap="round" />
+      <path d="M8 7 h8 M8 11 h8 M8 15 h8" stroke="var(--color-sketch-outline)" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
+      <path d="M12 12c.5-.5 1-.2 1 .3 0 .5-.7.9-1 .9-.3 0-1-.4-1-.9 0-.5.5-.8 1-.3z" fill="var(--color-chizuru-500)" stroke="var(--color-sketch-outline)" strokeWidth="1" />
       <ellipse cx="7" cy="5.5" rx="0.6" ry="1" fill="#ffffff" opacity="0.8" />
     </svg>
   );
@@ -313,15 +313,15 @@ export const GraduationIcon: React.FC<IconProps> = ({ size = 20, className = '',
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`gradIcon-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#e3f2fd" />
-          <stop offset="100%" stopColor="#bbdefb" />
+          <stop offset="0%" stopColor="var(--color-icon-grad-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-grad-stop-2)" />
         </linearGradient>
       </defs>
       <path d="M12 4 L21 8 L12 12 L3 8 Z" fill={`url(#gradIcon-${gradId})`} opacity="0.9" />
-      <path d="M12 4 L21 8 L12 12 L3 8 Z" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M6 10.5 V15.5 C6 17.5 8.7 19 12 19 C15.3 19 18 17.5 18 15.5 V10.5" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M21 8.5 V14.5" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="21" cy="14.5" r="1.5" fill="#ffd5e1" stroke="#5c4a42" strokeWidth="1" />
+      <path d="M12 4 L21 8 L12 12 L3 8 Z" fill="none" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 10.5 V15.5 C6 17.5 8.7 19 12 19 C15.3 19 18 17.5 18 15.5 V10.5" fill="none" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M21 8.5 V14.5" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="21" cy="14.5" r="1.5" fill="var(--color-icon-pin-stop-2)" stroke="var(--color-sketch-outline)" strokeWidth="1" />
     </svg>
   );
 };
@@ -332,16 +332,16 @@ export const CakeIcon: React.FC<IconProps> = ({ size = 20, className = '', ...pr
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`cakeGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#fff9db" />
-          <stop offset="100%" stopColor="#ffd8a8" />
+          <stop offset="0%" stopColor="var(--color-icon-cake-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-cake-stop-2)" />
         </linearGradient>
       </defs>
       <rect x="4.2" y="11.2" width="15.6" height="8.6" rx="2" fill={`url(#cakeGrad-${gradId})`} opacity="0.9" />
-      <rect x="4" y="11" width="16" height="9" rx="2" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M8 7 V11 M12 6 V11 M16 7 V11" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="8" cy="5.5" r="1" fill="#ff922b" />
-      <circle cx="12" cy="4.5" r="1" fill="#ff922b" />
-      <circle cx="16" cy="5.5" r="1" fill="#ff922b" />
+      <rect x="4" y="11" width="16" height="9" rx="2" fill="none" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 7 V11 M12 6 V11 M16 7 V11" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="8" cy="5.5" r="1" fill="var(--color-icon-cake-candle)" />
+      <circle cx="12" cy="4.5" r="1" fill="var(--color-icon-cake-candle)" />
+      <circle cx="16" cy="5.5" r="1" fill="var(--color-icon-cake-candle)" />
     </svg>
   );
 };
@@ -352,13 +352,13 @@ export const GenderFemaleIcon: React.FC<IconProps> = ({ size = 20, className = '
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`femGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#fff0f6" />
-          <stop offset="100%" stopColor="#ffdeeb" />
+          <stop offset="0%" stopColor="var(--color-icon-fem-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-fem-stop-2)" />
         </linearGradient>
       </defs>
       <circle cx="12" cy="8.2" r="5.2" fill={`url(#femGrad-${gradId})`} opacity="0.9" />
-      <circle cx="12" cy="8" r="5.5" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M12 13.5 V21.5 M8.5 17.5 H15.5" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="8" r="5.5" fill="none" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 13.5 V21.5 M8.5 17.5 H15.5" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 };
@@ -369,17 +369,13 @@ export const GenderMaleIcon: React.FC<IconProps> = ({ size = 20, className = '',
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...props}>
       <defs>
         <linearGradient id={`maleGrad-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#e3fafc" />
-          <stop offset="100%" stopColor="#c5f6fa" />
+          <stop offset="0%" stopColor="var(--color-icon-male-stop-1)" />
+          <stop offset="100%" stopColor="var(--color-icon-male-stop-2)" />
         </linearGradient>
       </defs>
       <circle cx="9.2" cy="14.8" r="5.2" fill={`url(#maleGrad-${gradId})`} opacity="0.9" />
-      <circle cx="9" cy="15" r="5.5" fill="none" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M13.5 10.5 L19.5 4.5 M15 4.5 H19.5 V9" stroke="#5c4a42" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="9" cy="15" r="5.5" fill="none" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13.5 10.5 L19.5 4.5 M15 4.5 H19.5 V9" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 };
-
-
-
-

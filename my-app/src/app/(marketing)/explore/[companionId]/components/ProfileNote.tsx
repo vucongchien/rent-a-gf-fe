@@ -82,9 +82,9 @@ export function ProfileNote({ companion }: { companion: CompanionDetail }) {
           <span className="font-sans text-xs text-text-muted uppercase tracking-wider font-semibold">Về tôi</span>
         </div>
         <p className="text-text leading-relaxed font-sans text-sm bg-cream/50 p-4 rounded-xl border border-neutral-200/40 relative pl-8 pr-6">
-          <span className="absolute left-3 top-3 text-sketch-outline/55 font-serif text-2xl leading-none">“</span>
+          <span className="absolute left-3 top-3 text-sketch-outline/55 font-sans font-extrabold text-2xl leading-none">“</span>
           {companion.bio}
-          <span className="absolute right-3 bottom-1 text-sketch-outline/55 font-serif text-2xl leading-none">”</span>
+          <span className="absolute right-3 bottom-1 text-sketch-outline/55 font-sans font-extrabold text-2xl leading-none">”</span>
         </p>
       </div>
 

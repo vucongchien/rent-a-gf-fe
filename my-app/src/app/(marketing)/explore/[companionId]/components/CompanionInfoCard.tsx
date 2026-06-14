@@ -1,6 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { StarIcon, MapPinIcon, CheckIcon } from "@/shared/components/atoms/Icons";
+import { StarIcon, MapPinIcon, CheckIcon, ChevronDownIcon } from "@/shared/components/atoms/Icons";
 import { Button } from "@/shared/components/atoms/Button";
 import type { CompanionDetail } from "@/shared/types";
 
@@ -124,14 +124,7 @@ export const CompanionInfoCard: React.FC<CompanionInfoCardProps> = ({
             <summary className="flex items-center justify-between font-sans font-black text-sm text-neutral-900 cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none">
               <span>Cam kết an toàn & bảo mật</span>
               <span className="transition-transform duration-200 group-open:rotate-180">
-                <svg
-                  className="w-4 h-4 text-neutral-600 stroke-[2.5]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDownIcon size={16} strokeWidth={2.5} className="text-neutral-600" />
               </span>
             </summary>
             <div className="mt-3 text-xs text-neutral-600 space-y-2.5 leading-relaxed font-medium">
@@ -155,14 +148,7 @@ export const CompanionInfoCard: React.FC<CompanionInfoCardProps> = ({
             <summary className="flex items-center justify-between font-sans font-black text-sm text-neutral-900 cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none">
               <span>Đánh giá khách hàng ({companion.reviewCount})</span>
               <span className="transition-transform duration-200 group-open:rotate-180">
-                <svg
-                  className="w-4 h-4 text-neutral-600 stroke-[2.5]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDownIcon size={16} strokeWidth={2.5} className="text-neutral-600" />
               </span>
             </summary>
             <div className="mt-4 space-y-3 max-h-[200px] overflow-y-auto pr-1 scrollbar-none">
@@ -206,14 +192,7 @@ export const CompanionInfoCard: React.FC<CompanionInfoCardProps> = ({
             <summary className="flex items-center justify-between font-sans font-black text-sm text-neutral-900 cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none">
               <span>Câu hỏi thường gặp</span>
               <span className="transition-transform duration-200 group-open:rotate-180">
-                <svg
-                  className="w-4 h-4 text-neutral-600 stroke-[2.5]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDownIcon size={16} strokeWidth={2.5} className="text-neutral-600" />
               </span>
             </summary>
             <div className="mt-4 text-xs text-neutral-600 space-y-3.5 leading-relaxed font-medium">

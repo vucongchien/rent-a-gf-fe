@@ -4,6 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { XIcon, ChevronRightIcon } from "@/shared/components/atoms/Icons";
+import { Button } from "@/shared/components/atoms/Button";
 
 export interface LightboxModalProps {
   companionId: string;
@@ -100,13 +101,14 @@ export const LightboxModal: React.FC<LightboxModalProps> = ({
       <div ref={modalRef} className="relative max-w-4xl w-full h-full flex flex-col items-center justify-center p-4 md:p-8 pointer-events-none">
         
         {/* Nút đóng */}
-        <button
+        <Button
+          variant="outline"
           onClick={handleClose}
-          className="absolute top-4 right-4 z-50 w-[42px] h-[42px] border-2 border-neutral-900 bg-white hover:bg-[var(--color-cream)] text-neutral-900 rounded-[12px] flex items-center justify-center cursor-pointer pointer-events-auto transition-transform hover:scale-105 active:scale-95 shadow-[2px_2px_0_var(--color-neutral-900)] focus:outline-none"
+          className="absolute top-4 right-4 z-50 !w-[42px] !h-[42px] !p-0 !rounded-[12px] flex items-center justify-center pointer-events-auto transition-transform hover:scale-105 active:scale-95 !shadow-[2px_2px_0_var(--color-neutral-900)] focus:outline-none"
           aria-label="Đóng ảnh phóng to"
         >
           <XIcon size={20} className="stroke-[2.5px]" />
-        </button>
+        </Button>
 
         {/* Khung ảnh chính */}
         <div className="relative w-full h-[75vh] md:h-[80vh] pointer-events-auto max-w-3xl flex items-center justify-center">
@@ -126,24 +128,26 @@ export const LightboxModal: React.FC<LightboxModalProps> = ({
 
         {/* Nút Previous (Mũi tên trái) */}
         {hasPrev && (
-          <button
+          <Button
+            variant="outline"
             onClick={() => navigateTo(currentIndex - 1)}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-50 w-11 h-11 border-2 border-neutral-900 bg-white hover:bg-[var(--color-cream)] text-neutral-900 rounded-[12px] flex items-center justify-center cursor-pointer pointer-events-auto shadow-[2px_2px_0_var(--color-neutral-900)] transition-transform hover:scale-105 focus:outline-none"
+            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-50 !w-11 !h-11 !p-0 !rounded-[12px] flex items-center justify-center pointer-events-auto !shadow-[2px_2px_0_var(--color-neutral-900)] transition-transform hover:scale-105 focus:outline-none"
             aria-label="Ảnh trước"
           >
             <ChevronRightIcon size={20} className="rotate-180 stroke-[2.5px] mr-0.5" />
-          </button>
+          </Button>
         )}
 
         {/* Nút Next (Mũi tên phải) */}
         {hasNext && (
-          <button
+          <Button
+            variant="outline"
             onClick={() => navigateTo(currentIndex + 1)}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 w-11 h-11 border-2 border-neutral-900 bg-white hover:bg-[var(--color-cream)] text-neutral-900 rounded-[12px] flex items-center justify-center cursor-pointer pointer-events-auto shadow-[2px_2px_0_var(--color-neutral-900)] transition-transform hover:scale-105 focus:outline-none"
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 !w-11 !h-11 !p-0 !rounded-[12px] flex items-center justify-center pointer-events-auto !shadow-[2px_2px_0_var(--color-neutral-900)] transition-transform hover:scale-105 focus:outline-none"
             aria-label="Ảnh sau"
           >
             <ChevronRightIcon size={20} className="stroke-[2.5px] ml-0.5" />
-          </button>
+          </Button>
         )}
 
         {/* Bộ đếm ảnh */}

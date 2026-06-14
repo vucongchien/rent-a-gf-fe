@@ -15,7 +15,7 @@ export function BookingFormSuccess(props: BookingFormSuccessProps) {
     <div className="text-center py-8 px-4 space-y-6">
       <div className="text-6xl">💌</div>
       <div className="space-y-2">
-        <h3 className="font-serif text-2xl text-brand font-black">Đặt hẹn thành công!</h3>
+        <h3 className="font-sans text-2xl text-brand font-black">Đặt hẹn thành công!</h3>
         <p className="text-sm text-neutral-600 max-w-xs mx-auto">
           Yêu cầu đã được gửi đến <b>{companionName}</b>. Tiền đặt cọc tạm thời đã được giữ trong két an toàn (Escrow).
         </p>

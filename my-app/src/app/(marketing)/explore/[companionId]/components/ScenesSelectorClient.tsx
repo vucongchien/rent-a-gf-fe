@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { ClockIcon, CoinIcon, CalendarIcon } from '@/shared/components/atoms/Icons'
 import type { CompanionScenario } from '@/shared/types'
 import { BookingModal } from './BookingModal'
+import { Button } from '@/shared/components/atoms/Button'
 
 interface SceneCardProps {
   companionName: string
@@ -49,12 +50,14 @@ function SceneCard({ companionName, sc, onSelect }: SceneCardProps) {
       </div>
 
       <div className="pt-3.5">
-        <button
+        <Button
+          variant="primary"
+          size="md"
           onClick={() => onSelect(sc)}
-          className="btn-base btn-primary btn-md rounded-full w-full justify-center whitespace-nowrap text-xs font-semibold cursor-pointer"
+          className="rounded-full w-full justify-center whitespace-nowrap text-xs font-semibold cursor-pointer"
         >
           Đặt hẹn với {companionName} ♡
-        </button>
+        </Button>
       </div>
     </article>
   )

@@ -24,7 +24,7 @@ function PolaroidFrame({ href, tilt, caption, onClick, children }: PolaroidFrame
       {children}
       {caption && (
         <div className="text-center mt-2.5">
-          <span className="inline-block px-3 py-1 bg-amber-50/80 border border-dashed border-amber-200/50 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.02)] rotate-[-1deg] font-mono text-[11px] text-[#5c4a42] tracking-wide">
+          <span className="inline-block px-3 py-1 bg-amber-50/80 border border-dashed border-amber-200/50 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.02)] rotate-[-1deg] font-mono text-[11px] text-sketch-outline tracking-wide">
             {caption.includes('♡') ? (
               <>
                 <span>{caption.replace('♡', '')}</span>

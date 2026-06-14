@@ -1,0 +1,25 @@
+@theme {
+  --color-icon-star-stop-1: #fff9d6;
+  --color-icon-star-stop-2: #ffd3dc;
+  --color-icon-pin-stop-1: #c5f0e3;
+  --color-icon-pin-stop-2: #ffd5e1;
+  --color-icon-clock-stop-1: #d2ebf7;
+  --color-icon-clock-stop-2: #fadfe5;
+  --color-icon-cal-stop-1: #fffcee;
+  --color-icon-cal-stop-2: #ffcbd6;
+  --color-icon-info-stop-1: #fef9e7;
+  --color-icon-info-stop-2: #ffdcc7;
+  --color-icon-check-stop-1: #ebf7ce;
+  --color-icon-check-stop-2: #b5e8b0;
+  --color-icon-note-stop-1: #fff2e6;
+  --color-icon-note-stop-2: #ffd6e8;
+  --color-icon-grad-stop-1: #e3f2fd;
+  --color-icon-grad-stop-2: #bbdefb;
+  --color-icon-cake-stop-1: #fff9db;
+  --color-icon-cake-stop-2: #ffd8a8;
+  --color-icon-cake-candle: #ff922b;
+  --color-icon-fem-stop-1: #fff0f6;
+  --color-icon-fem-stop-2: #ffdeeb;
+  --color-icon-male-stop-1: #e3fafc;
+  --color-icon-male-stop-2: #c5f6fa;
+}
