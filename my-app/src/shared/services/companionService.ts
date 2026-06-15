@@ -166,6 +166,43 @@ export const companionService = {
       console.error(`[companionService] Lỗi fetch companion detail cho ${companionId}:`, err);
       return null;
     }
+  },
+
+  /** Companion Management API */
+  async applyCompanion(options?: any) {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+    if (isMock) return { data: { status: 'pending' } };
+    return serverFetch('/companions/apply', { method: 'POST', req: options?.req });
+  },
+  
+  async getMyProfile(options?: any) {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+    if (isMock) return { data: mockCompanions[0] };
+    return serverFetch('/companions/me', { method: 'GET', req: options?.req });
+  },
+  
+  async updateMyProfile(body: any, options?: any) {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+    if (isMock) return { data: body }; 
+    return serverFetch('/companions/me', { method: 'PUT', body, req: options?.req });
+  },
+  
+  async createMyScenario(body: any, options?: any) {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+    if (isMock) return { data: { id: `sc-new-${Date.now()}`, ...body } };
+    return serverFetch('/companions/me/scenarios', { method: 'POST', body, req: options?.req });
+  },
+  
+  async updateMyScenario(scenarioId: string, body: any, options?: any) {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+    if (isMock) return { data: body };
+    return serverFetch(`/companions/me/scenarios/${scenarioId}`, { method: 'PUT', body, req: options?.req });
+  },
+  
+  async deleteMyScenario(scenarioId: string, options?: any) {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+    if (isMock) return { data: { success: true } };
+    return serverFetch(`/companions/me/scenarios/${scenarioId}`, { method: 'DELETE', req: options?.req });
   }
 };
 export type CompanionService = typeof companionService;

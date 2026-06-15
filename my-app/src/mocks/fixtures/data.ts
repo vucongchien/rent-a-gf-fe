@@ -548,6 +548,9 @@ export const companions = rawCompanions.map(c => ({
 const rawBookings = [
   {
     id: 'bk-1',
+    clientId: 'u-client-1',
+    clientName: 'Minh Khách',
+    clientAvatarUrl: 'https://i.pravatar.cc/100?u=u-client-1',
     companionId: 'comp-1',
     companionName: 'Nguyễn Thị Linh',
     companionAvatarUrl: 'https://i.pravatar.cc/100?u=comp-1',
@@ -562,6 +565,9 @@ const rawBookings = [
   },
   {
     id: 'bk-2',
+    clientId: 'u-client-1',
+    clientName: 'Minh Khách',
+    clientAvatarUrl: 'https://i.pravatar.cc/100?u=u-client-1',
     companionId: 'comp-2',
     companionName: 'Trần Hà My',
     companionAvatarUrl: 'https://i.pravatar.cc/100?u=comp-2',
@@ -576,6 +582,9 @@ const rawBookings = [
   },
   {
     id: 'bk-3',
+    clientId: 'u-client-1',
+    clientName: 'Minh Khách',
+    clientAvatarUrl: 'https://i.pravatar.cc/100?u=u-client-1',
     companionId: 'comp-4',
     companionName: 'Lê Thanh Thảo',
     companionAvatarUrl: 'https://i.pravatar.cc/100?u=comp-4',
@@ -593,6 +602,7 @@ const rawBookings = [
 export const mockBookings = rawBookings.map(b => ({
   ...b,
   companionAvatarUrl: getMockAvatarUrl(b.companionId),
+  clientAvatarUrl: getMockAvatarUrl(b.clientId),
 }));
 
 // --- WALLET ---

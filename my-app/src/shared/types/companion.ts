@@ -36,6 +36,10 @@ export interface CompanionScenario {
   isFeatured: boolean
 }
 
+export type CreateScenarioBody = Omit<CompanionScenario, 'id'>
+
+export type UpdateScenarioBody = Partial<CreateScenarioBody>
+
 /** Review của khách hàng */
 export interface CompanionReview {
   id: string

@@ -49,4 +49,42 @@ export const walletHandlers = [
       data: { status: 'success', creditedCoin: 500 },
     })
   }),
+
+  // POST /api/wallet/withdraw
+  http.post('/api/wallet/withdraw', async ({ request }) => {
+    await delay(1000)
+    const body = await request.json() as { amountInCoin: number }
+    if (!body.amountInCoin || body.amountInCoin < 500) {
+      return HttpResponse.json(
+        { error: { code: 'VALIDATION_ERROR', message: 'Số tiền rút tối thiểu là 500 Kano-Coin' } },
+        { status: 400 }
+      )
+    }
+    if (mockWallet.balance < body.amountInCoin) {
+      return HttpResponse.json(
+        { error: { code: 'INSUFFICIENT_FUNDS', message: 'Số dư không đủ' } },
+        { status: 400 }
+      )
+    }
+    
+    mockWallet.balance -= body.amountInCoin
+    
+    const txId = `tx-withdraw-${Date.now()}`
+    mockWallet.transactions.unshift({
+      id: txId,
+      label: 'Rút tiền về tài khoản',
+      amountInCoin: -body.amountInCoin,
+      type: 'debit',
+      status: 'completed',
+      createdAt: new Date().toISOString()
+    })
+
+    return HttpResponse.json({
+      data: {
+        success: true,
+        transactionId: txId,
+        newBalance: mockWallet.balance,
+      },
+    })
+  }),
 ]
