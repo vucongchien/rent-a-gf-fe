@@ -88,12 +88,12 @@ export const CompanionCard: React.FC<CompanionCardProps> = ({
       </Link>
 
       {/* BODY SECTION */}
-      <div className="pt-3.5 px-2 pb-2 flex flex-col flex-1">
-        <div className="flex items-baseline justify-between gap-[8px]">
-          <h3 className="font-sans font-semibold text-companion-title m-0 leading-none text-neutral-900">
+      <div className="pt-3.5 px-2 pb-2 flex flex-col flex-1 min-w-0">
+        <div className="flex items-baseline justify-between gap-[8px] min-w-0">
+          <h3 className="font-sans font-semibold text-companion-title m-0 leading-none text-neutral-900 truncate flex-1">
             {name}
           </h3>
-          <span className="font-mono text-[10.5px] tracking-[0.08em] uppercase text-neutral-500">
+          <span className="font-mono text-[10.5px] tracking-[0.08em] uppercase text-neutral-500 shrink-0">
             {location}
           </span>
         </div>
