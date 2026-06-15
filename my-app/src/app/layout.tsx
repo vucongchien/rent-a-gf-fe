@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Lora, Cherry_Bomb_One, Geist_Mono } from "next/font/google";
 import { authService } from "@/shared/services/authService";
 import "./globals.css";
-import React, { Suspense } from "react";
+import React from "react";
 
 import RootClientLayout from "./RootClientLayout";
 
@@ -49,9 +49,7 @@ export default async function RootLayout({
       className={`${lora.variable} ${cherryBomb.variable} ${geistMono.variable} h-full antialiased font-sans`}
     >
       <body className="min-h-full flex flex-col bg-surface text-text">
-        <Suspense fallback={null}>
-          <RootClientLayout initialUser={user}>{children}</RootClientLayout>
-        </Suspense>
+        <RootClientLayout initialUser={user}>{children}</RootClientLayout>
       </body>
     </html>
   );

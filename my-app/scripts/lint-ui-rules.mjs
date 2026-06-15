@@ -13,7 +13,9 @@ const ALLOWED_BUTTON_FILES = [
   'CloseButton.tsx',
   'LikeButton.tsx',
   'VoiceButton.tsx',
-  'FilterChip.tsx'
+  'FilterChip.tsx',
+  'IconButton.tsx',
+  'NavBarButton.tsx'
 ];
 
 // Danh sách các file được phép dùng <svg>

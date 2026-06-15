@@ -7,7 +7,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
   ({ className = '', ...props }, ref) => {
     return (
       <label 
-        className={`flex items-center gap-[9px] h-[42px] px-[15px] bg-white border border-neutral-200 rounded-xl text-neutral-500 text-[13.5px] min-w-[210px] cursor-text transition-all duration-180 focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10 ${className}`}
+        className={`flex items-center gap-[9px] h-[42px] px-[15px] bg-white border border-neutral-200 rounded-xl text-neutral-500 text-[13.5px] min-w-[140px] md:min-w-[210px] cursor-text transition-all duration-180 focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10 ${className}`}
       >
         <SearchIcon size={16} />
         <input 
