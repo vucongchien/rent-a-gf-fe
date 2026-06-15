@@ -14,6 +14,9 @@ export type EscrowStatus = 'frozen' | 'released' | 'refunded'
 
 export interface Booking {
   id: string
+  clientId: string
+  clientName: string
+  clientAvatarUrl: string
   companionId: string
   companionName: string
   companionAvatarUrl: string

@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from 'msw'
-import { mockBookings, companions, mockWallet } from '../fixtures/data'
+import { mockBookings, companions, mockWallet, currentMockUser } from '../fixtures/data'
 
 // State mutable cho booking CRUD
 const bookings = [...mockBookings]
@@ -14,6 +14,9 @@ function createBooking(body: {
   const scenario = companion?.scenarios.find(s => s.id === body.scenarioId)
   return {
     id: `bk-${Date.now()}`,
+    clientId: currentMockUser?.id || 'u-unknown',
+    clientName: currentMockUser?.displayName || 'Unknown Client',
+    clientAvatarUrl: currentMockUser?.avatarUrl || '',
     companionId: body.companionId,
     companionName: companion?.displayName ?? 'Unknown',
     companionAvatarUrl: companion?.avatarUrl ?? '',
@@ -32,12 +35,40 @@ export const bookingHandlers = [
   // GET /api/bookings
   http.get('/api/bookings', async ({ request }) => {
     await delay(600)
+
+    // Auto-complete bookings that are past their endsAt time
+    bookings.forEach(b => {
+      if (b.status === 'ACCEPTED' && new Date(b.endsAt) < new Date()) {
+        b.status = 'COMPLETED'
+        b.escrowStatus = 'released'
+        // Mock release funds to companion's wallet
+        if (currentMockUser?.role === 'companion' && b.companionId === currentMockUser.id) {
+            mockWallet.balance += b.priceInCoin
+            mockWallet.frozenBalance = Math.max(0, mockWallet.frozenBalance - b.priceInCoin)
+            mockWallet.transactions.unshift({
+              id: `tx-release-${b.id}`,
+              label: `Hoàn thành · ${b.scenarioName}`,
+              amountInCoin: b.priceInCoin,
+              type: 'credit',
+              status: 'completed',
+              createdAt: new Date().toISOString(),
+            })
+        }
+      }
+    })
+
     const url = new URL(request.url)
     const status = url.searchParams.get('status')
     const page = Number(url.searchParams.get('page') ?? 1)
     const limit = 10
 
     let items = bookings
+    if (currentMockUser?.role === 'client') {
+      items = items.filter(b => b.clientId === currentMockUser.id)
+    } else if (currentMockUser?.role === 'companion') {
+      items = items.filter(b => b.companionId === currentMockUser.id)
+    }
+
     if (status) items = items.filter(b => b.status.toLowerCase() === status.toLowerCase())
 
     const start = (page - 1) * limit

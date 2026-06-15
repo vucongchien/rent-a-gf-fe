@@ -98,5 +98,35 @@ export const walletService = {
       console.error(`[walletService] Lỗi fetch topup status ${txId}:`, err);
       throw err;
     }
+  },
+
+  /**
+   * Rút tiền từ ví
+   */
+  async withdraw(body: { amountInCoin: number }, options?: ServiceRequestOptions): Promise<ApiResponse<any>> {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+
+    if (isMock) {
+      return {
+        data: {
+          success: true,
+          transactionId: `tx-${Math.floor(Math.random() * 100000)}`,
+          newBalance: mockWallet.balance - body.amountInCoin,
+        }
+      };
+    }
+
+    const req = await getRequestCookieHeader(options?.req);
+
+    try {
+      return await serverFetch<ApiResponse<any>>('/wallet/withdraw', {
+        req,
+        method: 'POST',
+        body,
+      });
+    } catch (err) {
+      console.error('[walletService] Lỗi withdraw:', err);
+      throw err;
+    }
   }
 };
