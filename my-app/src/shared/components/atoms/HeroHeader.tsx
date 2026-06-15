@@ -13,7 +13,7 @@ export const HeroHeader: React.FC<HeroHeaderProps> = ({
 }) => {
   return (
     <div className={`flex flex-col gap-[18px]  sm:pt-0 mb-[28px] ${className}`}>
-      <h1 className="font-sans font-semibold text-[40px] md:text-[62px] leading-[1.15] md:leading-[1.1] m-0 tracking-[-0.03em] text-neutral-900">
+      <h1 className="font-sans font-semibold text-[32px] sm:text-[40px] md:text-[62px] leading-[1.15] md:leading-[1.1] m-0 tracking-[-0.03em] text-neutral-900">
         {title || (
           <>
             <span className="block">Find a companion</span>

@@ -46,11 +46,11 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ featuredCompanion })
         >
           {/* Floating panel at the bottom */}
           <div className="absolute left-[14px] right-[14px] bottom-[14px] flex items-end justify-between gap-[10px] z-10">
-            <div className="bg-white/92 backdrop-blur-[6px] border border-white rounded-[14px] p-[10px_14px] shadow-[0_8px_18px_-10px_rgba(0,0,0,0.25)] flex flex-col">
-              <h3 className="font-sans font-semibold text-[22px] m-0 text-neutral-900 leading-none">
+            <div className="bg-white/92 backdrop-blur-[6px] border border-white rounded-[14px] p-[10px_14px] shadow-[0_8px_18px_-10px_rgba(0,0,0,0.25)] flex flex-col min-w-0">
+              <h3 className="font-sans font-semibold text-[22px] m-0 text-neutral-900 leading-none truncate">
                 {featuredCompanion.name}
               </h3>
-              <span className="text-[12.5px] text-neutral-500 mt-[5px] whitespace-nowrap">
+              <span className="text-[12.5px] text-neutral-500 mt-[5px] truncate">
                 {featuredCompanion.location} {formattedMetadata.length > 0 ? `· ${formattedMetadata.join(' · ')}` : ''}
               </span>
             </div>
