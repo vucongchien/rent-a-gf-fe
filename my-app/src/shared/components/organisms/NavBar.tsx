@@ -205,7 +205,7 @@ export function NavBar({
       <>
         <span className="nb-icon">{renderIcon(item.icon, on)}</span>
         {showLabel && (
-          <span className="nb-label text-[11px] font-sans mt-[3px]">
+          <span className="nb-label text-[10.5px] font-sans mt-[3px] text-center truncate w-full px-1 select-none">
             {item.label}
           </span>
         )}
@@ -308,11 +308,14 @@ function injectStyles() {
 .nb-logo-dot{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,white)}
 .nb-logo-text{letter-spacing:-0.01em;color:var(--color-nav-logo)}
 .nb-list{position:relative;display:flex;align-items:center;gap:12px}
-.nb-item{position:relative;z-index:2;appearance:none;border:0;background:none;cursor:pointer;letter-spacing:-0.01em;display:flex;align-items:center;border-radius:999px;transition:color 220ms ease,transform var(--dur) var(--bz);-webkit-tap-highlight-color:transparent}
-.nb-item-col{flex-direction:column;gap:3px;padding:9px 14px 8px}
-.nb-item-row{flex-direction:row;gap:8px;padding:11px 14px}
-.nb-mobile .nb-item-col{padding:10px 14px}
-.nb-mobile .nb-item-row{padding:11px 13px}
+.nb-mobile .nb-list{gap:8px}
+.nb-item{position:relative;z-index:2;appearance:none;border:0;background:none;cursor:pointer;letter-spacing:-0.01em;display:flex;align-items:center;justify-content:center;border-radius:999px;transition:color 220ms ease,transform var(--dur) var(--bz);-webkit-tap-highlight-color:transparent}
+.nb-desktop .nb-item{width:76px}
+.nb-mobile .nb-item{width:64px}
+.nb-item-col{flex-direction:column;gap:3px;padding:9px 0 8px}
+.nb-item-row{flex-direction:row;gap:8px;padding:11px 0}
+.nb-mobile .nb-item-col{padding:10px 0}
+.nb-mobile .nb-item-row{padding:11px 0}
 .nb-item:focus{outline:none}
 .nb-item:focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 65%,white);outline-offset:3px}
 .nb-icon{display:flex;transition:transform var(--dur) var(--bz)}
