@@ -39,7 +39,7 @@ export const CompanionCard: React.FC<CompanionCardProps> = ({
   return (
     <article
       className={`
-        companion-card-item group bg-white border border-neutral-200 rounded-[24px] p-[12px]
+        companion-card-item group bg-white border border-neutral-200 rounded-[24px] p-[8px] md:p-[12px]
         md:shadow-[0_18px_40px_-30px_rgba(251,105,153,0.4)]
         transition-all duration-180 ease-out flex flex-col
         hover:-translate-y-[2px] hover:md:shadow-[0_28px_50px_-28px_rgba(251,105,153,0.5)]
@@ -88,7 +88,7 @@ export const CompanionCard: React.FC<CompanionCardProps> = ({
       </Link>
 
       {/* BODY SECTION */}
-      <div className="pt-3.5 px-2 pb-2 flex flex-col flex-1 min-w-0">
+      <div className="pt-2.5 px-1 pb-1 md:pt-3.5 md:px-2 md:pb-2 flex flex-col flex-1 min-w-0">
         <div className="flex items-baseline justify-between gap-[8px] min-w-0">
           <h3 className="font-sans font-semibold text-companion-title m-0 leading-none text-neutral-900 truncate flex-1">
             {name}
