@@ -302,20 +302,27 @@ function injectStyles() {
 .nb-wrap.nb-hidden.nb-desktop{transform:translateY(-160%);opacity:0}
 .nb-wrap.nb-hidden.nb-mobile{transform:translateY(180%);opacity:0}
 .nb-bar{pointer-events:auto;display:flex;align-items:center;gap:14px;padding:8px 12px;border-radius:999px;transition:background 280ms ease,box-shadow 280ms ease; max-width: 1100px; width: 100%;}
-.nb-desktop .nb-bar { padding: 8px 16px; justify-content: flex-start; }
-.nb-mobile .nb-bar{padding:7px 9px;gap:0; max-width: max-content; width: auto;}
+.nb-desktop .nb-bar { padding: 8px 16px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; justify-content: stretch; }
+.nb-desktop .nb-logo { grid-column: 1; justify-self: start; }
+.nb-desktop .nb-list { grid-column: 2; justify-self: center; }
+.nb-desktop .nb-actions { grid-column: 3; justify-self: end; margin-left: 0; }
+.nb-mobile .nb-bar{padding:7px clamp(6px, 1.8vw, 12px);gap:0; max-width: 92vw; width: 100%;}
 .nb-logo{display:flex;align-items:center;gap:9px;padding:0 8px 0 10px}
 .nb-logo-dot{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,white)}
 .nb-logo-text{letter-spacing:-0.01em;color:var(--color-nav-logo)}
 .nb-list{position:relative;display:flex;align-items:center;gap:12px}
-.nb-mobile .nb-list{gap:8px}
+.nb-mobile .nb-list{gap:clamp(4px, 1.2vw, 8px);width:100%;justify-content:space-between}
 .nb-item{position:relative;z-index:2;appearance:none;border:0;background:none;cursor:pointer;letter-spacing:-0.01em;display:flex;align-items:center;justify-content:center;border-radius:999px;transition:color 220ms ease,transform var(--dur) var(--bz);-webkit-tap-highlight-color:transparent}
 .nb-desktop .nb-item{width:76px}
-.nb-mobile .nb-item{width:64px}
+.nb-mobile .nb-item{flex:1;min-width:48px;max-width:72px}
 .nb-item-col{flex-direction:column;gap:3px;padding:9px 0 8px}
 .nb-item-row{flex-direction:row;gap:8px;padding:11px 0}
 .nb-mobile .nb-item-col{padding:10px 0}
 .nb-mobile .nb-item-row{padding:11px 0}
+@media (max-width:340px){
+  .nb-mobile .nb-label{display:none}
+  .nb-mobile .nb-item-col{padding:12px 0 10px}
+}
 .nb-item:focus{outline:none}
 .nb-item:focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 65%,white);outline-offset:3px}
 .nb-icon{display:flex;transition:transform var(--dur) var(--bz)}
