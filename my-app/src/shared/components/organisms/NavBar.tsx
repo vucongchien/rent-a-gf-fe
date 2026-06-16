@@ -141,7 +141,14 @@ export function NavBar({
   }, [measure]);
 
   const pick = (id: string) => {
-    if (id === active) return;
+    if (id === active) {
+      setWobble((w) => w + 1);
+      onChange?.(id);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
     if (!controlled) setInternal(id);
     setWobble((w) => w + 1);
     onChange?.(id);
@@ -198,10 +205,16 @@ export function NavBar({
   const renderItem = (item: NavItem) => {
     const on = item.id === active;
     const showLabel = true; // Always show label below icon
+    const isBouncing = item.id === active && wobble > 0;
 
     const content = (
       <>
-        <span className="nb-icon">{renderIcon(item.icon, on)}</span>
+        <span
+          key={isBouncing ? `bounce-${wobble}` : 'static'}
+          className="nb-icon"
+        >
+          {renderIcon(item.icon, on)}
+        </span>
         {showLabel && (
           <span className="nb-label text-[10.5px] font-sans mt-[3px] text-center truncate w-full px-1 select-none">
             {item.label}
@@ -216,7 +229,7 @@ export function NavBar({
     const commonProps = {
       className: 'nb-item font-medium no-underline' + (on ? ' is-active' : '') +
         ' nb-item-col' + // Force column layout (text below icon)
-        (effect === 'bounce' && on ? ' nb-bounce' : ''),
+        (isBouncing ? ' nb-bounce' : ''),
       style: { color: on ? accent : 'var(--color-nav-inactive)', '--bz': bezier, '--dur': dur + 'ms' } as React.CSSProperties,
       onClick: () => pick(item.id),
       'aria-current': on ? 'page' as const : undefined,
