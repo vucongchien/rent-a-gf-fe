@@ -200,7 +200,7 @@ export function NavBar({
 
   const renderItem = (item: NavItem) => {
     const on = item.id === active;
-    const showLabel = horizontalPill ? on : (showLabels && !mobile);
+    const showLabel = false; // Hide labels completely for minimal design and stable widths
 
     const content = (
       <>
@@ -309,11 +309,11 @@ function injectStyles() {
 .nb-logo-dot{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,white)}
 .nb-logo-text{letter-spacing:-0.01em;color:var(--color-nav-logo)}
 .nb-list{position:relative;display:flex;align-items:center;gap:4px}
-.nb-item{position:relative;z-index:2;appearance:none;border:0;background:none;cursor:pointer;letter-spacing:-0.01em;display:flex;align-items:center;border-radius:999px;transition:color 220ms ease,transform var(--dur) var(--bz);-webkit-tap-highlight-color:transparent}
-.nb-item-col{flex-direction:column;gap:3px;padding:9px 14px 8px}
-.nb-item-row{flex-direction:row;gap:8px;padding:11px 14px}
-.nb-mobile .nb-item-col{padding:10px 14px}
-.nb-mobile .nb-item-row{padding:11px 13px}
+.nb-item{position:relative;z-index:2;appearance:none;border:0;background:none;cursor:pointer;letter-spacing:-0.01em;display:flex;align-items:center;justify-content:center;border-radius:999px;transition:color 220ms ease,transform var(--dur) var(--bz);-webkit-tap-highlight-color:transparent;width:44px;height:44px;padding:0}
+.nb-item-col{flex-direction:column;gap:3px}
+.nb-item-row{flex-direction:row;gap:8px}
+.nb-mobile .nb-item-col{}
+.nb-mobile .nb-item-row{}
 .nb-item:focus{outline:none}
 .nb-item:focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 65%,white);outline-offset:3px}
 .nb-icon{display:flex;transition:transform var(--dur) var(--bz)}
