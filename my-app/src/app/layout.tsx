@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Lora, Cherry_Bomb_One, Geist_Mono } from "next/font/google";
-import { authService } from "@/shared/services/authService";
 import "./globals.css";
 import React from "react";
 
@@ -32,24 +31,18 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const userResponse = await authService.getMe().catch((err) => {
-    console.error("[RootLayout] Lỗi lấy thông tin user me từ server:", err);
-    return { data: null };
-  });
-  const user = userResponse?.data || null;
-
   return (
     <html
       lang="vi"
       className={`${lora.variable} ${cherryBomb.variable} ${geistMono.variable} h-full antialiased font-sans`}
     >
       <body className="min-h-full flex flex-col bg-surface text-text">
-        <RootClientLayout initialUser={user}>{children}</RootClientLayout>
+        <RootClientLayout>{children}</RootClientLayout>
       </body>
     </html>
   );

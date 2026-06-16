@@ -12,6 +12,7 @@ import React, {
   useState, useRef, useEffect, useLayoutEffect, useCallback, ReactNode
 } from 'react';
 import { NavBarButton } from '../atoms/NavBarButton';
+import Link from 'next/link';
 
 /* ── built-in icons from atoms ── */
 export interface NavItem {
@@ -200,23 +201,9 @@ export function NavBar({
   const renderItem = (item: NavItem) => {
     const on = item.id === active;
     const showLabel = horizontalPill ? on : (showLabels && !mobile);
-    return (
-      <NavBarButton
-        key={item.id}
-        ref={(el) => {
-          if (el) btnRefs.current[item.id] = el;
-        }}
-        type="button"
-        className={
-          'nb-item font-medium' + (on ? ' is-active' : '') +
-          (horizontalPill ? ' nb-item-row' : ' nb-item-col') +
-          (effect === 'bounce' && on ? ' nb-bounce' : '')
-        }
-        style={{ color: on ? accent : 'var(--color-nav-inactive)', '--bz': bezier, '--dur': dur + 'ms' } as React.CSSProperties}
-        onClick={() => pick(item.id)}
-        aria-current={on ? 'page' : undefined}
-        aria-label={item.label}
-      >
+
+    const content = (
+      <>
         <span className="nb-icon">{renderIcon(item.icon, on)}</span>
         {showLabel && (
           <span className={'nb-label' + (horizontalPill ? ' nb-label-expand text-sm' : ' text-[12.5px]')}>
@@ -226,6 +213,44 @@ export function NavBar({
         {item.badge != null && (
           <span className="nb-badge text-[10px] font-bold" style={{ background: accent }}>{item.badge}</span>
         )}
+      </>
+    );
+
+    const commonProps = {
+      className: 'nb-item font-medium no-underline' + (on ? ' is-active' : '') +
+        (horizontalPill ? ' nb-item-row' : ' nb-item-col') +
+        (effect === 'bounce' && on ? ' nb-bounce' : ''),
+      style: { color: on ? accent : 'var(--color-nav-inactive)', '--bz': bezier, '--dur': dur + 'ms' } as React.CSSProperties,
+      onClick: () => pick(item.id),
+      'aria-current': on ? 'page' as const : undefined,
+      'aria-label': item.label,
+    };
+
+    if (item.href) {
+      return (
+        <Link
+          key={item.id}
+          ref={(el) => {
+            if (el) btnRefs.current[item.id] = el as any;
+          }}
+          href={item.href}
+          {...commonProps}
+        >
+          {content}
+        </Link>
+      );
+    }
+
+    return (
+      <NavBarButton
+        key={item.id}
+        ref={(el) => {
+          if (el) btnRefs.current[item.id] = el;
+        }}
+        type="button"
+        {...commonProps}
+      >
+        {content}
       </NavBarButton>
     );
   };
