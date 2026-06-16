@@ -79,7 +79,7 @@ export function NavBar({
   const [wobble, setWobble] = useState(0);
 
   const listRef = useRef<HTMLDivElement>(null);
-  const btnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const btnRefs = useRef<Record<string, HTMLButtonElement | HTMLAnchorElement | null>>({});
   const lastScroll = useRef(0);
   
   const [indId] = useState(() => `nbi-${Math.random().toString(36).slice(2, 8)}`);
@@ -231,7 +231,7 @@ export function NavBar({
         <Link
           key={item.id}
           ref={(el) => {
-            if (el) btnRefs.current[item.id] = el as any;
+            if (el) btnRefs.current[item.id] = el;
           }}
           href={item.href}
           {...commonProps}
