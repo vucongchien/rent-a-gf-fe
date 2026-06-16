@@ -86,7 +86,6 @@ export function NavBar({
 
   const activeIndex = items.findIndex((i) => i.id === active);
   const mobile = forceMobile || isNarrow;
-  const horizontalPill = effect === 'pill';
 
   const s = spring / 100;
   const bezier = `cubic-bezier(0.34, ${(1 + s * 0.85).toFixed(3)}, 0.5, 1)`;
@@ -200,13 +199,13 @@ export function NavBar({
 
   const renderItem = (item: NavItem) => {
     const on = item.id === active;
-    const showLabel = false; // Hide labels completely for minimal design and stable widths
+    const showLabel = true; // Always show label below icon
 
     const content = (
       <>
         <span className="nb-icon">{renderIcon(item.icon, on)}</span>
         {showLabel && (
-          <span className={'nb-label' + (horizontalPill ? ' nb-label-expand text-sm' : ' text-[12.5px]')}>
+          <span className="nb-label text-[11px] font-sans mt-[3px]">
             {item.label}
           </span>
         )}
@@ -218,7 +217,7 @@ export function NavBar({
 
     const commonProps = {
       className: 'nb-item font-medium no-underline' + (on ? ' is-active' : '') +
-        (horizontalPill ? ' nb-item-row' : ' nb-item-col') +
+        ' nb-item-col' + // Force column layout (text below icon)
         (effect === 'bounce' && on ? ' nb-bounce' : ''),
       style: { color: on ? accent : 'var(--color-nav-inactive)', '--bz': bezier, '--dur': dur + 'ms' } as React.CSSProperties,
       onClick: () => pick(item.id),
@@ -308,12 +307,12 @@ function injectStyles() {
 .nb-logo{display:flex;align-items:center;gap:9px;padding:0 8px 0 10px}
 .nb-logo-dot{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,white)}
 .nb-logo-text{letter-spacing:-0.01em;color:var(--color-nav-logo)}
-.nb-list{position:relative;display:flex;align-items:center;gap:4px}
-.nb-item{position:relative;z-index:2;appearance:none;border:0;background:none;cursor:pointer;letter-spacing:-0.01em;display:flex;align-items:center;justify-content:center;border-radius:999px;transition:color 220ms ease,transform var(--dur) var(--bz);-webkit-tap-highlight-color:transparent;width:44px;height:44px;padding:0}
-.nb-item-col{flex-direction:column;gap:3px}
-.nb-item-row{flex-direction:row;gap:8px}
-.nb-mobile .nb-item-col{}
-.nb-mobile .nb-item-row{}
+.nb-list{position:relative;display:flex;align-items:center;gap:12px}
+.nb-item{position:relative;z-index:2;appearance:none;border:0;background:none;cursor:pointer;letter-spacing:-0.01em;display:flex;align-items:center;border-radius:999px;transition:color 220ms ease,transform var(--dur) var(--bz);-webkit-tap-highlight-color:transparent}
+.nb-item-col{flex-direction:column;gap:3px;padding:9px 14px 8px}
+.nb-item-row{flex-direction:row;gap:8px;padding:11px 14px}
+.nb-mobile .nb-item-col{padding:10px 14px}
+.nb-mobile .nb-item-row{padding:11px 13px}
 .nb-item:focus{outline:none}
 .nb-item:focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 65%,white);outline-offset:3px}
 .nb-icon{display:flex;transition:transform var(--dur) var(--bz)}
