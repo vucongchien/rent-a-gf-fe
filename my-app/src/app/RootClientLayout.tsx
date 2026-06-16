@@ -7,6 +7,7 @@ import { WalletProvider } from '@/shared/contexts/WalletContext';
 import { WalletModal } from '@/shared/components/organisms/WalletModal';
 import { GlobalNavBar } from '@/shared/components/organisms/GlobalNavBar';
 import type { User } from '@/shared/types';
+import { ToastProvider } from '@/shared/components/atoms/ToastNotification';
 
 interface RootClientLayoutProps {
   children: React.ReactNode;
@@ -18,13 +19,15 @@ export function RootClientLayout({ children, initialUser }: RootClientLayoutProp
     <MockProvider>
       <AuthProvider initialUser={initialUser}>
         <WalletProvider>
-          <WalletModal />
-          <Suspense fallback={null}>
-            <GlobalNavBar />
-          </Suspense>
-          <Suspense fallback={null}>
-            {children}
-          </Suspense>
+          <ToastProvider>
+            <WalletModal />
+            <Suspense fallback={null}>
+              <GlobalNavBar />
+            </Suspense>
+            <Suspense fallback={null}>
+              {children}
+            </Suspense>
+          </ToastProvider>
         </WalletProvider>
       </AuthProvider>
     </MockProvider>
