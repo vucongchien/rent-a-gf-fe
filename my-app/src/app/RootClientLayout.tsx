@@ -12,15 +12,13 @@ export function RootClientLayout({ children }: { children: React.ReactNode }) {
     <MockProvider>
       <AuthProvider>
         <WalletProvider>
-          <ToastProvider>
-            <WalletModal />
-            <Suspense fallback={null}>
-              <GlobalNavBar />
-            </Suspense>
-            <Suspense fallback={null}>
-              {children}
-            </Suspense>
-          </ToastProvider>
+          <WalletModal />
+          <Suspense fallback={null}>
+            <GlobalNavBar />
+          </Suspense>
+          <Suspense fallback={null}>
+            {children}
+          </Suspense>
         </WalletProvider>
       </AuthProvider>
     </MockProvider>
