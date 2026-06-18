@@ -6,17 +6,11 @@ import { AuthProvider } from '@/shared/contexts/AuthContext';
 import { WalletProvider } from '@/shared/contexts/WalletContext';
 import { WalletModal } from '@/shared/components/organisms/WalletModal';
 import { GlobalNavBar } from '@/shared/components/organisms/GlobalNavBar';
-import type { User } from '@/shared/types';
 
-interface RootClientLayoutProps {
-  children: React.ReactNode;
-  initialUser?: User | null;
-}
-
-export function RootClientLayout({ children, initialUser }: RootClientLayoutProps) {
+export function RootClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <MockProvider>
-      <AuthProvider initialUser={initialUser}>
+      <AuthProvider>
         <WalletProvider>
           <WalletModal />
           <Suspense fallback={null}>

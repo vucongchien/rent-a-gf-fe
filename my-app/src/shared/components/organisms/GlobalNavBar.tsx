@@ -1,20 +1,17 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { NavBar, NavItem } from './NavBar';
 import { CompassIcon, HistoryIcon, ChatIcon, BellIcon, UserIcon, HeartIcon } from '../atoms/Icons';
 import { SearchInput } from '../atoms/SearchInput';
 import { WalletButton } from '../atoms/WalletButton';
 import { AvatarDropdown } from '../molecules/AvatarDropdown';
 import { useAuth } from '@/shared/contexts/AuthContext';
-import { MobileProfileSheet } from './MobileProfileSheet'; // Sẽ tạo ở bước sau
 
 export const GlobalNavBar: React.FC = () => {
   const pathname = usePathname();
-  const router = useRouter();
   const { user } = useAuth();
-  const [profileOpen, setProfileOpen] = React.useState(false);
 
   // Xác định active tab dựa trên pathname
   const activeId = useMemo(() => {
@@ -55,24 +52,9 @@ export const GlobalNavBar: React.FC = () => {
       id: 'profile',
       label: 'Profile',
       icon: <UserIcon />,
-      href: '/me' // Sẽ bị chặn trên mobile để mở bottom sheet
+      href: '/me'
     }
   ], []);
-
-  const handleChange = (id: string) => {
-    const isMobile = window.innerWidth < 760;
-    const item = items.find(i => i.id === id);
-
-    if (id === 'profile' && isMobile) {
-      // Trên mobile, click tab profile mở bottom sheet
-      setProfileOpen(true);
-      return;
-    }
-
-    if (item?.href) {
-      router.push(item.href);
-    }
-  };
 
   const desktopActions = (
     <>
@@ -94,15 +76,11 @@ export const GlobalNavBar: React.FC = () => {
   };
 
   return (
-    <>
-      <NavBar
-        items={items}
-        activeId={activeId}
-        onChange={handleChange}
-        brand={brand}
-        actions={desktopActions}
-      />
-      <MobileProfileSheet isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
-    </>
+    <NavBar
+      items={items}
+      activeId={activeId}
+      brand={brand}
+      actions={desktopActions}
+    />
   );
 };

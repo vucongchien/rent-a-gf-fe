@@ -24,29 +24,29 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ featuredCompanion })
   ) || [];
 
   return (
-    <div className="relative bg-white border border-neutral-200 rounded-[30px] p-[14px] md:shadow-hero md:rotate-[1.4deg] md:max-w-none max-w-[480px] mx-auto w-full font-sans">
+    <div className="relative bg-white border border-neutral-200 rounded-[24px] md:rounded-[30px] p-[8px] md:p-[14px] md:shadow-hero md:rotate-[1.4deg] md:max-w-none max-w-[480px] mx-auto w-full font-sans">
       <FeaturedBadge />
 
       {/* MediaSlot bọc bằng Link để click vào ảnh cũng chuyển hướng */}
       <Link
         href={`/explore/${featuredCompanion.id}`}
-        className="block relative rounded-[24px] overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-chizuru-600)]"
+        className="block relative rounded-[18px] md:rounded-[24px] overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-chizuru-600)]"
       >
         <MediaSlot
           src={featuredCompanion.avatarUrl}
           alt={featuredCompanion.name}
-          aspectRatio="4/3.4"
+          aspectRatio="auto"
           radius="2xl"
           tint="pink"
           // Hero là LCP element → priority=true để browser preload ngay, không lazy-load
           priority
           // Ảnh hero chiếm ~50vw trên md+, 100vw trên mobile
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="border border-neutral-200 relative overflow-hidden"
+          className="aspect-[4/5] md:aspect-[4/3.4] border border-neutral-200 relative overflow-hidden"
         >
           {/* Floating panel at the bottom */}
-          <div className="absolute left-[14px] right-[14px] bottom-[14px] flex items-end justify-between gap-[10px] z-10">
-            <div className="bg-white/92 backdrop-blur-[6px] border border-white rounded-[14px] p-[10px_14px] shadow-[0_8px_18px_-10px_rgba(0,0,0,0.25)] flex flex-col min-w-0 flex-1">
+          <div className="absolute left-[8px] right-[8px] bottom-[8px] md:left-[14px] md:right-[14px] md:bottom-[14px] flex items-end justify-between gap-[8px] md:gap-[10px] z-10">
+            <div className="bg-white/92 backdrop-blur-[6px] border border-white rounded-[12px] md:rounded-[14px] p-[8px_12px] md:p-[10px_14px] shadow-[0_8px_18px_-10px_rgba(0,0,0,0.25)] flex flex-col min-w-0 flex-1">
               <h3 className="font-sans font-semibold text-[18px] sm:text-[22px] m-0 text-neutral-900 leading-none truncate">
                 {featuredCompanion.name}
               </h3>
@@ -66,7 +66,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ featuredCompanion })
                 soundUrl={featuredCompanion.voiceUrl} 
                 size="default" 
                 label="Hi!" 
-                className="shadow-[0_3px_0_var(--color-neutral-900)] flex-none h-[40px] px-[14px] text-[13.5px] rounded-full"
+                className="shadow-[0_3px_0_var(--color-neutral-900)] flex-none h-[36px] md:h-[40px] px-[10px] md:px-[14px] text-[12.5px] md:text-[13.5px] rounded-full"
               />
             )}
           </div>
