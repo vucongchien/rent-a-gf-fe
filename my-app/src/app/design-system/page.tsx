@@ -12,11 +12,13 @@ import { BookingForm } from "@/shared/components/molecules/BookingForm";
 import { ScenesSelectorClient } from "@/app/(marketing)/explore/[companionId]/components/ScenesSelectorClient";
 import { useWallet } from "@/shared/contexts/WalletContext";
 import { useAuth } from "@/shared/contexts/AuthContext";
+import { WipeReveal } from "@/shared/components/atoms/WipeReveal";
 
 function DesignSystemContent() {
   const { toast } = useToast();
   const [isLikedDemo, setIsLikedDemo] = React.useState(false);
   const [isLikedDemoUncontrolled, setIsLikedDemoUncontrolled] = React.useState(false);
+  const [replayKey, setReplayKey] = React.useState(0);
   
   const { balance, topup } = useWallet();
   const { user, login, logout } = useAuth();
@@ -428,6 +430,98 @@ function DesignSystemContent() {
                 companionName="Chizuru Ichinose"
                 scenarios={mockScenariosForDemo}
               />
+            </div>
+          </div>
+        </section>
+
+        {/* 8. Hiệu ứng quét xuất hiện dần WipeReveal */}
+        <section className="space-y-6 pb-24">
+          <div className="flex items-center space-x-3 border-b border-neutral-100 pb-3">
+            <span className="w-2.5 h-6 bg-rose-500 rounded-full"></span>
+            <Typography variant="h3" className="text-neutral-900 font-bold">
+              8. Hiệu ứng WipeReveal (Mép Mờ, Mép Sắc Nét, Vệt Sáng & Hoa Anh Đào Bay)
+            </Typography>
+          </div>
+
+          <div className="bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm space-y-6">
+            <Typography variant="body2" className="text-neutral-500">
+              Hiệu ứng WipeReveal tự động quét nội dung từ trái qua phải ngay khi load trang. Phiên bản nâng cấp hỗ trợ vệt sáng quét qua (Glow Shimmer Line) và **Hoa Anh Đào vẽ tay phong cách màu nước (watercolor)** trượt và xoay tròn bay theo chiều gió, tự động làm mờ (fade out) sau khi hoàn tất.
+            </Typography>
+
+            <div className="flex flex-col space-y-6">
+              <div>
+                <Button onClick={() => setReplayKey(prev => prev + 1)} variant="outline" size="sm">
+                  Chạy lại hiệu ứng 🔄
+                </Button>
+              </div>
+
+              <div key={replayKey} className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 rounded-3xl bg-[--color-cream] border border-neutral-100/50">
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Typography variant="body2" font="mono" className="text-neutral-400 uppercase tracking-wider text-xs">
+                      Mép Mờ + Glow Hồng + Hoa Anh Đào Bay (showIcon)
+                    </Typography>
+                    
+                    <WipeReveal variant="feathered" duration={1} delay={0.1} glowColor="var(--color-chizuru-500)" showIcon={true} iconSize={28}>
+                      <div className="p-5 rounded-2xl bg-white border border-neutral-100 shadow-sm space-y-2">
+                        <Typography variant="h4" className="text-rose-600 font-bold">
+                          Chizuru Ichinose
+                        </Typography>
+                        <Typography variant="body2" className="text-neutral-500">
+                          &quot;Hẹn hò với tôi, bạn sẽ nhận được 100% sự lãng mạn thực sự.&quot;
+                        </Typography>
+                      </div>
+                    </WipeReveal>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Typography variant="body2" font="mono" className="text-neutral-400 uppercase tracking-wider text-xs">
+                      Tiêu đề Lớn + Glow Hồng Đậm + Hoa Anh Đào Lớn (iconSize=36)
+                    </Typography>
+                    <WipeReveal variant="feathered" duration={1.5} delay={0.3} glowColor="var(--color-chizuru-600)" showIcon={true} iconSize={36}>
+                      <Typography variant="h1" font="display" className="text-rose-500 text-stroke-black text-shadow-pop">
+                        Kanojo, Okarishimasu!
+                      </Typography>
+                    </WipeReveal>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Typography variant="body2" font="mono" className="text-neutral-400 uppercase tracking-wider text-xs">
+                      Mép Sắc Nét + Glow Xanh Ruka + Hoa Anh Đào Bay
+                    </Typography>
+
+                    <WipeReveal variant="sharp" duration={1} delay={0.1} glowColor="var(--color-ruka-500)" showIcon={true} iconSize={28}>
+                      <div className="p-5 rounded-2xl bg-white border border-neutral-100 shadow-sm space-y-2">
+                        <Typography variant="h4" className="text-emerald-600 font-bold">
+                          Ruka Sarashina
+                        </Typography>
+                        <Typography variant="body2" className="text-neutral-500">
+                          &quot;Nhịp tim của em chỉ đập nhanh hơn khi ở bên cạnh anh thôi!&quot;
+                        </Typography>
+                      </div>
+                    </WipeReveal>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Typography variant="body2" font="mono" className="text-neutral-400 uppercase tracking-wider text-xs">
+                      Mép Mờ Không Có Vệt Sáng & Icon (enableGlow/showIcon = false)
+                    </Typography>
+
+                    <WipeReveal variant="feathered" duration={1} delay={0.3} enableGlow={false} showIcon={false}>
+                      <div className="p-5 rounded-2xl bg-white border border-neutral-100 shadow-sm space-y-2">
+                        <Typography variant="h4" className="text-neutral-700 font-bold">
+                          Sumi Sakurasawa
+                        </Typography>
+                        <Typography variant="body2" className="text-neutral-500">
+                          (Dịu dàng cúi đầu và mỉm cười nhẹ nhàng...)
+                        </Typography>
+                      </div>
+                    </WipeReveal>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
