@@ -20,8 +20,10 @@ const ALLOWED_BUTTON_FILES = [
 
 // Danh sách các file được phép dùng <svg>
 const ALLOWED_SVG_FILES = [
-  'Icons.tsx'
+  'Icons.tsx',
+  'BulletDot.tsx'
 ];
+
 
 let hasErrors = false;
 

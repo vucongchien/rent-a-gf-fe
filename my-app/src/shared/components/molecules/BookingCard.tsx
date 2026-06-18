@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { Booking } from '@/shared/types';
+import { BulletDot } from '@/shared/components/atoms/BulletDot';
 
 export interface BookingCardProps {
   booking: Booking;
@@ -96,23 +97,17 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
         {/* Bullet Info list with custom SVG dot */}
         <ul className="flex flex-col gap-0.5 sm:gap-1 text-[11px] sm:text-[13px] md:text-[13.5px] text-neutral-500 font-sans" aria-label="Thông tin chi tiết đặt hẹn">
           <li className="flex items-center gap-2.5">
-            <svg className="w-1.5 h-1.5 text-neutral-300 flex-shrink-0" viewBox="0 0 6 6" fill="currentColor">
-              <circle cx="3" cy="3" r="2" />
-            </svg>
+            <BulletDot className="w-1.5 h-1.5" aria-hidden="true" />
             <span>
               Trạng thái: <span className={`font-semibold ${statusConfig.textColor}`}>{statusConfig.label}</span>
             </span>
           </li>
           <li className="flex items-center gap-2.5">
-            <svg className="w-1.5 h-1.5 text-neutral-300 flex-shrink-0" viewBox="0 0 6 6" fill="currentColor">
-              <circle cx="3" cy="3" r="2" />
-            </svg>
+            <BulletDot className="w-1.5 h-1.5" aria-hidden="true" />
             <span>{formatBookingTime(booking.scheduledAt, booking.endsAt)}</span>
           </li>
           <li className="flex items-center gap-2.5">
-            <svg className="w-1.5 h-1.5 text-neutral-300 flex-shrink-0" viewBox="0 0 6 6" fill="currentColor">
-              <circle cx="3" cy="3" r="2" />
-            </svg>
+            <BulletDot className="w-1.5 h-1.5" aria-hidden="true" />
             <span className="truncate">{booking.scenarioLocation}</span>
           </li>
         </ul>

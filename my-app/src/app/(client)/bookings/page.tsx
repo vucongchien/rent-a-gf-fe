@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { bookingService } from '@/shared/services/bookingService';
 import { BookingCard } from '@/shared/components/molecules/BookingCard';
 import { WipeReveal } from '@/shared/components/atoms/WipeReveal';
+import { CalendarXIcon } from '@/shared/components/atoms/Icons';
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -102,14 +103,7 @@ async function BookingsListContainer({ currentTab }: ListContainerProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 bg-white border border-neutral-200 rounded-[24px] text-center shadow-sm">
         <div className="w-16 h-16 rounded-full bg-chizuru-50 flex items-center justify-center text-chizuru-500 mb-4 border border-chizuru-100">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-            <line x1="16" x2="16" y1="2" y2="6"/>
-            <line x1="8" x2="8" y1="2" y2="6"/>
-            <line x1="3" x2="21" y1="10" y2="10"/>
-            <line x1="10" x2="14" y1="14" y2="18"/>
-            <line x1="14" x2="10" y1="14" y2="18"/>
-          </svg>
+          <CalendarXIcon size={28} className="text-chizuru-500" />
         </div>
         <h3 className="font-sans font-bold text-neutral-800 text-lg mb-1">
           Không tìm thấy lịch hẹn

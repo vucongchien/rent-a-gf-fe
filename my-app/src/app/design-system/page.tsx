@@ -462,13 +462,13 @@ function DesignSystemContent() {
                       Mép Mờ + Glow Hồng + Hoa Anh Đào Bay (showIcon)
                     </Typography>
                     
-                    <WipeReveal variant="feathered" duration={1} delay={0.1} glowColor="#FFB6C1" showIcon={true} iconSize={28}>
+                    <WipeReveal variant="feathered" duration={1} delay={0.1} glowColor="var(--color-chizuru-500)" showIcon={true} iconSize={28}>
                       <div className="p-5 rounded-2xl bg-white border border-neutral-100 shadow-sm space-y-2">
                         <Typography variant="h4" className="text-rose-600 font-bold">
                           Chizuru Ichinose
                         </Typography>
                         <Typography variant="body2" className="text-neutral-500">
-                          "Hẹn hò với tôi, bạn sẽ nhận được 100% sự lãng mạn thực sự."
+                          &quot;Hẹn hò với tôi, bạn sẽ nhận được 100% sự lãng mạn thực sự.&quot;
                         </Typography>
                       </div>
                     </WipeReveal>
@@ -478,7 +478,7 @@ function DesignSystemContent() {
                     <Typography variant="body2" font="mono" className="text-neutral-400 uppercase tracking-wider text-xs">
                       Tiêu đề Lớn + Glow Hồng Đậm + Hoa Anh Đào Lớn (iconSize=36)
                     </Typography>
-                    <WipeReveal variant="feathered" duration={1.5} delay={0.3} glowColor="#FF69B4" showIcon={true} iconSize={36}>
+                    <WipeReveal variant="feathered" duration={1.5} delay={0.3} glowColor="var(--color-chizuru-600)" showIcon={true} iconSize={36}>
                       <Typography variant="h1" font="display" className="text-rose-500 text-stroke-black text-shadow-pop">
                         Kanojo, Okarishimasu!
                       </Typography>
@@ -492,13 +492,13 @@ function DesignSystemContent() {
                       Mép Sắc Nét + Glow Xanh Ruka + Hoa Anh Đào Bay
                     </Typography>
 
-                    <WipeReveal variant="sharp" duration={1} delay={0.1} glowColor="#88D8C0" showIcon={true} iconSize={28}>
+                    <WipeReveal variant="sharp" duration={1} delay={0.1} glowColor="var(--color-ruka-500)" showIcon={true} iconSize={28}>
                       <div className="p-5 rounded-2xl bg-white border border-neutral-100 shadow-sm space-y-2">
                         <Typography variant="h4" className="text-emerald-600 font-bold">
                           Ruka Sarashina
                         </Typography>
                         <Typography variant="body2" className="text-neutral-500">
-                          "Nhịp tim của em chỉ đập nhanh hơn khi ở bên cạnh anh thôi!"
+                          &quot;Nhịp tim của em chỉ đập nhanh hơn khi ở bên cạnh anh thôi!&quot;
                         </Typography>
                       </div>
                     </WipeReveal>

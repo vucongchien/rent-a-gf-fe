@@ -393,26 +393,26 @@ export const SakuraIcon: React.FC<IconProps> = ({ size = 24, className = '', ...
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" className={className} {...props}>
       <defs>
         <linearGradient id={`sakuraGrad1-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFF0F5" />
-          <stop offset="40%" stopColor="#FFA6C9" stopOpacity="0.95" />
-          <stop offset="100%" stopColor="#FF69B4" stopOpacity="0.8" />
+          <stop offset="0%" stopColor="var(--color-chizuru-50)" />
+          <stop offset="40%" stopColor="var(--color-chizuru-500)" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="var(--color-chizuru-600)" stopOpacity="0.8" />
         </linearGradient>
         <linearGradient id={`sakuraGrad2-${gradId}`} x1="100%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#FFF" stopOpacity="0.8" />
-          <stop offset="60%" stopColor="#FFB6C1" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#DB7093" stopOpacity="0.75" />
+          <stop offset="60%" stopColor="var(--color-chizuru-500)" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="var(--color-sumi-600)" stopOpacity="0.75" />
         </linearGradient>
       </defs>
       
       {/* Các đốm màu nước loang xung quanh */}
-      <circle cx="28" cy="22" r="3" fill="#FFB6C1" opacity="0.6" />
-      <circle cx="78" cy="32" r="2" fill="#FF91A4" opacity="0.5" />
-      <circle cx="70" cy="76" r="3" fill="#FFC0CB" opacity="0.6" />
-      <circle cx="32" cy="74" r="2.5" fill="#FFB6C1" opacity="0.5" />
+      <circle cx="28" cy="22" r="3" fill="var(--color-chizuru-500)" opacity="0.6" />
+      <circle cx="78" cy="32" r="2" fill="var(--color-sumi-500)" opacity="0.5" />
+      <circle cx="70" cy="76" r="3" fill="var(--color-sumi-100)" opacity="0.6" />
+      <circle cx="32" cy="74" r="2.5" fill="var(--color-chizuru-500)" opacity="0.5" />
       
       {/* Các tia sáng lấp lánh (sparkles) */}
-      <path d="M 20,40 Q 20,45 25,45 Q 20,45 20,50 Q 20,45 15,45 Q 20,45 20,40" fill="#FCE883" opacity="0.8" />
-      <path d="M 80,55 Q 80,60 85,60 Q 80,60 80,65 Q 80,60 75,60 Q 80,60 80,55" fill="#FCE883" opacity="0.8" />
+      <path d="M 20,40 Q 20,45 25,45 Q 20,45 20,50 Q 20,45 15,45 Q 20,45 20,40" fill="var(--color-mami-500)" opacity="0.8" />
+      <path d="M 80,55 Q 80,60 85,60 Q 80,60 80,65 Q 80,60 75,60 Q 80,60 80,55" fill="var(--color-mami-500)" opacity="0.8" />
 
       {/* Lớp màu nước nền thứ nhất */}
       <path 
@@ -453,10 +453,10 @@ export const SakuraIcon: React.FC<IconProps> = ({ size = 24, className = '', ...
 
       {/* Nhụy hoa */}
       <circle cx="50" cy="50" r="4" fill="var(--color-accent)" stroke="var(--color-sketch-outline)" strokeWidth="1.5" />
-      <circle cx="47" cy="46" r="1.5" fill="#FF69B4" />
-      <circle cx="53" cy="47" r="1.5" fill="#FF69B4" />
-      <circle cx="51" cy="53" r="1.5" fill="#FF69B4" />
-      <circle cx="46" cy="52" r="1.5" fill="#FF69B4" />
+      <circle cx="47" cy="46" r="1.5" fill="var(--color-chizuru-600)" />
+      <circle cx="53" cy="47" r="1.5" fill="var(--color-chizuru-600)" />
+      <circle cx="51" cy="53" r="1.5" fill="var(--color-chizuru-600)" />
+      <circle cx="46" cy="52" r="1.5" fill="var(--color-chizuru-600)" />
 
       {/* Điểm nhấn highlight trắng */}
       <path d="M 40,28 A 6,6 0 0,1 46,34" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" opacity="0.9" />
@@ -464,3 +464,15 @@ export const SakuraIcon: React.FC<IconProps> = ({ size = 24, className = '', ...
     </svg>
   );
 };
+
+export const CalendarXIcon: React.FC<IconProps> = ({ size = 28, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+    <line x1="16" x2="16" y1="2" y2="6"/>
+    <line x1="8" x2="8" y1="2" y2="6"/>
+    <line x1="3" x2="21" y1="10" y2="10"/>
+    <line x1="10" x2="14" y1="14" y2="18"/>
+    <line x1="14" x2="10" y1="14" y2="18"/>
+  </svg>
+);
+
