@@ -31,7 +31,7 @@ export default async function BookingsPage() {
    ========================================================================== */
 async function BookingsLoader() {
   // Fetch bookings (handles mock/offline automatically via bookingService)
-  const data = await bookingService.getBookings();
+  const data = await bookingService.getClientBookings();
 
   return <BookingsClientView initialBookings={data.items} />;
 }

@@ -3,10 +3,10 @@ import { bookingService } from '@/shared/services/bookingService'
 import { toErrorPayload } from '@/shared/lib/apiClient'
 import type { CreateBookingBody } from '@/shared/types'
 
-/** GET /api/bookings — Danh sách booking của user hiện tại */
+/** GET /api/client/bookings — Danh sách booking của client hiện tại */
 export async function GET(req: NextRequest) {
   try {
-    const { items, total, hasNextPage } = await bookingService.getBookings({
+    const { items, total, hasNextPage } = await bookingService.getClientBookings({
       req,
       searchParams: req.nextUrl.searchParams,
     })
@@ -22,9 +22,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-/**
- * POST /api/bookings — Tạo booking mới
- */
+/** POST /api/client/bookings — Tạo booking mới */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as CreateBookingBody
@@ -32,7 +30,6 @@ export async function POST(req: NextRequest) {
 
     const result = await bookingService.createBooking(body, { req })
 
-    // Forward idempotency key nếu có
     const res = NextResponse.json({ data: result }, { status: 201 })
     if (idempotencyKey) res.headers.set('X-Idempotency-Key', idempotencyKey)
     return res

@@ -25,9 +25,9 @@ async function getRequestCookieHeader(req?: { headers: { get(name: string): stri
 
 export const bookingService = {
   /**
-   * Lấy danh sách booking của user hiện tại
+   * Lấy danh sách booking của Client
    */
-  async getBookings(options?: ServiceRequestOptions & {
+  async getClientBookings(options?: ServiceRequestOptions & {
     searchParams?: URLSearchParams;
   }): Promise<{
     items: Booking[];
@@ -37,10 +37,10 @@ export const bookingService = {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      // Offline mock data
+      const clientBookings = mockBookings.filter(b => b.clientId === 'u-client-1');
       return {
-        items: mockBookings as Booking[],
-        total: mockBookings.length,
+        items: clientBookings as Booking[],
+        total: clientBookings.length,
         hasNextPage: false,
       };
     }
@@ -53,7 +53,7 @@ export const bookingService = {
           items: Booking[];
           meta: { total: number; hasNextPage: boolean };
         }
-      }>('/bookings', {
+      }>('/client/bookings', {
         req,
         searchParams: options?.searchParams,
       });
@@ -64,44 +64,40 @@ export const bookingService = {
         hasNextPage: raw.data.meta.hasNextPage,
       };
     } catch (err) {
-      console.error('[bookingService] Lỗi fetch bookings:', err);
+      console.error('[bookingService] Lỗi fetch client bookings:', err);
       return { items: [], total: 0, hasNextPage: false };
     }
   },
 
   /**
-   * Lấy chi tiết một lịch hẹn
+   * Lấy chi tiết lịch hẹn của Client
    */
-  async getBookingDetail(bookingId: string, options?: ServiceRequestOptions): Promise<Booking | null> {
+  async getClientBookingDetail(bookingId: string, options?: ServiceRequestOptions): Promise<Booking | null> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      const found = mockBookings.find(b => b.id === bookingId);
+      const found = mockBookings.find(b => b.id === bookingId && b.clientId === 'u-client-1');
       return (found as Booking) || null;
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
     try {
-      const raw = await serverFetch<{ data: Booking }>(`/bookings/${bookingId}`, { req });
+      const raw = await serverFetch<{ data: Booking }>(`/client/bookings/${bookingId}`, { req });
       return raw.data;
     } catch (err) {
-      console.error(`[bookingService] Lỗi fetch booking detail ${bookingId}:`, err);
+      console.error(`[bookingService] Lỗi fetch client booking detail ${bookingId}:`, err);
       return null;
     }
   },
 
   /**
-   * Tạo lịch hẹn mới
+   * Tạo lịch hẹn mới (Client)
    */
   async createBooking(body: CreateBookingBody, options?: ServiceRequestOptions): Promise<CreateBookingResult> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      // NOTE: Không modify mockWallet ở đây - Server Action chạy trong Node.js,
-      // còn MSW (source of truth cho wallet) chạy trong Browser Service Worker.
-      // Đây là 2 process/module instance riêng biệt - mutation server-side vô nghĩa.
-      // Việc trừ coin được xử lý bởi MSW POST /api/bookings handler (browser-side).
       return {
         id: `bk-${Date.now()}`,
         status: 'PENDING',
@@ -114,7 +110,7 @@ export const bookingService = {
     try {
       const raw = await serverFetch<{
         data: { bookingId: string; status: string; frozenCoin: number }
-      }>('/bookings', {
+      }>('/client/bookings', {
         req,
         method: 'POST',
         body,
@@ -132,43 +128,7 @@ export const bookingService = {
   },
 
   /**
-   * Chấp nhận đặt lịch (cho Companion)
-   */
-  async acceptBooking(bookingId: string, options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean; status: string }>> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
-      return { data: { success: true, status: 'ACCEPTED' } };
-    }
-
-    const req = await getRequestCookieHeader(options?.req);
-
-    return serverFetch<ApiResponse<{ success: boolean; status: string }>>(`/bookings/${bookingId}/accept`, {
-      req,
-      method: 'PATCH',
-    });
-  },
-
-  /**
-   * Từ chối đặt lịch (cho Companion)
-   */
-  async rejectBooking(bookingId: string, options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean; status: string }>> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
-      return { data: { success: true, status: 'REJECTED' } };
-    }
-
-    const req = await getRequestCookieHeader(options?.req);
-
-    return serverFetch<ApiResponse<{ success: boolean; status: string }>>(`/bookings/${bookingId}/reject`, {
-      req,
-      method: 'PATCH',
-    });
-  },
-
-  /**
-   * Hủy đặt lịch (cho Client/Companion)
+   * Hủy đặt lịch (Client)
    */
   async cancelBooking(bookingId: string, options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean; status: string }>> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
@@ -179,7 +139,110 @@ export const bookingService = {
 
     const req = await getRequestCookieHeader(options?.req);
 
-    return serverFetch<ApiResponse<{ success: boolean; status: string }>>(`/bookings/${bookingId}/cancel`, {
+    return serverFetch<ApiResponse<{ success: boolean; status: string }>>(`/client/bookings/${bookingId}/cancel`, {
+      req,
+      method: 'PATCH',
+    });
+  },
+
+  /**
+   * Lấy danh sách booking của Companion
+   */
+  async getCompanionBookings(options?: ServiceRequestOptions & {
+    searchParams?: URLSearchParams;
+  }): Promise<{
+    items: Booking[];
+    total: number;
+    hasNextPage: boolean;
+  }> {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+
+    if (isMock) {
+      const compBookings = mockBookings.filter(b => b.companionId === 'comp-1');
+      return {
+        items: compBookings as Booking[],
+        total: compBookings.length,
+        hasNextPage: false,
+      };
+    }
+
+    const req = await getRequestCookieHeader(options?.req);
+
+    try {
+      const raw = await serverFetch<{
+        data: {
+          items: Booking[];
+          meta: { total: number; hasNextPage: boolean };
+        }
+      }>('/companion/bookings', {
+        req,
+        searchParams: options?.searchParams,
+      });
+
+      return {
+        items: raw.data.items,
+        total: raw.data.meta.total,
+        hasNextPage: raw.data.meta.hasNextPage,
+      };
+    } catch (err) {
+      console.error('[bookingService] Lỗi fetch companion bookings:', err);
+      return { items: [], total: 0, hasNextPage: false };
+    }
+  },
+
+  /**
+   * Lấy chi tiết lịch hẹn của Companion
+   */
+  async getCompanionBookingDetail(bookingId: string, options?: ServiceRequestOptions): Promise<Booking | null> {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+
+    if (isMock) {
+      const found = mockBookings.find(b => b.id === bookingId && b.companionId === 'comp-1');
+      return (found as Booking) || null;
+    }
+
+    const req = await getRequestCookieHeader(options?.req);
+
+    try {
+      const raw = await serverFetch<{ data: Booking }>(`/companion/bookings/${bookingId}`, { req });
+      return raw.data;
+    } catch (err) {
+      console.error(`[bookingService] Lỗi fetch companion booking detail ${bookingId}:`, err);
+      return null;
+    }
+  },
+
+  /**
+   * Chấp nhận đặt lịch (Companion)
+   */
+  async acceptBooking(bookingId: string, options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean; status: string }>> {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+
+    if (isMock) {
+      return { data: { success: true, status: 'ACCEPTED' } };
+    }
+
+    const req = await getRequestCookieHeader(options?.req);
+
+    return serverFetch<ApiResponse<{ success: boolean; status: string }>>(`/companion/bookings/${bookingId}/accept`, {
+      req,
+      method: 'PATCH',
+    });
+  },
+
+  /**
+   * Từ chối đặt lịch (Companion)
+   */
+  async rejectBooking(bookingId: string, options?: ServiceRequestOptions): Promise<ApiResponse<{ success: boolean; status: string }>> {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+
+    if (isMock) {
+      return { data: { success: true, status: 'REJECTED' } };
+    }
+
+    const req = await getRequestCookieHeader(options?.req);
+
+    return serverFetch<ApiResponse<{ success: boolean; status: string }>>(`/companion/bookings/${bookingId}/reject`, {
       req,
       method: 'PATCH',
     });

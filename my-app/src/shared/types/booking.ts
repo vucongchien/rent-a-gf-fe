@@ -28,6 +28,7 @@ export interface Booking {
   chatRoomId: string | null
   scenarioLocation: string
   escrowStatus: EscrowStatus
+  isFundsReleased?: boolean
 }
 
 /** Kết quả tạo booking mới */
