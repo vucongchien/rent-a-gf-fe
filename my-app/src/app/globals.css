@@ -594,22 +594,99 @@ dialog.modern-dialog[open]::backdrop {
 @media (prefers-reduced-motion: reduce){.nb-ind,.nb-item,.nb-icon,.nb-wrap{transition:none !important;animation:none !important}}
 
 /* =========================================
-   SAKURA GLOW PULSE & FLOAT (WipeReveal)
+   PURE CSS WIPE REVEAL ANIMATIONS (WipeReveal)
    ========================================= */
+@keyframes wipe-reveal-feathered {
+  0% {
+    mask-position: 150% 0;
+    -webkit-mask-position: 150% 0;
+  }
+  100% {
+    mask-position: 0% 0;
+    -webkit-mask-position: 0% 0;
+  }
+}
+
+@keyframes wipe-reveal-sharp {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0% 0 0);
+  }
+}
+
+@keyframes glow-bar-slide {
+  0% {
+    left: 0%;
+    opacity: 1;
+  }
+  85% {
+    left: 100%;
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes sakura-slide-rotate {
+  0% {
+    left: 0%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    opacity: 1;
+  }
+  85% {
+    left: 100%;
+    transform: translate(-50%, -50%) rotate(360deg);
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    transform: translate(-50%, -50%) rotate(360deg);
+    opacity: 0;
+  }
+}
+
 @keyframes sakura-float-glow {
   0%, 100% {
-    filter: drop-shadow(0 0 5px rgba(255, 182, 193, 0.75)) drop-shadow(0 0 10px rgba(255, 105, 180, 0.45));
+    filter: drop-shadow(0 0 5px var(--glow-color, #FFB6C1)) drop-shadow(0 0 10px rgba(255, 105, 180, 0.45));
     transform: translateY(0) scale(1);
   }
   50% {
-    filter: drop-shadow(0 0 14px rgba(255, 182, 193, 1)) drop-shadow(0 0 24px rgba(255, 105, 180, 0.8));
-    transform: translateY(-8px) scale(1.15); /* Nhún nhảy nhô cao lên một chút và nở to ra */
+    filter: drop-shadow(0 0 14px var(--glow-color, #FFB6C1)) drop-shadow(0 0 24px rgba(255, 105, 180, 0.8));
+    transform: translateY(-8px) scale(1.15); /* Nhún nhảy nhô cao lên và nở to ra */
   }
+}
+
+@utility animate-reveal-feathered {
+  mask-image: linear-gradient(to right, #000 0%, #000 40%, transparent 60%, transparent 100%);
+  mask-size: 250% 100%;
+  mask-position: 150% 0;
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 40%, transparent 60%, transparent 100%);
+  -webkit-mask-size: 250% 100%;
+  -webkit-mask-position: 150% 0;
+  animation: wipe-reveal-feathered var(--reveal-duration, 0.8s) var(--reveal-delay, 0s) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@utility animate-reveal-sharp {
+  clip-path: inset(0 100% 0 0);
+  animation: wipe-reveal-sharp var(--reveal-duration, 0.8s) var(--reveal-delay, 0s) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@utility animate-glow-bar {
+  animation: glow-bar-slide var(--reveal-duration, 0.8s) var(--reveal-delay, 0s) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@utility animate-sakura-container {
+  animation: sakura-slide-rotate var(--reveal-duration, 0.8s) var(--reveal-delay, 0s) cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 @utility animate-sakura-glow {
   animation: sakura-float-glow 1s ease-in-out infinite;
 }
+
 
 
 

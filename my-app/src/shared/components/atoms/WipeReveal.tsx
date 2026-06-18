@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { SakuraIcon } from "./Icons";
 
@@ -30,105 +28,58 @@ export const WipeReveal: React.FC<WipeRevealProps> = ({
   style,
   ...props
 }) => {
-  const [isRevealed, setIsRevealed] = React.useState(false);
-  const [isAnimFinished, setIsAnimFinished] = React.useState(false);
-
   // Khi có showIcon, chúng ta sẽ ưu tiên ẩn vệt sáng thẳng để tránh vướng víu
   const shouldShowGlowBar = enableGlow && !showIcon;
 
-  React.useEffect(() => {
-    // 1. Kích hoạt animation ngay sau khi mount
-    const timerReveal = setTimeout(() => {
-      setIsRevealed(true);
-    }, 50);
+  // CSS variables truyền xuống inline style để các animation class trong CSS sử dụng
+  const styleVariables = {
+    "--reveal-duration": `${duration}s`,
+    "--reveal-delay": `${delay}s`,
+    "--glow-color": glowColor,
+    ...style,
+  } as React.CSSProperties;
 
-    // 2. Kích hoạt timer ẩn vệt sáng & icon sau khi hoàn tất animation quét
-    let timerFinish: NodeJS.Timeout;
-    if (shouldShowGlowBar || showIcon) {
-      const totalTimeMs = (duration + delay) * 1000;
-      timerFinish = setTimeout(() => {
-        setIsAnimFinished(true);
-      }, totalTimeMs);
-    }
+  // Lấy class animation tương ứng cho nội dung
+  const revealClass = variant === "feathered" ? "animate-reveal-feathered" : "animate-reveal-sharp";
 
-    return () => {
-      clearTimeout(timerReveal);
-      if (timerFinish) clearTimeout(timerFinish);
-    };
-  }, [duration, delay, shouldShowGlowBar, showIcon]);
-
-  // Thiết lập style hiển thị của nội dung (che/hiện bằng Mask hoặc ClipPath)
-  const getRevealStyle = (): React.CSSProperties => {
-    if (variant === "feathered") {
-      return {
-        WebkitMaskImage: "linear-gradient(to right, #000 0%, #000 40%, transparent 60%, transparent 100%)",
-        WebkitMaskSize: "250% 100%",
-        WebkitMaskPosition: isRevealed ? "0% 0" : "150% 0",
-        maskImage: "linear-gradient(to right, #000 0%, #000 40%, transparent 60%, transparent 100%)",
-        maskSize: "250% 100%",
-        maskPosition: isRevealed ? "0% 0" : "150% 0",
-        transition: `mask-position ${duration}s ${delay}s cubic-bezier(0.25, 1, 0.5, 1), -webkit-mask-position ${duration}s ${delay}s cubic-bezier(0.25, 1, 0.5, 1)`,
-        willChange: "mask-position, -webkit-mask-position",
-      };
-    } else {
-      return {
-        clipPath: isRevealed ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
-        transition: `clip-path ${duration}s ${delay}s cubic-bezier(0.25, 1, 0.5, 1)`,
-        willChange: "clip-path",
-      };
-    }
+  // Style phụ trợ cho vệt sáng
+  const glowStyle: React.CSSProperties = {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: "3px",
+    background: `linear-gradient(to bottom, transparent, var(--glow-color) 20%, #ffffff 50%, var(--glow-color) 80%, transparent)`,
+    boxShadow: `0 0 15px 5px var(--glow-color), 0 0 6px 1px #ffffff`,
+    transform: "translateX(-50%)",
+    pointerEvents: "none",
+    zIndex: 10,
   };
 
-  // Thiết lập style cho vệt sáng quét qua (chỉ dùng khi không có icon)
-  const getGlowStyle = (): React.CSSProperties => {
-    return {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: isRevealed ? "100%" : "0%",
-      width: "3px",
-      background: `linear-gradient(to bottom, transparent, ${glowColor} 20%, #ffffff 50%, ${glowColor} 80%, transparent)`,
-      boxShadow: `0 0 15px 5px ${glowColor}, 0 0 6px 1px #ffffff`,
-      transform: "translateX(-50%)",
-      transition: `left ${duration}s ${delay}s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease-out`,
-      pointerEvents: "none",
-      opacity: isRevealed && !isAnimFinished ? 1 : 0,
-      zIndex: 10,
-    };
-  };
-
-  // Thiết lập container cho icon Sakura trượt ngang và xoay tròn
-  const getIconContainerStyle = (): React.CSSProperties => {
-    const rotateDeg = isRevealed ? "360deg" : "0deg";
-    return {
-      position: "absolute",
-      top: "50%",
-      left: isRevealed ? "100%" : "0%",
-      transform: `translate(-50%, -50%) rotate(${rotateDeg})`,
-      transition: `left ${duration}s ${delay}s cubic-bezier(0.25, 1, 0.5, 1), transform ${duration}s ${delay}s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease-out`,
-      pointerEvents: "none",
-      opacity: isRevealed && !isAnimFinished ? 1 : 0,
-      zIndex: 11,
-    };
+  // Style phụ trợ cho container bọc icon
+  const iconContainerStyle: React.CSSProperties = {
+    position: "absolute",
+    top: "50%",
+    pointerEvents: "none",
+    zIndex: 11,
   };
 
   return (
     <div
       className={`relative inline-block w-full overflow-hidden ${className}`}
-      style={{
-        ...style,
-      }}
+      style={styleVariables}
       {...props}
     >
-      {/* Container nội dung thực hiện ẩn hiện */}
-      <div style={getRevealStyle()}>{children}</div>
+      {/* Container nội dung thực hiện ẩn hiện bằng thuần CSS animation */}
+      <div className={revealClass}>{children}</div>
 
-      {/* Vệt sáng di chuyển đè lên trên (chỉ hiện khi không dùng icon) */}
-      {shouldShowGlowBar && <div style={getGlowStyle()} />}
+      {/* Vệt sáng di chuyển đè lên trên bằng CSS animation */}
+      {shouldShowGlowBar && (
+        <div style={glowStyle} className="animate-glow-bar" />
+      )}
 
-      {/* Icon Sakura di chuyển và xoay tròn, kết hợp animation nhún nhảy và tỏa sáng mượt mà */}
+      {/* Icon Sakura di chuyển, xoay tròn và nhấp nháy phát sáng bằng CSS animation */}
       {showIcon && (
-        <div style={getIconContainerStyle()}>
+        <div style={iconContainerStyle} className="animate-sakura-container">
           <div className="animate-sakura-glow" style={{ width: iconSize, height: iconSize }}>
             <SakuraIcon size={iconSize} />
           </div>

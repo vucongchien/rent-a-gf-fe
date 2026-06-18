@@ -2,7 +2,6 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { bookingService } from '@/shared/services/bookingService';
 import { BookingCard } from '@/shared/components/molecules/BookingCard';
-import { MobileHeader } from '@/shared/components/organisms/MobileHeader';
 import { WipeReveal } from '@/shared/components/atoms/WipeReveal';
 
 interface PageProps {
@@ -22,20 +21,11 @@ export default async function BookingsPage({ searchParams }: PageProps) {
 
   return (
     <div className="w-full pb-12">
-      {/* Mobile Header */}
-      <MobileHeader
-        left={
-          <WipeReveal variant="feathered" duration={0.8} delay={0.1} showIcon={true} iconSize={20} className="w-auto">
-            <h1 className="text-xl font-bold text-neutral-900 px-4 font-sans">Lịch đặt hẹn</h1>
-          </WipeReveal>
-        }
-      />
-
-      {/* Desktop Header Title (Artbook style) */}
-      <div className="hidden lg:flex items-center gap-4 pt-4 pb-6 mb-4 w-full">
-        <div className="w-[8px] h-[32px] bg-ruka-500 rounded-sm shrink-0" />
-        <WipeReveal variant="feathered" duration={1} delay={0.1} showIcon={true} iconSize={28} className="w-auto">
-          <h1 className="text-[28px] sm:text-3xl font-bold font-sans tracking-[0.15em] uppercase text-neutral-800">
+      {/* Header Title (Artbook style - Shared for Desktop & Mobile) */}
+      <div className="flex items-center gap-3 sm:gap-4 pt-4 pb-4 sm:pb-6 mb-2 sm:mb-4 w-full">
+        <div className="w-[6px] sm:w-[8px] h-[24px] sm:h-[32px] bg-ruka-500 rounded-sm shrink-0" />
+        <WipeReveal variant="feathered" duration={1} delay={0.35} showIcon={true} iconSize={24} className="w-auto">
+          <h1 className="text-xl sm:text-3xl font-bold font-sans tracking-[0.12em] sm:tracking-[0.15em] uppercase text-neutral-800">
             Lịch đặt hẹn
           </h1>
         </WipeReveal>
