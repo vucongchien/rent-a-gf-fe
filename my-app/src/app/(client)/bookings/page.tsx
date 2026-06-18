@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { bookingService } from '@/shared/services/bookingService';
 import { BookingCard } from '@/shared/components/molecules/BookingCard';
 import { MobileHeader } from '@/shared/components/organisms/MobileHeader';
+import { WipeReveal } from '@/shared/components/atoms/WipeReveal';
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -20,18 +21,27 @@ export default async function BookingsPage({ searchParams }: PageProps) {
   const currentTab = (resolvedSearchParams.tab as string) || 'all';
 
   return (
-    <div className="min-h-full bg-neutral-50 pb-12">
+    <div className="w-full pb-12">
       {/* Mobile Header */}
       <MobileHeader
-        left={<h1 className="text-xl font-bold text-neutral-900 px-4 font-sans">Lịch đặt hẹn</h1>}
+        left={
+          <WipeReveal variant="feathered" duration={0.8} delay={0.1} showIcon={true} iconSize={20} className="w-auto">
+            <h1 className="text-xl font-bold text-neutral-900 px-4 font-sans">Lịch đặt hẹn</h1>
+          </WipeReveal>
+        }
       />
 
-      {/* Desktop Header Title */}
-      <div className="hidden lg:block max-w-3xl mx-auto pt-8 px-4">
-        <h1 className="text-2xl font-bold text-neutral-900 font-sans">Lịch đặt hẹn</h1>
+      {/* Desktop Header Title (Artbook style) */}
+      <div className="hidden lg:flex items-center gap-4 pt-4 pb-6 mb-4 w-full">
+        <div className="w-[8px] h-[32px] bg-ruka-500 rounded-sm shrink-0" />
+        <WipeReveal variant="feathered" duration={1} delay={0.1} showIcon={true} iconSize={28} className="w-auto">
+          <h1 className="text-[28px] sm:text-3xl font-bold font-sans tracking-[0.15em] uppercase text-neutral-800">
+            Lịch đặt hẹn
+          </h1>
+        </WipeReveal>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-4 flex flex-col gap-6">
+      <div className="max-w-[680px] mx-auto w-full flex flex-col gap-6 px-4">
         {/* Status Filter Tabs (URL-as-state) */}
         <nav className="flex gap-2 overflow-x-auto pb-1 scrollbar-none" aria-label="Bộ lọc trạng thái đặt hẹn">
           {tabItems.map((tab) => {
@@ -132,7 +142,7 @@ async function BookingsListContainer({ currentTab }: ListContainerProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-8 md:gap-10">
       {sortedBookings.map((booking) => (
         <BookingCard key={booking.id} booking={booking} />
       ))}
@@ -145,26 +155,35 @@ async function BookingsListContainer({ currentTab }: ListContainerProps) {
    ========================================================================== */
 function BookingsSkeleton() {
   return (
-    <div className="flex flex-col gap-4 animate-pulse">
+    <div className="flex flex-col gap-8 md:gap-10 animate-pulse">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white border border-neutral-200 rounded-[20px] p-4 flex gap-4 shadow-sm">
-          {/* Avatar Skeleton */}
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-2xl flex-shrink-0" />
+        <div key={i} className="flex gap-6 items-center">
+          {/* Avatar Skeleton (Horizontal Capsule 2:1) */}
+          <div className="w-[90px] sm:w-[180px] h-[45px] sm:h-[90px] bg-neutral-100 rounded-full flex-shrink-0" />
           
           {/* Details Skeleton */}
           <div className="flex-1 py-1 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="h-4.5 w-32 bg-neutral-200 rounded-md" />
-                <div className="h-4 w-16 bg-neutral-100 rounded-full" />
+              {/* Tiêu đề 2 dòng trên mobile, 1 dòng trên desktop */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 mb-3">
+                <div className="h-5 w-24 sm:w-32 bg-neutral-200 rounded-md" />
+                <div className="h-4 w-36 sm:w-48 bg-neutral-100 rounded-md" />
               </div>
-              <div className="h-4 w-48 bg-neutral-100 rounded-md mb-2" />
-            </div>
-            
-            <div className="flex flex-col gap-1.5 mt-2">
-              <div className="h-3.5 w-44 bg-neutral-100 rounded-md" />
-              <div className="h-3.5 w-36 bg-neutral-100 rounded-md" />
-              <div className="h-4 w-28 bg-neutral-200 rounded-md mt-1" />
+              
+              <div className="flex flex-col gap-1 sm:gap-2 mt-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-neutral-200" />
+                  <div className="h-3 w-28 sm:h-3.5 sm:w-48 bg-neutral-100 rounded-md" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-neutral-200" />
+                  <div className="h-3 w-40 sm:h-3.5 sm:w-64 bg-neutral-100 rounded-md" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-neutral-200" />
+                  <div className="h-3 w-32 sm:h-3.5 sm:w-36 bg-neutral-100 rounded-md" />
+                </div>
+              </div>
             </div>
           </div>
         </div>

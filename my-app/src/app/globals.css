@@ -593,5 +593,24 @@ dialog.modern-dialog[open]::backdrop {
 @keyframes nb-blobmorph{0%,100%{border-radius:46% 54% 50% 50%/52% 48% 52% 48%}50%{border-radius:54% 46% 52% 48%/46% 54% 48% 52%}}
 @media (prefers-reduced-motion: reduce){.nb-ind,.nb-item,.nb-icon,.nb-wrap{transition:none !important;animation:none !important}}
 
+/* =========================================
+   SAKURA GLOW PULSE & FLOAT (WipeReveal)
+   ========================================= */
+@keyframes sakura-float-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(255, 182, 193, 0.75)) drop-shadow(0 0 10px rgba(255, 105, 180, 0.45));
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(255, 182, 193, 1)) drop-shadow(0 0 24px rgba(255, 105, 180, 0.8));
+    transform: translateY(-8px) scale(1.15); /* Nhún nhảy nhô cao lên một chút và nở to ra */
+  }
+}
+
+@utility animate-sakura-glow {
+  animation: sakura-float-glow 1s ease-in-out infinite;
+}
+
+
 
 

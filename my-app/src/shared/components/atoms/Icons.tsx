@@ -386,3 +386,81 @@ export const UserIcon: React.FC<IconProps> = ({ size = 20, className = '', ...pr
     <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
   </svg>
 );
+
+export const SakuraIcon: React.FC<IconProps> = ({ size = 24, className = '', ...props }) => {
+  const gradId = React.useId().replace(/:/g, "-");
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" className={className} {...props}>
+      <defs>
+        <linearGradient id={`sakuraGrad1-${gradId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFF0F5" />
+          <stop offset="40%" stopColor="#FFA6C9" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#FF69B4" stopOpacity="0.8" />
+        </linearGradient>
+        <linearGradient id={`sakuraGrad2-${gradId}`} x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#FFF" stopOpacity="0.8" />
+          <stop offset="60%" stopColor="#FFB6C1" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#DB7093" stopOpacity="0.75" />
+        </linearGradient>
+      </defs>
+      
+      {/* Các đốm màu nước loang xung quanh */}
+      <circle cx="28" cy="22" r="3" fill="#FFB6C1" opacity="0.6" />
+      <circle cx="78" cy="32" r="2" fill="#FF91A4" opacity="0.5" />
+      <circle cx="70" cy="76" r="3" fill="#FFC0CB" opacity="0.6" />
+      <circle cx="32" cy="74" r="2.5" fill="#FFB6C1" opacity="0.5" />
+      
+      {/* Các tia sáng lấp lánh (sparkles) */}
+      <path d="M 20,40 Q 20,45 25,45 Q 20,45 20,50 Q 20,45 15,45 Q 20,45 20,40" fill="#FCE883" opacity="0.8" />
+      <path d="M 80,55 Q 80,60 85,60 Q 80,60 80,65 Q 80,60 75,60 Q 80,60 80,55" fill="#FCE883" opacity="0.8" />
+
+      {/* Lớp màu nước nền thứ nhất */}
+      <path 
+        d="M50 25 C45 10, 25 12, 32 30 C15 32, 10 52, 28 58 C18 73, 35 88, 48 76 C55 90, 75 88, 68 70 C85 68, 90 48, 72 42 C82 27, 65 12, 50 25 Z" 
+        fill={`url(#sakuraGrad1-${gradId})`} 
+        opacity="0.85" 
+      />
+      
+      {/* Lớp màu nước nền thứ hai */}
+      <path 
+        d="M50 28 C46 14, 28 16, 34 32 C18 34, 14 53, 30 59 C20 74, 37 87, 49 76 C56 89, 74 87, 68 71 C84 69, 88 50, 72 44 C80 30, 64 16, 50 28 Z" 
+        fill={`url(#sakuraGrad2-${gradId})`} 
+        opacity="0.75" 
+      />
+
+      {/* Đường viền vẽ tay nguệch ngoạc */}
+      <path 
+        d="M50 25 
+           C46 15, 30 14, 33 29 
+           C16 30, 11 48, 26 55 
+           C17 68, 32 82, 46 72 
+           C52 84, 69 82, 64 67 
+           C79 65, 84 48, 69 41 
+           C77 28, 62 15, 50 25 Z" 
+        stroke="var(--color-sketch-outline)" 
+        strokeWidth="2.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        opacity="0.8"
+      />
+      
+      {/* Các gân cánh hoa vẽ tay */}
+      <path d="M50 50 Q45 38 48 30" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" opacity="0.7" />
+      <path d="M50 50 Q38 42 32 40" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" opacity="0.7" />
+      <path d="M50 50 Q42 58 38 68" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" opacity="0.7" />
+      <path d="M50 50 Q58 58 62 68" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" opacity="0.7" />
+      <path d="M50 50 Q58 42 66 38" stroke="var(--color-sketch-outline)" strokeWidth="1.8" strokeLinecap="round" opacity="0.7" />
+
+      {/* Nhụy hoa */}
+      <circle cx="50" cy="50" r="4" fill="var(--color-accent)" stroke="var(--color-sketch-outline)" strokeWidth="1.5" />
+      <circle cx="47" cy="46" r="1.5" fill="#FF69B4" />
+      <circle cx="53" cy="47" r="1.5" fill="#FF69B4" />
+      <circle cx="51" cy="53" r="1.5" fill="#FF69B4" />
+      <circle cx="46" cy="52" r="1.5" fill="#FF69B4" />
+
+      {/* Điểm nhấn highlight trắng */}
+      <path d="M 40,28 A 6,6 0 0,1 46,34" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" opacity="0.9" />
+      <path d="M 68,36 A 6,6 0 0,1 72,42" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" opacity="0.9" />
+    </svg>
+  );
+};
