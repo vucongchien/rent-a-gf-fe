@@ -39,17 +39,17 @@ export const AvatarDropdown: React.FC = () => {
     <div ref={ref} className="relative">
       {/* Avatar trigger */}
       <Button
-        variant="ghost"
+        variant="unstyled"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label="Account menu"
-        className="relative p-0 border-none shadow-none hover:bg-transparent active:scale-95 rounded-full"
+        className="relative flex items-center justify-center p-0 border-none bg-transparent cursor-pointer active:scale-95 rounded-full transition-transform focus-visible:outline-none"
       >
         <Avatar
           src={user.avatarUrl}
           name={user.displayName}
           size={36}
-          className="border-2 border-neutral-200 hover:border-chizuru-600"
+          className="border-2 border-neutral-200 hover:border-chizuru-600 transition-colors"
         />
       </Button>
 
@@ -60,6 +60,57 @@ export const AvatarDropdown: React.FC = () => {
           <div className="px-3.5 py-2.5 border-b border-neutral-100">
             <p className="font-sans font-semibold text-[13.5px] text-neutral-900 truncate">{user.displayName}</p>
             <p className="font-mono text-[11px] text-neutral-500 capitalize mt-[1px]">{user.role}</p>
+          </div>
+          {/* Quick Switch Roles */}
+          <div className="px-1.5 py-1 border-b border-neutral-100 flex flex-col gap-0.5">
+            <p className="px-2 py-0.5 text-[9.5px] font-bold text-neutral-400 uppercase tracking-wider font-sans select-none">
+              Đóng vai (Dev)
+            </p>
+            {user.role !== 'CLIENT' && (
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  setOpen(false);
+                  await login('client');
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/explore';
+                  }
+                }}
+                className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
+              >
+                👤 Khách hàng (Minh)
+              </Button>
+            )}
+            {user.role !== 'COMPANION' && (
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  setOpen(false);
+                  await login('companion');
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/bookings';
+                  }
+                }}
+                className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
+              >
+                👧 Bạn gái (Linh)
+              </Button>
+            )}
+            {user.role !== 'ADMIN' && (
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  setOpen(false);
+                  await login('admin');
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/explore';
+                  }
+                }}
+                className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
+              >
+                🔑 Admin
+              </Button>
+            )}
           </div>
           {/* Actions */}
           <Button

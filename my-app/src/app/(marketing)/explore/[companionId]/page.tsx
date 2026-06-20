@@ -11,26 +11,21 @@ import { ReviewsWall } from './components/ReviewsWall'
 import { ReviewsSkeleton } from './components/ReviewsSkeleton'
 import { RelatedCompanions, RelatedCompanionsSkeleton } from './components/RelatedCompanions'
 
-import { MobileHeader } from '@/shared/components/organisms/MobileHeader'
-import { WalletButton } from '@/shared/components/atoms/WalletButton'
-import { ChevronRightIcon } from '@/shared/components/atoms/Icons'
-import Link from 'next/link'
-
 interface PageProps {
   params: Promise<{ companionId: string }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { companionId } = await params
-  const result = await companionService.getCompanionDetail(companionId)
-  if (!result?.data) return { title: 'Companion not found' }
-  const c = result.data
+  const companion = await companionService.getCompanionDetail(companionId)
+  if (!companion) return { title: 'Companion not found' }
+  const c = companion
   return {
     title: `${c.displayName} · Sổ tay hẹn hò`,
-    description: c.bio,
+    description: c.biography,
     openGraph: {
       title: c.displayName,
-      description: c.bio,
+      description: c.biography,
       images: c.albumUrls[0] ? [{ url: c.albumUrls[0] }] : [],
     },
   }
@@ -38,9 +33,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CompanionDetailPage({ params }: PageProps) {
   const { companionId } = await params
-  const result = await companionService.getCompanionDetail(companionId)
-  if (!result?.data) notFound()
-  const companion = result.data
+  const companion = await companionService.getCompanionDetail(companionId)
+  if (!companion) notFound()
 
   after(async () => {
     console.log(`[analytics] view:companion/${companionId}`)
@@ -49,19 +43,7 @@ export default async function CompanionDetailPage({ params }: PageProps) {
   const albumUrls = companion.albumUrls.length > 0
     ? companion.albumUrls : ['/placeholder.png']
 
-  const mobileHeaderLeft = (
-    <Link href="/explore" className="w-10 h-10 flex items-center justify-center text-neutral-700 active:scale-95 transition-transform rotate-180">
-      <ChevronRightIcon size={20} />
-    </Link>
-  );
-
-  const mobileHeaderRight = (
-    <WalletButton />
-  );
-
   return (
-    <>
-      <MobileHeader left={mobileHeaderLeft} right={mobileHeaderRight} transparent />
       <main className="max-w-[1180px] mx-auto px-4 md:px-8 py-10 space-y-16 pb-32">
 
 
@@ -77,7 +59,7 @@ export default async function CompanionDetailPage({ params }: PageProps) {
         <section id="scenes" className="scroll-mt-6">
           <Suspense fallback={<ScenesSkeleton />}>
             <ScenesSelectorClient
-              companionId={companion.id}
+              companionId={companion.companionId}
               companionName={companion.displayName}
               scenarios={companion.scenarios}
             />
@@ -88,8 +70,8 @@ export default async function CompanionDetailPage({ params }: PageProps) {
           <Suspense fallback={<ReviewsSkeleton />}>
             <ReviewsWall
               reviews={companion.recentReviews ?? []}
-              ratingAvg={companion.ratingAvg}
-              reviewCount={companion.reviewCount}
+              ratingAvg={companion.averageRating}
+              reviewCount={companion.totalReviews}
               companionName={companion.displayName}
             />
           </Suspense>
@@ -98,9 +80,10 @@ export default async function CompanionDetailPage({ params }: PageProps) {
         {/* Bạn đồng hành liên quan */}
         <section className="scroll-mt-6">
           <Suspense fallback={<RelatedCompanionsSkeleton />}>
-            <RelatedCompanions currentId={companionId} city={companion.city} />
+            <RelatedCompanions currentId={companionId} city={companion.availableCities[0]} />
           </Suspense>
         </section>
+
 
         {/* Hỏi đáp FAQ */}
         <section className="space-y-6 pt-10 border-t border-neutral-200">
@@ -137,6 +120,5 @@ export default async function CompanionDetailPage({ params }: PageProps) {
         </section>
 
       </main>
-    </>
   )
 }

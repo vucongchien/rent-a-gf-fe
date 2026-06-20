@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { walletService } from '@/shared/services/walletService'
+import { companionService } from '@/shared/services/companionService'
 import { toErrorPayload } from '@/shared/lib/apiClient'
 
-/** GET /api/wallet — Số dư + lịch sử giao dịch */
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const data = await walletService.getWallet({ req })
+    const data = await companionService.applyCompanion({ req })
     return NextResponse.json(data)
   } catch (err) {
     const payload = toErrorPayload(err)

@@ -2,42 +2,77 @@
  * booking.ts — Types cho Booking domain.
  */
 
+import type { PaginatedMeta } from './api'
+
 export type BookingStatus =
   | 'PENDING'
   | 'ACCEPTED'
   | 'REJECTED'
   | 'CANCELLED'
   | 'COMPLETED'
-  | 'IN_PROGRESS'
+  | 'DISPUTED'
 
-export type EscrowStatus = 'frozen' | 'released' | 'refunded'
+export interface ScenarioSnapshot {
+  title: string
+  price: number
+  durationMinutes: number
+  publicPlace: string
+}
 
-export interface Booking {
-  id: string
-  companionId: string
-  companionName: string
-  companionAvatarUrl: string
-  scenarioName: string
-  scheduledAt: string
-  endsAt: string
-  status: BookingStatus
-  priceInCoin: number
+/** Item trong danh sách booking (dùng cho GET /bookings) */
+export interface BookingListItem {
+  bookingId: string
+  partnerName: string
+  partnerAvatar: string
+  scenarioTitle: string
+  price: number
+  startTime: string
   chatRoomId: string | null
-  scenarioLocation: string
-  escrowStatus: EscrowStatus
-}
-
-/** Kết quả tạo booking mới */
-export interface CreateBookingResult {
-  id: string
+  hasReviewed: boolean
   status: BookingStatus
-  frozenCoin: number
 }
 
-/** Body gửi khi tạo booking */
+/** Chi tiết Booking (dùng cho GET /bookings/{bookingId}) */
+export interface BookingDetail {
+  bookingId: string
+  clientId: string
+  companionId: string
+  scenarioSnapshot: ScenarioSnapshot
+  startTime: string
+  endTime: string
+  status: BookingStatus
+  chatRoomId: string | null
+  chatRoomStatus: 'ACTIVE' | 'INACTIVE'
+  hasReviewed: boolean
+}
+
+/** Request body tạo booking */
 export interface CreateBookingBody {
   companionId: string
   scenarioId: string
-  scheduledAt: string
-  note?: string
+  startTime: string
+}
+
+/** Phản hồi khi tạo booking thành công */
+export interface CreateBookingResponse {
+  bookingId: string
+  clientId: string
+  companionId: string
+  scenarioSnapshot: ScenarioSnapshot
+  startTime: string
+  endTime: string
+  status: BookingStatus
+}
+
+/** Phản hồi khi hủy booking thành công */
+export interface CancelBookingResponse {
+  bookingId: string
+  status: 'CANCELLED'
+  refundAmount: number
+  compensationAmount: number
+}
+
+/** Phản hồi danh sách bookings có phân trang */
+export interface BookingsResponse extends PaginatedMeta {
+  bookings: BookingListItem[]
 }

@@ -115,19 +115,18 @@ export function useBookingForm(props: UseBookingFormProps) {
         body: JSON.stringify({
           companionId,
           scenarioId,
-          scheduledAt: new Date(scheduledAt).toISOString(),
-          note: note || undefined,
+          startTime: new Date(scheduledAt).toISOString(),
         }),
       })
 
       if (res.ok) {
-        const { data } = await res.json()
+        const data = await res.json()
         setMockState({ status: 'success', bookingId: data.bookingId })
       } else {
-        const { error } = await res.json().catch(() => ({ error: {} }))
+        const err = await res.json().catch(() => ({}))
         setMockState({
           status: 'error',
-          message: error?.message ?? 'Đặt lịch thất bại. Vui lòng thử lại.',
+          message: err?.message ?? 'Đặt lịch thất bại. Vui lòng thử lại.',
         })
       }
     } catch {
@@ -135,7 +134,7 @@ export function useBookingForm(props: UseBookingFormProps) {
     } finally {
       setMockIsPending(false)
     }
-  }, [companionId, scenarioId, scheduledAt, note, mockIsPending])
+  }, [companionId, scenarioId, scheduledAt, mockIsPending])
 
   return {
     step,

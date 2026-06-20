@@ -2,33 +2,33 @@
  * wallet.ts — Types cho Wallet domain.
  */
 
-export type TransactionType = 'credit' | 'debit'
-export type TransactionStatus = 'completed' | 'pending' | 'failed'
+export interface Wallet {
+  walletId: string
+  userId: string
+  availableBalance: number
+  frozenBalance: number
+}
+
+export interface TopupRequestBody {
+  userId: string
+  amount: number
+}
+
+export interface TopupResponse {
+  paymentUrl: string
+}
+
+export interface VnPayIpnResponse {
+  RspCode: string
+  Message: string
+}
 
 export interface WalletTransaction {
-  id: string
-  label: string
-  amountInCoin: number
-  type: TransactionType
-  status: TransactionStatus
-  createdAt: string
-}
-
-export interface Wallet {
-  balance: number
-  frozenBalance: number
-  transactions: WalletTransaction[]
-}
-
-/** Kết quả topup */
-export interface TopupResult {
-  success: boolean
   transactionId: string
-  newBalance: number
-}
-
-/** Polling status của topup */
-export interface TopupStatus {
-  status: 'pending' | 'success' | 'failed'
-  creditedCoin: number
+  walletId: string
+  amount: number
+  type: 'CREDIT' | 'DEBIT'
+  status: 'PENDING' | 'SUCCESS' | 'FAILED'
+  createdAt: string
+  description?: string
 }

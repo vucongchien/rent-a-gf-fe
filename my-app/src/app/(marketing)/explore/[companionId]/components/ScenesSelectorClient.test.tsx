@@ -32,24 +32,20 @@ vi.mock('./BookingModal', () => ({
 
 const mockScenarios = [
   {
-    id: 'sc-1',
-    name: 'Cà phê & trò chuyện',
+    scenarioId: 'sc-1',
+    title: 'Cà phê & trò chuyện',
     description: 'Gặp gỡ tại quán cà phê yên tĩnh, cùng chia sẻ câu chuyện thú vị.',
     durationMinutes: 60,
-    priceInCoin: 150,
-    location: 'Quận 1, TP.HCM',
-    isActive: true,
-    isFeatured: true,
+    price: 150,
+    publicPlace: 'Quận 1, TP.HCM',
   },
   {
-    id: 'sc-2',
-    name: 'Dạo phố Sài Gòn',
+    scenarioId: 'sc-2',
+    title: 'Dạo phố Sài Gòn',
     description: 'Khám phá các con phố đẹp cùng nhau.',
     durationMinutes: 120,
-    priceInCoin: 300,
-    location: 'Bến Nhà Rồng, TP.HCM',
-    isActive: true,
-    isFeatured: false,
+    price: 300,
+    publicPlace: 'Bến Nhà Rồng, TP.HCM',
   },
 ]
 

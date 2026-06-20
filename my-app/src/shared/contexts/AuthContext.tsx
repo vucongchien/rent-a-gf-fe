@@ -23,8 +23,8 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
     try {
       const res = await fetch('/api/auth/me');
       if (res.ok) {
-        const { data } = await res.json();
-        setUser(data);
+        const userObj = await res.json();
+        setUser(userObj);
       } else {
         setUser(null);
       }

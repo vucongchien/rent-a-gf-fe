@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { bookingService } from '@/shared/services/bookingService'
 import { toErrorPayload } from '@/shared/lib/apiClient'
 
-/** PATCH /api/bookings/[bookingId]/cancel */
-export async function PATCH(
+/** PUT /api/bookings/:bookingId/cancel — Hủy booking */
+export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ bookingId: string }> },
+  { params }: { params: Promise<{ bookingId: string }> }
 ) {
   const { bookingId } = await params
   try {

@@ -46,7 +46,7 @@ const getTagStyle = (meta: string) => {
 };
 
 export function ProfileNote({ companion }: { companion: CompanionDetail }) {
-  const ratingText = companion.ratingAvg > 0 ? companion.ratingAvg.toFixed(1) : 'New'
+  const ratingText = companion.averageRating > 0 ? companion.averageRating.toFixed(1) : 'New'
 
   return (
     <div className="bg-white/90 border border-neutral-200/30 rounded-2xl p-6 md:p-8 shadow-[var(--shadow-card-info)] backdrop-blur-md space-y-6">
@@ -63,12 +63,12 @@ export function ProfileNote({ companion }: { companion: CompanionDetail }) {
               <div className="flex items-center gap-1 font-sans font-semibold text-neutral-700 bg-amber-50/80 border border-amber-200/40 px-2.5 py-0.5 rounded-full">
                 <StarIcon size={14} className="text-amber-400 fill-amber-400" />
                 <span>{ratingText}</span>
-                <span className="text-neutral-500 font-normal">({companion.reviewCount} phản hồi)</span>
+                <span className="text-neutral-500 font-normal">({companion.totalReviews} phản hồi)</span>
               </div>
               
               <div className="flex items-center gap-1 text-neutral-500 font-sans font-medium">
                 <MapPinIcon size={14} className="text-neutral-400" />
-                <span>{companion.city}</span>
+                <span>{companion.availableCities.join(', ')}</span>
               </div>
             </div>
           </div>
@@ -83,7 +83,7 @@ export function ProfileNote({ companion }: { companion: CompanionDetail }) {
         </div>
         <p className="text-text leading-relaxed font-sans text-sm bg-cream/50 p-4 rounded-xl border border-neutral-200/40 relative pl-8 pr-6">
           <span className="absolute left-3 top-3 text-sketch-outline/55 font-sans font-extrabold text-2xl leading-none">“</span>
-          {companion.bio}
+          {companion.biography}
           <span className="absolute right-3 bottom-1 text-sketch-outline/55 font-sans font-extrabold text-2xl leading-none">”</span>
         </p>
       </div>

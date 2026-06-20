@@ -1,6 +1,6 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { mockWallet } from '@/mocks/fixtures/data';
-import type { Wallet, TopupResult, TopupStatus, ApiResponse, ServiceRequestOptions } from '@/shared/types';
+import type { Wallet, TopupResponse, WalletTransaction, ServiceRequestOptions } from '@/shared/types';
 import { cookies } from 'next/headers';
 
 async function getRequestCookieHeader(req?: { headers: { get(name: string): string | null } }) {
@@ -24,21 +24,24 @@ async function getRequestCookieHeader(req?: { headers: { get(name: string): stri
 
 export const walletService = {
   /**
-   * Lấy thông tin ví và lịch sử giao dịch
+   * Lấy thông tin ví
    */
-  async getWallet(options?: ServiceRequestOptions): Promise<ApiResponse<Wallet>> {
+  async getWallet(options?: ServiceRequestOptions): Promise<Wallet> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
       return {
-        data: mockWallet as Wallet,
+        walletId: mockWallet.walletId,
+        userId: mockWallet.userId,
+        availableBalance: mockWallet.availableBalance,
+        frozenBalance: mockWallet.frozenBalance,
       };
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
     try {
-      return await serverFetch<ApiResponse<Wallet>>('/wallet', { req });
+      return await serverFetch<Wallet>('/finance/wallet', { req });
     } catch (err) {
       console.error('[walletService] Lỗi fetch wallet:', err);
       throw err;
@@ -48,26 +51,25 @@ export const walletService = {
   /**
    * Khởi tạo nạp tiền qua VNPay
    */
-  async initiateTopup(body: { amountInCoin: number }, options?: ServiceRequestOptions): Promise<ApiResponse<TopupResult>> {
+  async initiateTopup(body: { amount: number }, options?: ServiceRequestOptions): Promise<TopupResponse> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
       return {
-        data: {
-          success: true,
-          transactionId: `tx-${Math.floor(Math.random() * 100000)}`,
-          newBalance: mockWallet.balance + body.amountInCoin,
-        }
+        paymentUrl: `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=${body.amount * 1000 * 100}&vnp_TxnRef=mock_tx_${Date.now()}`
       };
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
     try {
-      return await serverFetch<ApiResponse<TopupResult>>('/wallet/topup/initiate', {
+      return await serverFetch<TopupResponse>('/finance/topup', {
         req,
         method: 'POST',
-        body,
+        body: {
+          userId: 'u-client-1', // Mock client-id nếu chạy backend thực tế sẽ tự lấy từ session
+          amount: body.amount
+        },
       });
     } catch (err) {
       console.error('[walletService] Lỗi initiate topup:', err);
@@ -76,27 +78,23 @@ export const walletService = {
   },
 
   /**
-   * Poll trạng thái thanh toán VNPay
+   * Lấy lịch sử giao dịch
    */
-  async getTopupStatus(txId: string, options?: ServiceRequestOptions): Promise<ApiResponse<TopupStatus>> {
+  async getTransactions(options?: ServiceRequestOptions): Promise<WalletTransaction[]> {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      return {
-        data: {
-          status: 'success',
-          creditedCoin: 1000,
-        }
-      };
+      return mockWallet.transactions;
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
     try {
-      return await serverFetch<ApiResponse<TopupStatus>>(`/wallet/topup/${txId}/status`, { req });
+      return await serverFetch<WalletTransaction[]>('/finance/transactions', { req });
     } catch (err) {
-      console.error(`[walletService] Lỗi fetch topup status ${txId}:`, err);
-      throw err;
+      console.error('[walletService] Lỗi fetch transactions:', err);
+      return [];
     }
   }
 };
+

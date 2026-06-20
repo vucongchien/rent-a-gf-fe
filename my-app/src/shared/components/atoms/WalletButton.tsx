@@ -7,12 +7,16 @@ import { Button } from './Button';
 import { CoinIcon } from './Icons';
 
 export interface WalletButtonProps {
+  balance?: number;
   className?: string;
 }
 
-export const WalletButton: React.FC<WalletButtonProps> = ({ className = '' }) => {
-  const { balance, open: openWallet } = useWallet();
+export const WalletButton: React.FC<WalletButtonProps> = ({ balance: propBalance, className = '' }) => {
+
+  const { open: openWallet, balance: contextBalance } = useWallet();
+  const balance = propBalance ?? contextBalance;
   const animatedBalance = useAnimatedNumber(balance);
+
 
   return (
     <Button

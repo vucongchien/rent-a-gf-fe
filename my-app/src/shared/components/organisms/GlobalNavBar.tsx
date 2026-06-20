@@ -8,19 +8,24 @@ import { SearchInput } from '../atoms/SearchInput';
 import { WalletButton } from '../atoms/WalletButton';
 import { AvatarDropdown } from '../molecules/AvatarDropdown';
 import { useAuth } from '@/shared/contexts/AuthContext';
+import { useWallet } from '@/shared/contexts/WalletContext';
+import type { User } from '@/shared/types';
 
-export const GlobalNavBar: React.FC = () => {
+interface GlobalNavBarPresentationProps {
+  user: User | null;
+  balance: number;
+}
+
+export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> = ({ user, balance }) => {
   const pathname = usePathname();
-  const { user } = useAuth();
 
-  // Xác định active tab dựa trên pathname
   const activeId = useMemo(() => {
     if (pathname.startsWith('/explore')) return 'home';
     if (pathname.startsWith('/bookings')) return 'bookings';
     if (pathname.startsWith('/chat')) return 'chat';
     if (pathname.startsWith('/notifications')) return 'notifications';
     if (pathname.startsWith('/me') || pathname.startsWith('/profile')) return 'profile';
-    return 'home'; // default
+    return 'home';
   }, [pathname]);
 
   const items: NavItem[] = useMemo(() => [
@@ -61,7 +66,7 @@ export const GlobalNavBar: React.FC = () => {
       <div className="hidden md:block w-48 lg:w-64">
         <SearchInput placeholder="Search names, traits..." />
       </div>
-      {user && <WalletButton />}
+      {user && <WalletButton balance={balance} />}
       <AvatarDropdown />
     </>
   );
@@ -84,3 +89,17 @@ export const GlobalNavBar: React.FC = () => {
     />
   );
 };
+
+export const GlobalNavBar: React.FC = () => {
+  const { user } = useAuth();
+  const { balance } = useWallet();
+
+  return (
+    <GlobalNavBarPresentation
+      user={user}
+      balance={balance}
+    />
+  );
+};
+
+export default GlobalNavBar;

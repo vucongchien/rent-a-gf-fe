@@ -4,6 +4,7 @@ import { bookingHandlers } from './bookings'
 import { walletHandlers } from './wallet'
 import { chatHandlers } from './chat'
 import { notificationHandlers } from './notifications'
+import { mediaHandlers } from './media'
 
 export const handlers = [
   ...authHandlers,
@@ -12,4 +13,5 @@ export const handlers = [
   ...walletHandlers,
   ...chatHandlers,
   ...notificationHandlers,
+  ...mediaHandlers,
 ]

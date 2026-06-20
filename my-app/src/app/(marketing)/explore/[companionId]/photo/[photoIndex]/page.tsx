@@ -19,12 +19,11 @@ export default async function StandalonePhotoPage({ params }: StandalonePhotoPag
   const { companionId, photoIndex } = await params;
   const index = parseInt(photoIndex, 10);
 
-  const companionData = await companionService.getCompanionDetail(companionId);
-  if (!companionData || !companionData.data) {
+  const companion = await companionService.getCompanionDetail(companionId);
+  if (!companion) {
     notFound();
   }
 
-  const companion = companionData.data;
   const activeUrl = companion.albumUrls[index];
 
   if (!activeUrl) {

@@ -14,18 +14,26 @@ vi.mock('@/shared/components/atoms/Avatar', () => ({
 
 const mockReviews: CompanionReview[] = [
   {
-    id: 'rev-1',
+    reviewId: 'rev-1',
+    bookingId: 'bk-1',
+    clientId: 'cli-1',
+    companionId: 'comp-1',
     authorName: 'Khánh Huy',
     rating: 5,
     comment: 'Buổi hẹn hò rất vui vẻ, Mochi nói chuyện cực kỳ dễ thương và đúng giờ.',
-    postedAt: '2026-06-10',
+    createdAt: '2026-06-10T00:00:00.000Z',
+    updatedAt: '2026-06-10T00:00:00.000Z',
   },
   {
-    id: 'rev-2',
+    reviewId: 'rev-2',
+    bookingId: 'bk-2',
+    clientId: 'cli-1',
+    companionId: 'comp-1',
     authorName: 'Hoàng Long',
     rating: 4,
     comment: 'Trải nghiệm tốt, quán cà phê yên tĩnh đúng như mong muốn.',
-    postedAt: '2026-06-08',
+    createdAt: '2026-06-08T00:00:00.000Z',
+    updatedAt: '2026-06-08T00:00:00.000Z',
   },
 ]
 
@@ -54,12 +62,12 @@ describe('ReviewsWall', () => {
     // Check first review
     expect(screen.getByText('Khánh Huy')).toBeInTheDocument()
     expect(screen.getByText('"Buổi hẹn hò rất vui vẻ, Mochi nói chuyện cực kỳ dễ thương và đúng giờ."')).toBeInTheDocument()
-    expect(screen.getByText('2026-06-10')).toBeInTheDocument()
+    expect(screen.getByText(/10\/6/)).toBeInTheDocument()
 
     // Check second review
     expect(screen.getByText('Hoàng Long')).toBeInTheDocument()
     expect(screen.getByText('"Trải nghiệm tốt, quán cà phê yên tĩnh đúng như mong muốn."')).toBeInTheDocument()
-    expect(screen.getByText('2026-06-08')).toBeInTheDocument()
+    expect(screen.getByText(/8\/6/)).toBeInTheDocument()
 
     // Check avatars are rendered
     const avatars = screen.getAllByTestId('mock-avatar')

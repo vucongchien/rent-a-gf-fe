@@ -3,6 +3,7 @@
  */
 
 export type NotificationType =
+  | 'BOOKING_REQUESTED'
   | 'BOOKING_ACCEPTED'
   | 'BOOKING_REJECTED'
   | 'BOOKING_CANCELLED'
@@ -11,12 +12,11 @@ export type NotificationType =
   | 'SYSTEM'
 
 export interface Notification {
-  id: string
+  id: string // Giữ nguyên "id" theo chuẩn SSE payload
   type: NotificationType
   title: string
   body: string
-  isRead: boolean
-  createdAt: string
-  /** Optional link điều hướng khi bấm vào notification */
-  actionUrl?: string
+  bookingId?: string
+  isRead?: boolean
+  createdAt?: string
 }

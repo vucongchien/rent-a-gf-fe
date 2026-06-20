@@ -1,45 +1,44 @@
 import { http, HttpResponse, delay } from 'msw'
 import { mockChatRooms, mockMessages } from '../fixtures/data'
+import type { ChatMessage } from '@/shared/types/chat'
 
 export const chatHandlers = [
-  // GET /api/chat/rooms
-  http.get('/api/chat/rooms', async () => {
+  // GET /api/interaction/rooms
+  http.get('/api/interaction/rooms', async () => {
     await delay(500)
-    return HttpResponse.json({ data: { rooms: mockChatRooms } })
+    return HttpResponse.json(mockChatRooms)
   }),
 
-  // GET /api/chat/rooms/:roomId/messages
-  http.get('/api/chat/rooms/:roomId/messages', async ({ params }) => {
+  // GET /api/interaction/rooms/:roomId/messages
+  http.get('/api/interaction/rooms/:roomId/messages', async ({ params }) => {
     await delay(400)
     const messages = mockMessages[params.roomId as string] ?? []
-    return HttpResponse.json({
-      data: { items: messages, nextCursor: null },
-    })
+    return HttpResponse.json(messages)
   }),
 
-  // POST /api/chat/rooms/:roomId/messages
-  http.post('/api/chat/rooms/:roomId/messages', async ({ params, request }) => {
+  // POST /api/interaction/rooms/:roomId/messages
+  http.post('/api/interaction/rooms/:roomId/messages', async ({ params, request }) => {
     await delay(300)
-    const room = mockChatRooms.find(r => r.id === params.roomId)
-    if (room?.isLocked) {
+    const room = mockChatRooms.find(r => r.chatRoomId === params.roomId)
+    if (room?.status === 'INACTIVE') {
       return HttpResponse.json(
-        { error: { code: 'ROOM_LOCKED', message: 'Phòng chat đã bị khóa' } },
+        { code: 'ROOM_LOCKED', message: 'Phòng chat đã bị khóa' },
         { status: 422 }
       )
     }
-    const body = await request.json() as { content: string }
-    const newMsg = {
-      id: `msg-${Date.now()}`,
+    const body = await request.json() as { text: string }
+    const newMsg: ChatMessage = {
+      messageId: `msg-${Date.now()}`,
+      roomId: params.roomId as string,
       senderId: 'u-client-1',
-      senderName: 'Minh Khách',
-      content: body.content,
-      sentAt: new Date().toISOString(),
-      status: 'sent' as const,
+      content: body.text,
+      createdAt: new Date().toISOString(),
     }
     if (!mockMessages[params.roomId as string]) {
       mockMessages[params.roomId as string] = []
     }
     mockMessages[params.roomId as string].push(newMsg)
-    return HttpResponse.json({ data: newMsg }, { status: 201 })
+    return HttpResponse.json(newMsg, { status: 201 })
   }),
 ]
+

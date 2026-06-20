@@ -1,6 +1,7 @@
 import React from 'react'
 import { companionService } from '@/shared/services/companionService'
 import { CompanionCard } from '@/shared/components/molecules/CompanionCard'
+import type { Companion } from '@/shared/types'
 
 interface RelatedCompanionsProps {
   currentId: string
@@ -9,10 +10,10 @@ interface RelatedCompanionsProps {
 
 export async function RelatedCompanions({ currentId, city }: RelatedCompanionsProps) {
   // Lấy danh sách companion cùng thành phố (lấy limit 4 phòng trường hợp lọc bỏ companion hiện tại)
-  const result = await companionService.getCompanions({ limit: 4, city })
+  const result = await companionService.getCompanions({ pageSize: 4, city })
   
   // Lọc bỏ chính companion đang xem
-  const list = result.items.filter(c => c.id !== currentId).slice(0, 3)
+  const list = result.companions.filter((c: Companion) => c.companionId !== currentId).slice(0, 3)
 
   if (list.length === 0) return null
 
@@ -32,16 +33,16 @@ export async function RelatedCompanions({ currentId, city }: RelatedCompanionsPr
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {list.map((c) => (
+        {list.map((c: Companion) => (
           <CompanionCard
-            key={c.id}
-            id={c.id}
+            key={c.companionId}
+            id={c.companionId}
             name={c.displayName}
-            location={c.city}
-            price={`${c.featuredScenario?.priceInCoin || 150} Coin`}
+            location={c.availableCities[0]}
+            price={`${c.minPrice || 150} Coin`}
             avatarUrl={c.avatarUrl}
             voiceUrl={c.voiceIntroUrl}
-            metadata={c.metadata}
+            metadata={c.availableCities}
             traits={[]}
           />
         ))}
@@ -49,6 +50,7 @@ export async function RelatedCompanions({ currentId, city }: RelatedCompanionsPr
     </div>
   )
 }
+
 
 export function RelatedCompanionsSkeleton() {
   return (

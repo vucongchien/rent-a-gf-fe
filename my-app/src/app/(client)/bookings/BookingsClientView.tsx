@@ -3,12 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import type { Booking } from '@/shared/types';
+import type { BookingListItem } from '@/shared/types';
 import { BookingCard } from '@/shared/components/molecules/BookingCard';
 import { CalendarXIcon } from '@/shared/components/atoms/Icons';
 
 interface BookingsClientViewProps {
-  initialBookings: Booking[];
+  initialBookings: BookingListItem[];
 }
 
 const tabItems = [
@@ -27,8 +27,7 @@ export const BookingsClientView: React.FC<BookingsClientViewProps> = ({ initialB
     if (currentTab === 'pending') {
       return (
         booking.status === 'PENDING' ||
-        booking.status === 'ACCEPTED' ||
-        booking.status === 'IN_PROGRESS'
+        booking.status === 'ACCEPTED'
       );
     }
     if (currentTab === 'completed') {
@@ -42,7 +41,7 @@ export const BookingsClientView: React.FC<BookingsClientViewProps> = ({ initialB
 
   // Sắp xếp bookings: Mới nhất hiển thị trước
   const sortedBookings = [...filteredBookings].sort((a, b) => {
-    return new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime();
+    return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
   });
 
   return (
@@ -97,7 +96,7 @@ export const BookingsClientView: React.FC<BookingsClientViewProps> = ({ initialB
       ) : (
         <div className="flex flex-col gap-8 md:gap-10">
           {sortedBookings.map((booking) => (
-            <BookingCard key={booking.id} booking={booking} />
+            <BookingCard key={booking.bookingId} booking={booking} />
           ))}
         </div>
       )}

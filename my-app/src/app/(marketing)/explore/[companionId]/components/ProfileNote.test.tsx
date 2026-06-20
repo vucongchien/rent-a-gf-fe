@@ -13,17 +13,16 @@ vi.mock('@/shared/components/atoms/VoiceButton', () => ({
 }))
 
 const mockCompanion: CompanionDetail = {
-  id: 'comp-1',
+  companionId: 'comp-1',
   displayName: 'Mochi',
-  city: 'TP.HCM',
-  ratingAvg: 4.8,
-  reviewCount: 12,
+  availableCities: ['TP.HCM'],
+  averageRating: 4.8,
+  totalReviews: 12,
   avatarUrl: '/avatar.jpg',
   voiceIntroUrl: '/audio.mp3',
-  featuredScenario: null,
   metadata: ['Nữ', 'Vui vẻ', 'Dịu dàng'],
   albumUrls: ['/photo-1.jpg'],
-  bio: 'Mình là Mochi, thích cà phê và trò chuyện cùng mọi người.',
+  biography: 'Mình là Mochi, thích cà phê và trò chuyện cùng mọi người.',
   scenarios: [],
 }
 
@@ -63,8 +62,8 @@ describe('ProfileNote', () => {
   it('renders New for ratingAvg = 0 and hides VoiceButton when voiceIntroUrl is null', () => {
     const companionNoVoice: CompanionDetail = {
       ...mockCompanion,
-      ratingAvg: 0,
-      reviewCount: 0,
+      averageRating: 0,
+      totalReviews: 0,
       voiceIntroUrl: null,
     }
 
