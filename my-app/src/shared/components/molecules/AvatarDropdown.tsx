@@ -39,17 +39,17 @@ export const AvatarDropdown: React.FC = () => {
     <div ref={ref} className="relative">
       {/* Avatar trigger */}
       <Button
-        variant="ghost"
+        variant="unstyled"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label="Account menu"
-        className="relative p-0 border-none shadow-none hover:bg-transparent active:scale-95 rounded-full"
+        className="relative flex items-center justify-center p-0 border-none bg-transparent cursor-pointer active:scale-95 rounded-full transition-transform focus-visible:outline-none"
       >
         <Avatar
           src={user.avatarUrl}
           name={user.displayName}
           size={36}
-          className="border-2 border-neutral-200 hover:border-chizuru-600"
+          className="border-2 border-neutral-200 hover:border-chizuru-600 transition-colors"
         />
       </Button>
 

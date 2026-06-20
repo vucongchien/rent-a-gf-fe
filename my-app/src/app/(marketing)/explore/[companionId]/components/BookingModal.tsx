@@ -66,13 +66,13 @@ export function BookingModal({ isOpen, onClose, companionId, companionName, scen
 
           <div className="note-card w-full p-8 bg-[--color-cream]">
             <h2 className="font-sans font-bold text-3xl text-brand mb-2">Đặt lịch hẹn</h2>
-            <p className="text-sm text-neutral-600 mb-6">{scenario.name} · với {companionName}</p>
+            <p className="text-sm text-neutral-600 mb-6">{scenario.title} · với {companionName}</p>
             <BookingForm
               companionId={companionId}
               companionName={companionName}
-              scenarioId={scenario.id}
-              scenarioName={scenario.name}
-              priceInCoin={scenario.priceInCoin}
+              scenarioId={scenario.scenarioId}
+              scenarioName={scenario.title}
+              priceInCoin={scenario.price}
               durationMinutes={scenario.durationMinutes}
             />
           </div>

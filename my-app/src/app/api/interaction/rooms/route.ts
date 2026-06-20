@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { chatService } from '@/shared/services/chatService'
 import { toErrorPayload } from '@/shared/lib/apiClient'
 
-/** GET /api/chat/rooms — Danh sách phòng chat của user */
+/** GET /api/interaction/rooms — Danh sách phòng chat của user */
 export async function GET(req: NextRequest) {
   try {
     const data = await chatService.getChatRooms({ req })

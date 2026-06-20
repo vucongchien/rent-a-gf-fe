@@ -15,14 +15,14 @@ interface SceneCardProps {
 function SceneCard({ companionName, sc, onSelect }: SceneCardProps) {
   return (
     <article
-      id={`scene-${sc.id}`}
+      id={`scene-${sc.scenarioId}`}
       className="bg-white/90 rounded-2xl p-5 border border-neutral-100 shadow-[var(--shadow-card-info)]
                  flex flex-col justify-between min-h-[220px] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-info-hover)]"
     >
       <div className="space-y-3 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-sans font-bold text-neutral-800 text-base leading-snug flex-1">
-            {sc.name}
+            {sc.title}
           </h3>
           <span className="flex-none text-neutral-400 mt-0.5">
             <CalendarIcon size={16} />
@@ -43,7 +43,7 @@ function SceneCard({ companionName, sc, onSelect }: SceneCardProps) {
           <div className="flex items-center justify-between">
             <span className="text-neutral-600">Chi phí:</span>
             <span className="font-bold text-chizuru-600 flex items-center gap-1 text-sm">
-              <CoinIcon size={12} /> {sc.priceInCoin} Coin
+              <CoinIcon size={12} /> {sc.price} Coin
             </span>
           </div>
         </div>
@@ -92,9 +92,9 @@ export function ScenesSelectorClient({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {scenarios.filter(s => s.isActive).map((sc) => (
+        {scenarios.map((sc) => (
           <SceneCard 
-            key={sc.id} 
+            key={sc.scenarioId} 
             companionName={companionName}
             sc={sc} 
             onSelect={(selected) => {

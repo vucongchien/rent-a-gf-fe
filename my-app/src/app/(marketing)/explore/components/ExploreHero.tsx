@@ -8,10 +8,10 @@ export async function ExploreHero() {
 
   // Convert Companion type sang FeaturedCompanion type của HeroFeatured component
   const formattedFeatured = featuredCompanion ? {
-    id: featuredCompanion.id,
+    id: featuredCompanion.companionId,
     name: featuredCompanion.displayName,
-    location: featuredCompanion.city,
-    price: featuredCompanion.featuredScenario ? `${featuredCompanion.featuredScenario.priceInCoin} KC` : 'Liên hệ',
+    location: featuredCompanion.availableCities.join(', '),
+    price: featuredCompanion.minPrice ? `${featuredCompanion.minPrice} KC` : 'Liên hệ',
     avatarUrl: featuredCompanion.avatarUrl,
     voiceUrl: featuredCompanion.voiceIntroUrl,
     metadata: featuredCompanion.metadata,

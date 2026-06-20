@@ -2,89 +2,50 @@ import { http, HttpResponse, delay } from 'msw'
 import { mockWallet } from '../fixtures/data'
 
 export const walletHandlers = [
-  // GET /api/wallet
-  http.get('/api/wallet', async () => {
+  // GET /api/finance/wallet
+  http.get('/api/finance/wallet', async () => {
     await delay(500)
-    return HttpResponse.json({ data: mockWallet })
+    return HttpResponse.json({
+      walletId: mockWallet.walletId,
+      userId: mockWallet.userId,
+      availableBalance: mockWallet.availableBalance,
+      frozenBalance: mockWallet.frozenBalance,
+    })
   }),
 
-  // POST /api/wallet/topup/initiate
-  http.post('/api/wallet/topup/initiate', async ({ request }) => {
-    await delay(1200) // tạo khoảng trễ giả lập xử lý ngân hàng mượt mà
-    const body = await request.json() as { amountInCoin: number }
-    if (!body.amountInCoin || body.amountInCoin < 100) {
+  // POST /api/finance/topup
+  http.post('/api/finance/topup', async ({ request }) => {
+    await delay(1200)
+    const body = await request.json() as { userId: string; amount: number }
+    if (!body.amount || body.amount < 100) {
       return HttpResponse.json(
-        { error: { code: 'VALIDATION_ERROR', message: 'Số tiền tối thiểu là 100 Kano-Coin' } },
+        { code: 'VALIDATION_ERROR', message: 'Số tiền nạp tối thiểu là 100 Kano-Coin' },
         { status: 400 }
       )
     }
-    
-    // Cộng tiền trực tiếp vào database mock client-side
-    mockWallet.balance += body.amountInCoin
+
+    mockWallet.availableBalance += body.amount
     
     const txId = `tx-topup-${Date.now()}`
     mockWallet.transactions.unshift({
-      id: txId,
-      label: 'Nạp tiền Kano-Coin',
-      amountInCoin: body.amountInCoin,
-      type: 'credit',
-      status: 'completed',
+      transactionId: txId,
+      walletId: mockWallet.walletId,
+      description: 'Nạp tiền VNPay',
+      amount: body.amount,
+      type: 'CREDIT' as const,
+      status: 'SUCCESS' as const,
       createdAt: new Date().toISOString()
     })
 
     return HttpResponse.json({
-      data: {
-        success: true,
-        transactionId: txId,
-        newBalance: mockWallet.balance,
-      },
+      paymentUrl: `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=${body.amount * 1000 * 100}&vnp_TxnRef=${txId}`
     })
   }),
 
-  // GET /api/wallet/topup/:txId/status
-  http.get('/api/wallet/topup/:txId/status', async () => {
+  // GET /api/finance/transactions (dùng cho Transaction Logs)
+  http.get('/api/finance/transactions', async () => {
     await delay(500)
-    // Mock: luôn trả success sau 1 lần poll
-    return HttpResponse.json({
-      data: { status: 'success', creditedCoin: 500 },
-    })
-  }),
-
-  // POST /api/wallet/withdraw
-  http.post('/api/wallet/withdraw', async ({ request }) => {
-    await delay(1000)
-    const body = await request.json() as { amountInCoin: number }
-    if (!body.amountInCoin || body.amountInCoin < 500) {
-      return HttpResponse.json(
-        { error: { code: 'VALIDATION_ERROR', message: 'Số tiền rút tối thiểu là 500 Kano-Coin' } },
-        { status: 400 }
-      )
-    }
-    if (mockWallet.balance < body.amountInCoin) {
-      return HttpResponse.json(
-        { error: { code: 'INSUFFICIENT_FUNDS', message: 'Số dư không đủ' } },
-        { status: 400 }
-      )
-    }
-    
-    mockWallet.balance -= body.amountInCoin
-    
-    const txId = `tx-withdraw-${Date.now()}`
-    mockWallet.transactions.unshift({
-      id: txId,
-      label: 'Rút tiền về tài khoản',
-      amountInCoin: -body.amountInCoin,
-      type: 'debit',
-      status: 'completed',
-      createdAt: new Date().toISOString()
-    })
-
-    return HttpResponse.json({
-      data: {
-        success: true,
-        transactionId: txId,
-        newBalance: mockWallet.balance,
-      },
-    })
+    return HttpResponse.json(mockWallet.transactions)
   }),
 ]
+

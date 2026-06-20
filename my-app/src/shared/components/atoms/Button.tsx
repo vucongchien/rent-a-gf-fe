@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "accent" | "quick-select";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "accent" | "quick-select" | "unstyled";
   size?: "sm" | "md" | "lg";
   isActive?: boolean;
   activeBorderColor?: string;
@@ -25,6 +25,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const isQuickSelect = variant === "quick-select";
+    const isUnstyled = variant === "unstyled";
 
     // CSS classes cho quick select (nút nạp nhanh)
     const quickSelectClasses = `
@@ -36,9 +37,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ${className}
     `;
 
-    const classes = isQuickSelect 
-      ? quickSelectClasses 
-      : `btn-base ${variantClasses[variant as keyof typeof variantClasses]} ${sizeClasses[size]} ${className}`;
+    const classes = isUnstyled
+      ? className
+      : isQuickSelect 
+        ? quickSelectClasses 
+        : `btn-base ${variantClasses[variant as keyof typeof variantClasses]} ${sizeClasses[size]} ${className}`;
 
     // Truyền style border color động cho quick select active
     const inlineStyle = isQuickSelect && isActive

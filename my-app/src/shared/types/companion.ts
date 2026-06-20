@@ -1,58 +1,81 @@
 /**
  * companion.ts — Types cho Companion domain.
- * Owned by frontend — đây là contract BFF trả về client.
- * Backend schema có thể khác, Route Handler transform về shape này.
  */
 
-/** Companion trong danh sách (list view) */
 export interface Companion {
-  id: string
+  companionId: string
   displayName: string
-  city: string
-  ratingAvg: number
-  reviewCount: number
   avatarUrl: string
+  averageRating: number
+  totalReviews: number
+  availableCities: string[]
+  minPrice: number
   voiceIntroUrl: string | null
-  featuredScenario: CompanionScenarioSummary | null
-  metadata: string[]
-  albumUrls: string[]
+  metadata?: string[]
 }
 
-/** Scenario tóm tắt hiển thị trên card */
-export interface CompanionScenarioSummary {
-  name: string
-  priceInCoin: number
-}
-
-/** Scenario đầy đủ cho trang detail */
 export interface CompanionScenario {
-  id: string
-  name: string
+  scenarioId: string
+  title: string
   description: string
+  price: number
   durationMinutes: number
-  priceInCoin: number
-  location: string
-  isActive: boolean
-  isFeatured: boolean
+  publicPlace: string
 }
 
-export type CreateScenarioBody = Omit<CompanionScenario, 'id'>
+export interface CompanionDetail {
+  companionId: string
+  displayName: string
+  biography: string
+  avatarUrl: string
+  albumUrls: string[]
+  voiceIntroUrl: string | null
+  availableCities: string[]
+  averageRating: number
+  totalReviews: number
+  scenarios: CompanionScenario[]
+  recentReviews?: CompanionReview[]
+  metadata?: string[]
+}
+
+
+export interface CompanionProfileMe {
+  companionId: string
+  displayName: string
+  biography: string
+  avatarUrl: string
+  albumUrls: string[]
+  voiceIntroUrl: string | null
+  availableCities: string[]
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+}
+
+export interface CompanionReview {
+  reviewId: string
+  bookingId: string
+  clientId: string
+  companionId: string
+  rating: number
+  comment: string
+  createdAt: string
+  updatedAt: string
+  authorName?: string
+  authorAvatarUrl?: string
+}
+
+
+export interface CreateScenarioBody {
+  title: string
+  description: string
+  price: number
+  durationMinutes: number
+  publicPlace: string
+}
 
 export type UpdateScenarioBody = Partial<CreateScenarioBody>
 
-/** Review của khách hàng */
-export interface CompanionReview {
-  id: string
-  authorName: string
-  rating: number
-  comment: string
-  postedAt: string
-}
-
-/** Companion chi tiết (detail page) */
-export interface CompanionDetail extends Companion {
-  bio: string
-  scenarios: CompanionScenario[]
-  reviewCount: number
-  recentReviews?: CompanionReview[]
+/** Phản hồi danh sách companion có phân trang */
+import type { PaginatedMeta } from './api'
+export interface CompanionsResponse extends PaginatedMeta {
+  companions: Companion[]
 }

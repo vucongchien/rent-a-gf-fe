@@ -533,34 +533,28 @@ function DesignSystemContent() {
 
 const mockScenariosForDemo = [
   {
-    id: "sc-ds-1",
-    name: "Cà phê buổi sáng yên tĩnh ☕",
+    scenarioId: "sc-ds-1",
+    title: "Cà phê buổi sáng yên tĩnh ☕",
     description: "Nhâm nhi tách cà phê thơm và cùng nhau trò chuyện về sở thích của cả hai.",
     durationMinutes: 60,
-    priceInCoin: 100,
-    location: "Khu Thảo Điền, Quận 2",
-    isActive: true,
-    isFeatured: false,
+    price: 100,
+    publicPlace: "Khu Thảo Điền, Quận 2",
   },
   {
-    id: "sc-ds-2",
-    name: "Dạo quanh Hồ Gươm chiều thu 🍂",
+    scenarioId: "sc-ds-2",
+    title: "Dạo quanh Hồ Gươm chiều thu 🍂",
     description: "Cùng đi dạo dưới làn gió thu dịu mát, ngắm nhìn tháp Rùa và thưởng thức kem Tràng Tiền.",
     durationMinutes: 120,
-    priceInCoin: 250,
-    location: "Hoàn Kiếm, Hà Nội",
-    isActive: true,
-    isFeatured: true,
+    price: 250,
+    publicPlace: "Hoàn Kiếm, Hà Nội",
   },
   {
-    id: "sc-ds-3",
-    name: "Hẹn hò rạp chiếu phim lãng mạn 🍿",
+    scenarioId: "sc-ds-3",
+    title: "Hẹn hò rạp chiếu phim lãng mạn 🍿",
     description: "Cùng xem một bộ phim tình cảm hot nhất, chia sẻ hộp bắp rang bơ ngọt ngào.",
     durationMinutes: 150,
-    priceInCoin: 350,
-    location: "CGV Vincom Landmark 81",
-    isActive: true,
-    isFeatured: false,
+    price: 350,
+    publicPlace: "CGV Vincom Landmark 81",
   }
 ];
 

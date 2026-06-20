@@ -17,6 +17,7 @@
  */
 
 import { ApiError } from './apiError'
+import type { ApiErrorDetail } from '@/shared/types'
 
 const TIMEOUT_MS = 10_000
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? 'access_token'
@@ -109,20 +110,23 @@ export async function serverFetch<T = unknown>(
     }
 
     if (!res.ok) {
-      // Parse backend error format: { error: { code, message, field } }
-      let code = `HTTP_${res.status}`
+      // Parse Naked JSON Error format ở root level: { code, message, details }
+      let code: string | number = `HTTP_${res.status}`
       let message = `Backend trả về ${res.status} cho ${method} ${path}`
+      let details: ApiErrorDetail[] = []
       let raw: unknown = null
       try {
         raw = await res.json()
-        const errBody = raw as { error?: { code?: string; message?: string } }
-        if (errBody?.error?.code) code = errBody.error.code
-        if (errBody?.error?.message) message = errBody.error.message
+        const errBody = raw as { code?: string | number; message?: string; details?: ApiErrorDetail[] }
+        if (errBody?.code !== undefined) code = errBody.code
+        if (errBody?.message) message = errBody.message
+        if (errBody?.details) details = errBody.details
       } catch { /* ignore parse error */ }
 
-      throw new ApiError(res.status, code, message, raw)
+      throw new ApiError(res.status, code, message, details, raw)
     }
 
+    // Trả về trực tiếp JSON payload ở root level (Naked JSON)
     return res.json() as Promise<T>
   } catch (err) {
     if (err instanceof ApiError) throw err
@@ -141,7 +145,7 @@ export async function serverFetch<T = unknown>(
  * Tạo error response chuẩn để trả về client từ Route Handler.
  * Import từ next/server ở nơi dùng.
  */
-export function toErrorPayload(err: unknown): { status: number; code: string; message: string } {
+export function toErrorPayload(err: unknown): { status: number; code: string | number; message: string } {
   if (err instanceof ApiError) {
     return { status: err.status, code: err.code, message: err.message }
   }

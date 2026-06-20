@@ -11,27 +11,29 @@ export const notificationHandlers = [
     const page = Number(url.searchParams.get('page') ?? 1)
     const limit = 20
     const start = (page - 1) * limit
+    
     return HttpResponse.json({
-      data: {
-        items: notifications.slice(start, start + limit),
-        meta: { page, limit, total: notifications.length, hasNextPage: start + limit < notifications.length },
-      },
+      items: notifications.slice(start, start + limit),
+      total: notifications.length,
+      page,
+      pageSize: limit
     })
   }),
 
-  // PATCH /api/notifications/:id/read
-  http.patch('/api/notifications/:notifId/read', async ({ params }) => {
+  // PUT /api/notifications/:notifId/read
+  http.put('/api/notifications/:notifId/read', async ({ params }) => {
     await delay(200)
     notifications = notifications.map(n =>
       n.id === params.notifId ? { ...n, isRead: true } : n
     )
-    return HttpResponse.json({ data: { success: true } })
+    return HttpResponse.json({ success: true })
   }),
 
-  // PATCH /api/notifications/read-all
-  http.patch('/api/notifications/read-all', async () => {
+  // PUT /api/notifications/read-all
+  http.put('/api/notifications/read-all', async () => {
     await delay(300)
     notifications = notifications.map(n => ({ ...n, isRead: true }))
-    return HttpResponse.json({ data: { success: true } })
+    return HttpResponse.json({ success: true })
   }),
 ]
+

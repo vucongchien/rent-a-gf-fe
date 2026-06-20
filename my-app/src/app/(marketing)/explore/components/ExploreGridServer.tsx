@@ -11,18 +11,19 @@ interface ExploreGridServerProps {
 }
 
 export async function ExploreGridServer({ city, limit = DEFAULT_LIMIT }: ExploreGridServerProps) {
-  const { items, hasNextPage } = await companionService.getCompanions({
+  const { companions, total, page, pageSize } = await companionService.getCompanions({
     city,
-    limit,
+    pageSize: limit,
   });
 
+  const hasNextPage = page * pageSize < total;
   const activeCity = city ?? 'all';
 
   return (
     <section id="explore-grid" className="scroll-mt-[100px]">
 
 
-      {items.length === 0 ? (
+      {companions.length === 0 ? (
         <div className="text-center py-[60px] text-neutral-500 font-sans">
           Không tìm thấy bạn đồng hành nào ở khu vực này.
         </div>
@@ -31,28 +32,24 @@ export async function ExploreGridServer({ city, limit = DEFAULT_LIMIT }: Explore
           data-testid="companion-grid"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px] md:gap-[22px]"
         >
-          {items.map((comp) => (
+          {companions.map((comp) => (
             <CompanionCard
-              key={comp.id}
-              id={comp.id}
+              key={comp.companionId}
+              id={comp.companionId}
               name={comp.displayName}
-              location={comp.city}
-              price={comp.featuredScenario ? `${comp.featuredScenario.priceInCoin} KC` : 'Free to meet'}
+              location={comp.availableCities.join(', ')}
+              price={comp.minPrice ? `${comp.minPrice} KC` : 'Free to meet'}
               avatarUrl={comp.avatarUrl}
               voiceUrl={comp.voiceIntroUrl}
-              traits={comp.reviewCount === 0 ? ['new'] : undefined}
-              metadata={
-                comp.metadata && comp.metadata.length > 0
-                  ? comp.metadata
-                  : [comp.featuredScenario?.name || 'Friendly chat']
-              }
+              traits={comp.totalReviews === 0 ? ['new'] : undefined}
+              metadata={comp.metadata}
             />
           ))}
         </div>
       )}
 
       {/* Client island: Load more qua URL */}
-      {hasNextPage && items.length > 0 && (
+      {hasNextPage && companions.length > 0 && (
         <LoadMoreClient city={activeCity} currentLimit={limit} />
       )}
     </section>

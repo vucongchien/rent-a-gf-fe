@@ -17,9 +17,9 @@ function ReviewCard({ review }: { review: CompanionReview }) {
                  break-inside-avoid mb-6 inline-block w-full transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-info-hover)]"
     >
       <div className="flex items-center gap-3 mb-3">
-        <Avatar src={null} name={review.authorName} size={40} />
+        <Avatar src={review.authorAvatarUrl || null} name={review.authorName || 'Ẩn danh'} size={40} />
         <div>
-          <h4 className="font-sans font-bold text-neutral-800 text-sm">{review.authorName}</h4>
+          <h4 className="font-sans font-bold text-neutral-800 text-sm">{review.authorName || 'Người dùng ẩn danh'}</h4>
           <div className="flex gap-0.5 mt-0.5">
             {[1, 2, 3, 4, 5].map((i) => (
               <StarIcon 
@@ -36,7 +36,7 @@ function ReviewCard({ review }: { review: CompanionReview }) {
       </p>
       <div className="text-xs text-neutral-400 font-mono mt-3 pt-2.5 border-t border-neutral-100/60 flex justify-between items-center">
         <span>Đã xác thực hẹn hò</span>
-        <span>{review.postedAt}</span>
+        <span>{review.createdAt ? new Date(review.createdAt).toLocaleDateString('vi-VN') : 'Gần đây'}</span>
       </div>
     </article>
   )
@@ -68,7 +68,7 @@ export function ReviewsWall({ reviews, ratingAvg, reviewCount, companionName }: 
       {reviews.length > 0 ? (
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 pt-2">
           {reviews.map((rev) => (
-            <ReviewCard key={rev.id} review={rev} />
+            <ReviewCard key={rev.reviewId} review={rev} />
           ))}
         </div>
       ) : (

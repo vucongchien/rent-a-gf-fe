@@ -11,24 +11,25 @@ export const authHandlers = [
     await delay(300)
     if (!currentMockUser) {
       return HttpResponse.json(
-        { error: { code: 'UNAUTHENTICATED', message: 'Chưa đăng nhập' } },
+        { code: 'UNAUTHENTICATED', message: 'Chưa đăng nhập' },
         { status: 401 }
       )
     }
-    return HttpResponse.json({ data: currentMockUser })
+    return HttpResponse.json(currentMockUser)
   }),
 
   // POST /api/auth/logout
   http.post('/api/auth/logout', async () => {
     await delay(200)
     setMockUser('guest')
-    return HttpResponse.json({ data: { success: true } })
+    return HttpResponse.json({ message: 'Logout successful' })
   }),
 
   // POST /api/auth/mock-switch — chỉ dùng trong dev để switch role
   http.post('/api/auth/mock-switch', async ({ request }) => {
     const body = await request.json() as { role: keyof typeof mockUsers }
     setMockUser(body.role)
-    return HttpResponse.json({ data: { role: body.role } })
+    return HttpResponse.json({ role: body.role })
   }),
 ]
+

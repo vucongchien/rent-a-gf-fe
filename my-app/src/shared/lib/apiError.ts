@@ -6,9 +6,11 @@ export class ApiError extends Error {
   constructor(
     /** HTTP status code */
     public readonly status: number,
-    /** Error code từ backend hoặc BFF */
-    public readonly code: string,
+    /** Error code từ backend hoặc BFF (có thể là number từ gRPC hoặc string) */
+    public readonly code: string | number,
     message: string,
+    /** Chi tiết lỗi dạng gRPC-Gateway validation details */
+    public readonly details?: unknown[],
     /** Raw response body nếu cần debug */
     public readonly raw?: unknown,
   ) {
@@ -37,3 +39,4 @@ export class ApiError extends Error {
 export function isApiError(err: unknown): err is ApiError {
   return err instanceof ApiError
 }
+

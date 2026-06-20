@@ -8,20 +8,16 @@ import { setupServer } from 'msw/node';
 // Setup mock server
 const server = setupServer(
   http.get('/api/auth/me', () => {
-    return HttpResponse.json({
-      data: { id: 'test-user', role: 'client', displayName: 'Test User' }
-    });
+    return HttpResponse.json({ id: 'test-user', role: 'client', displayName: 'Test User' });
   }),
   http.post('/api/auth/mock-switch', async ({ request }) => {
     const { role } = await request.json() as { role: string };
     server.use(
       http.get('/api/auth/me', () => {
-        return HttpResponse.json({
-          data: { id: `test-${role}`, role, displayName: `Test ${role}` }
-        });
+        return HttpResponse.json({ id: `test-${role}`, role, displayName: `Test ${role}` });
       })
     );
-    return HttpResponse.json({ data: { role } });
+    return HttpResponse.json({ role });
   }),
   http.post('/api/auth/logout', () => {
     server.use(
@@ -29,7 +25,7 @@ const server = setupServer(
         return HttpResponse.json({ error: 'Unauthorized' }, { status: 401 });
       })
     );
-    return HttpResponse.json({ data: { success: true } });
+    return HttpResponse.json({ success: true });
   })
 );
 

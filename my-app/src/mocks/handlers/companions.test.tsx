@@ -11,16 +11,12 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 interface CompanionTestResponse {
-  data?: {
-    items?: Array<{ id: string; displayName: string; city: string }>;
-    id?: string;
-  };
+  companions?: Array<{ companionId: string; displayName: string; availableCities: string[] }>;
+  companionId?: string;
 }
 
 interface CompanionTestError {
-  error?: {
-    code: string;
-  };
+  code: string;
 }
 
 // Component ảo để giả lập fetch từ frontend (JSDOM tự resolve base URL)
@@ -41,14 +37,14 @@ const FetcherComponent = ({ endpoint }: { endpoint: string }) => {
       });
   }, [endpoint]);
 
-  if (error) return <div data-testid="error">{error.error?.code}</div>;
+  if (error) return <div data-testid="error">{error.code}</div>;
   if (!data) return <div>Loading...</div>;
 
   return (
     <div data-testid="result">
-      <span data-testid="item-count">{data.data?.items?.length || 0}</span>
-      <span data-testid="first-city">{data.data?.items?.[0]?.city}</span>
-      <span data-testid="detail-id">{data.data?.id}</span>
+      <span data-testid="item-count">{data.companions?.length || 0}</span>
+      <span data-testid="first-city">{data.companions?.[0]?.availableCities?.[0]}</span>
+      <span data-testid="detail-id">{data.companionId}</span>
     </div>
   );
 };

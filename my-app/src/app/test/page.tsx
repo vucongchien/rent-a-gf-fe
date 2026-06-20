@@ -48,7 +48,6 @@ interface User {
   displayName: string
   avatarUrl: string
   role: 'client' | 'companion' | 'admin'
-  companionApplicationStatus: 'idle' | 'pending' | 'approved' | 'rejected'
 }
 
 const getFutureScheduledAt = () => {

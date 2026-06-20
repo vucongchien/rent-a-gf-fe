@@ -34,11 +34,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
     try {
       setIsLoading(true);
-      const res = await fetch('/api/wallet');
+      const res = await fetch('/api/finance/wallet');
       if (res.ok) {
-        const { data } = await res.json();
-        setBalance(data.balance);
-        setFrozenBalance(data.frozenBalance);
+        const wallet = await res.json();
+        setBalance(wallet.availableBalance);
+        setFrozenBalance(wallet.frozenBalance);
       }
     } catch (err) {
       console.error('Failed to fetch wallet info', err);
@@ -56,10 +56,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const topup = async (amountInCoin: number): Promise<boolean> => {
     if (!user) return false;
     try {
-      const res = await fetch('/api/wallet/topup/initiate', {
+      const res = await fetch('/api/finance/topup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amountInCoin }),
+        body: JSON.stringify({ amount: amountInCoin }),
       });
       if (res.ok) {
         // Mock server đã tự động cộng tiền và ghi nhận

@@ -2,18 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { bookingService } from '@/shared/services/bookingService'
 import { toErrorPayload } from '@/shared/lib/apiClient'
 
-/** GET /api/companion/bookings/:bookingId — Chi tiết booking của companion */
-export async function GET(
+/** PUT /api/bookings/:bookingId/accept — Chấp nhận booking */
+export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ bookingId: string }> }
 ) {
   const { bookingId } = await params
   try {
-    const data = await bookingService.getCompanionBookingDetail(bookingId, { req })
-    if (!data) {
-      return NextResponse.json({ error: { code: 'NOT_FOUND', message: 'Không tìm thấy booking' } }, { status: 404 })
-    }
-    return NextResponse.json({ data })
+    const data = await bookingService.acceptBooking(bookingId, { req })
+    return NextResponse.json(data)
   } catch (err) {
     const payload = toErrorPayload(err)
     return NextResponse.json(payload, { status: payload.status })
