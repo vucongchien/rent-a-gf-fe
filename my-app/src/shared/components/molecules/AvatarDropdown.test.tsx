@@ -18,7 +18,7 @@ describe('AvatarDropdown', () => {
   });
 
   it('renders sign in button when guest', () => {
-    (useAuth as any).mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       user: null,
       isLoading: false,
       login: mockLogin,
@@ -35,10 +35,11 @@ describe('AvatarDropdown', () => {
   });
 
   it('renders user avatar and switch options when logged in as CLIENT', () => {
-    (useAuth as any).mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       user: {
         userId: 'u-client-1',
         displayName: 'Minh Khách',
+        email: 'minh@example.com',
         avatarUrl: 'https://example.com/avatar.jpg',
         role: 'CLIENT',
       },
@@ -71,10 +72,11 @@ describe('AvatarDropdown', () => {
   });
 
   it('renders correct switch options when logged in as COMPANION', () => {
-    (useAuth as any).mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       user: {
         userId: 'u-comp-1',
         displayName: 'Nguyễn Thị Linh',
+        email: 'linh@example.com',
         avatarUrl: 'https://example.com/avatar.jpg',
         role: 'COMPANION',
       },
