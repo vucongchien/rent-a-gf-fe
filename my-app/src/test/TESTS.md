@@ -30,6 +30,7 @@ Dự án sử dụng `vitest` kết hợp với `@testing-library/react`.
 |---|---|---|
 | **CompanionBadge** | `src/shared/components/atoms/CompanionBadge.test.tsx` | Đảm bảo Badge ghép text bằng dấu `·` chuẩn xác, và áp dụng màu gradient đúng đắn cho các traits kết hợp. |
 | **CompanionCard** | `src/shared/components/molecules/CompanionCard.test.tsx` | Kiểm tra UI Molecule, đảm bảo thẻ render đủ avatar, tags, meta data, và nhận diện tốt các trigger events như click Like, click Voice, click Meet Me. |
+| **AvatarDropdown** | `src/shared/components/molecules/AvatarDropdown.test.tsx` | Kiểm tra hoạt động của nút đăng nhập mặc định (CLIENT) và tính năng chuyển đổi nhanh vai trò (CLIENT/COMPANION/ADMIN) trực tiếp từ dropdown menu. |
 
 ### Phase 3: Integration
 | Tên Page | File Test | Ý nghĩa kiểm thử |

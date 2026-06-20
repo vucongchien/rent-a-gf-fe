@@ -44,10 +44,20 @@ const tint = (hex: string, amt: number) =>
 
 /* ── SUB-COMPONENTS NỘI BỘ (Để file chính gọn gàng hơn) ── */
 
+export interface NavIndicatorState {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  cx: number;
+  bottom: number;
+  ready: boolean;
+}
+
 interface NavIndicatorProps {
   show: boolean;
   effect: 'pill' | 'underline' | 'dot' | 'blob' | 'bounce';
-  ind: any;
+  ind: NavIndicatorState;
   indId: string;
   mobile: boolean;
   accent: string;
@@ -150,7 +160,7 @@ interface NavBarItemProps {
   bezier: string;
   dur: number;
   wobble: number;
-  btnRefs: React.MutableRefObject<Record<string, HTMLElement | null>>;
+  setRef: (id: string, el: HTMLButtonElement | HTMLAnchorElement | null) => void;
   onPick: (id: string) => void;
 }
 
@@ -161,7 +171,7 @@ const NavBarItem: React.FC<NavBarItemProps> = ({
   bezier,
   dur,
   wobble,
-  btnRefs,
+  setRef,
   onPick,
 }) => {
   const on = item.id === active;
@@ -197,9 +207,9 @@ const NavBarItem: React.FC<NavBarItemProps> = ({
     'aria-label': item.label,
   };
 
-  const refSetter = (el: HTMLElement | null) => {
+  const refSetter = (el: HTMLButtonElement | HTMLAnchorElement | null) => {
     if (el) {
-      btnRefs.current[item.id] = el;
+      setRef(item.id, el);
     }
   };
 
@@ -333,7 +343,9 @@ export function NavBar({
           bezier={bezier}
           dur={dur}
           wobble={wobble}
-          btnRefs={btnRefs}
+          setRef={(id, el) => {
+            btnRefs.current[id] = el;
+          }}
           onPick={pick}
         />
       ))}

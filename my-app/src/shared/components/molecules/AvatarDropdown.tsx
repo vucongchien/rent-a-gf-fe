@@ -61,6 +61,57 @@ export const AvatarDropdown: React.FC = () => {
             <p className="font-sans font-semibold text-[13.5px] text-neutral-900 truncate">{user.displayName}</p>
             <p className="font-mono text-[11px] text-neutral-500 capitalize mt-[1px]">{user.role}</p>
           </div>
+          {/* Quick Switch Roles */}
+          <div className="px-1.5 py-1 border-b border-neutral-100 flex flex-col gap-0.5">
+            <p className="px-2 py-0.5 text-[9.5px] font-bold text-neutral-400 uppercase tracking-wider font-sans select-none">
+              Đóng vai (Dev)
+            </p>
+            {user.role !== 'CLIENT' && (
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  setOpen(false);
+                  await login('client');
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/explore';
+                  }
+                }}
+                className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
+              >
+                👤 Khách hàng (Minh)
+              </Button>
+            )}
+            {user.role !== 'COMPANION' && (
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  setOpen(false);
+                  await login('companion');
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/bookings';
+                  }
+                }}
+                className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
+              >
+                👧 Bạn gái (Linh)
+              </Button>
+            )}
+            {user.role !== 'ADMIN' && (
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  setOpen(false);
+                  await login('admin');
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/explore';
+                  }
+                }}
+                className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
+              >
+                🔑 Admin
+              </Button>
+            )}
+          </div>
           {/* Actions */}
           <Button
             variant="ghost"
