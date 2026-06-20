@@ -9,14 +9,16 @@ import { WalletButton } from '../atoms/WalletButton';
 import { AvatarDropdown } from '../molecules/AvatarDropdown';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useWallet } from '@/shared/contexts/WalletContext';
+import { useNotifications } from '@/shared/contexts/NotificationContext';
 import type { User } from '@/shared/types';
 
 interface GlobalNavBarPresentationProps {
   user: User | null;
   balance: number;
+  unreadCount: number;
 }
 
-export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> = ({ user, balance }) => {
+export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> = ({ user, balance, unreadCount }) => {
   const pathname = usePathname();
 
   const activeId = useMemo(() => {
@@ -51,7 +53,8 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
       id: 'notifications',
       label: 'Thông báo',
       icon: <BellIcon />,
-      href: '/notifications'
+      href: '/notifications',
+      badge: unreadCount > 0 ? unreadCount : undefined
     },
     {
       id: 'profile',
@@ -59,11 +62,11 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
       icon: <UserIcon />,
       href: '/me'
     }
-  ], []);
-
+  ], [unreadCount]);
+// ... (phần còn lại của file giữ nguyên)
   const desktopActions = (
     <>
-      <div className="hidden md:block w-48 lg:w-64">
+      <div className="hidden md:block w-[210px] lg:w-64">
         <SearchInput placeholder="Search names, traits..." />
       </div>
       {user && <WalletButton balance={balance} />}
@@ -93,11 +96,13 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
 export const GlobalNavBar: React.FC = () => {
   const { user } = useAuth();
   const { balance } = useWallet();
+  const { unreadCount } = useNotifications();
 
   return (
     <GlobalNavBarPresentation
       user={user}
       balance={balance}
+      unreadCount={unreadCount}
     />
   );
 };

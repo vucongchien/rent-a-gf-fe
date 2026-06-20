@@ -353,7 +353,7 @@ export function NavBar({
   );
 
   const actionsElement = actions && (
-    <div className="nb-actions flex items-center gap-3">
+    <div className="nb-actions flex items-center gap-3 md:gap-5 lg:gap-3">
       {actions}
     </div>
   );
@@ -393,7 +393,7 @@ export function NavBar({
             className={className}
             style={mobileTopBarStyle}
           >
-            <div className="nb-bar flex justify-end" style={barStyle}>
+            <div className="nb-bar flex justify-end px-5" style={barStyle}>
               {rightSection}
             </div>
           </nav>
