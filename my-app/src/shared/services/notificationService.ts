@@ -1,6 +1,6 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { mockNotifications } from '@/mocks/fixtures/data';
-import type { Notification, NotificationType, ServiceRequestOptions } from '@/shared/types';
+import type { Notification, NotificationType, NotificationCategory, ServiceRequestOptions } from '@/shared/types';
 import { cookies } from 'next/headers';
 
 async function getRequestCookieHeader(req?: { headers: { get(name: string): string | null } }) {
@@ -42,9 +42,13 @@ export const notificationService = {
         title: n.title,
         body: n.body,
         type: n.type as NotificationType,
+        category: n.category as NotificationCategory,
         isRead: n.isRead,
         createdAt: n.createdAt,
         bookingId: n.bookingId,
+        actionUrl: n.actionUrl,
+        senderName: n.senderName,
+        senderAvatar: n.senderAvatar,
       }));
       return {
         items,

@@ -667,6 +667,77 @@ export const mockMessages: Record<string, ChatMessage[]> = {
 
 // --- NOTIFICATIONS ---
 export const mockNotifications = [
-  { id: 'notif-1', title: 'Booking được xác nhận!', body: 'Linh đã xác nhận lịch hẹn Cà phê & trò chuyện của bạn.', type: 'BOOKING_ACCEPTED' as const, isRead: false, actionUrl: '/bookings/bk-1', createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(), bookingId: 'bk-1' },
-  { id: 'notif-2', title: 'Nạp tiền thành công', body: 'Bạn đã nạp thành công 1000 Kano-Coin.', type: 'SYSTEM' as const, isRead: true, actionUrl: '/wallet', createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
-]
+  {
+    id: 'notif-1',
+    title: 'Booking được xác nhận!',
+    body: 'Linh đã xác nhận lịch hẹn Cà phê & trò chuyện của bạn.',
+    type: 'BOOKING_ACCEPTED' as const,
+    category: 'TRANSACTIONAL' as const,
+    isRead: false,
+    actionUrl: '/bookings/bk-1',
+    bookingId: 'bk-1',
+    senderName: 'Nguyễn Thị Linh',
+    senderAvatar: getMockAvatarUrl('comp-1'),
+    createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'notif-2',
+    title: 'Nạp tiền thành công',
+    body: 'Bạn đã nạp thành công 1000 Kano-Coin vào ví.',
+    type: 'PAYMENT_SUCCESS' as const,
+    category: 'TRANSACTIONAL' as const,
+    isRead: true,
+    actionUrl: '/wallet',
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'notif-3',
+    title: 'Mã xác thực OTP',
+    body: 'Mã OTP để hoàn tất giao dịch đặt lịch là 582194. Có hiệu lực trong 5 phút.',
+    type: 'OTP_CODE' as const,
+    category: 'TRANSACTIONAL' as const,
+    isRead: true,
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'notif-4',
+    title: 'Tin nhắn mới từ Linh',
+    body: 'Hẹn gặp bạn ngày mai nhé! Mình sẽ đến đúng giờ.',
+    type: 'CHAT_MESSAGE' as const,
+    category: 'INTERACTION' as const,
+    isRead: false,
+    actionUrl: '/chat',
+    bookingId: 'bk-1',
+    senderName: 'Nguyễn Thị Linh',
+    senderAvatar: getMockAvatarUrl('comp-1'),
+    createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'notif-5',
+    title: 'Voucher chào mừng thành viên mới 🌸',
+    body: 'Kanojo gửi tặng bạn mã giảm giá 15% (KANOJONEW) áp dụng cho lần hẹn hò đầu tiên.',
+    type: 'PROMOTION_VOUCHER' as const,
+    category: 'PROMOTIONAL' as const,
+    isRead: false,
+    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'notif-6',
+    title: 'Nhắc nhở: Cập nhật Profile',
+    body: 'Hãy cập nhật hình ảnh đại diện và phần mô tả cá nhân để thu hút nhiều bạn gái hơn nhé!',
+    type: 'PROFILE_REMINDER' as const,
+    category: 'PROMOTIONAL' as const,
+    isRead: true,
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'notif-7',
+    title: 'Hệ thống chuẩn bị bảo trì định kỳ',
+    body: 'Kanojo sẽ tiến hành bảo trì hệ thống nâng cấp định kỳ từ 02:00 đến 04:00 ngày mai. Giao dịch thanh toán có thể bị gián đoạn.',
+    type: 'SYSTEM_MAINTENANCE' as const,
+    category: 'PROMOTIONAL' as const,
+    isRead: true,
+    createdAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString()
+  }
+];
+
