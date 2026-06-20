@@ -42,7 +42,7 @@ export async function ExploreGridServer({ city, limit = DEFAULT_LIMIT }: Explore
               avatarUrl={comp.avatarUrl}
               voiceUrl={comp.voiceIntroUrl}
               traits={comp.totalReviews === 0 ? ['new'] : undefined}
-              metadata={comp.metadata}
+              metadata={comp.availableCities}
             />
           ))}
         </div>
