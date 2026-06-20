@@ -11,11 +11,6 @@ import { ReviewsWall } from './components/ReviewsWall'
 import { ReviewsSkeleton } from './components/ReviewsSkeleton'
 import { RelatedCompanions, RelatedCompanionsSkeleton } from './components/RelatedCompanions'
 
-import { MobileHeader } from '@/shared/components/organisms/MobileHeader'
-import { WalletButton } from '@/shared/components/atoms/WalletButton'
-import { ChevronRightIcon } from '@/shared/components/atoms/Icons'
-import Link from 'next/link'
-
 interface PageProps {
   params: Promise<{ companionId: string }>
 }
@@ -48,19 +43,7 @@ export default async function CompanionDetailPage({ params }: PageProps) {
   const albumUrls = companion.albumUrls.length > 0
     ? companion.albumUrls : ['/placeholder.png']
 
-  const mobileHeaderLeft = (
-    <Link href="/explore" className="w-10 h-10 flex items-center justify-center text-neutral-700 active:scale-95 transition-transform rotate-180">
-      <ChevronRightIcon size={20} />
-    </Link>
-  );
-
-  const mobileHeaderRight = (
-    <WalletButton />
-  );
-
   return (
-    <>
-      <MobileHeader left={mobileHeaderLeft} right={mobileHeaderRight} transparent />
       <main className="max-w-[1180px] mx-auto px-4 md:px-8 py-10 space-y-16 pb-32">
 
 
@@ -137,6 +120,5 @@ export default async function CompanionDetailPage({ params }: PageProps) {
         </section>
 
       </main>
-    </>
   )
 }

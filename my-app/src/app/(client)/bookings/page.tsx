@@ -6,7 +6,6 @@ import { BookingsClientView } from './BookingsClientView';
 export default async function BookingsPage() {
   return (
     <div className="w-full pb-12">
-      {/* Header Title (Artbook style - Shared for Desktop & Mobile) */}
       <div className="flex items-center gap-3 sm:gap-4 pt-4 pb-4 sm:pb-6 mb-2 sm:mb-4 w-full">
         <div className="w-[6px] sm:w-[8px] h-[24px] sm:h-[32px] bg-ruka-500 rounded-sm shrink-0" />
         <WipeReveal variant="feathered" duration={1} delay={0.35} showIcon={true} iconSize={24} className="w-auto">

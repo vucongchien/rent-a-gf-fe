@@ -1,8 +1,12 @@
 import * as React from "react";
 import Link from "next/link";
-import { StarIcon, MapPinIcon, CheckIcon, ChevronDownIcon } from "@/shared/components/atoms/Icons";
+import { StarIcon, MapPinIcon } from "@/shared/components/atoms/Icons";
 import { Button } from "@/shared/components/atoms/Button";
 import type { CompanionDetail } from "@/shared/types";
+import { ScenarioSelector } from "./ScenarioSelector";
+import { CommitmentAccordion } from "./CommitmentAccordion";
+import { ReviewsAccordion } from "./ReviewsAccordion";
+import { FAQAccordion } from "./FAQAccordion";
 
 interface CompanionInfoCardProps {
   companion: CompanionDetail;
@@ -66,42 +70,11 @@ export const CompanionInfoCard: React.FC<CompanionInfoCardProps> = ({
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {companion.scenarios.map((sc) => {
-            const isSelected = sc.scenarioId === selectedScenarioId;
-            return (
-              <Link
-                key={sc.scenarioId}
-                href={`/explore/${companion.companionId}?scenarioId=${sc.scenarioId}`}
-                scroll={false}
-                className={`
-                  p-3.5 border-2 rounded-xl text-left transition-all duration-150 relative flex flex-col justify-between min-h-[92px]
-                  ${
-                    isSelected
-                      ? "border-neutral-900 bg-[var(--color-cream)] shadow-[3px_3px_0_var(--color-neutral-900)] translate-x-[-1px] translate-y-[-1px]"
-                      : "border-neutral-200 hover:border-neutral-400 bg-white"
-                  }
-                `}
-              >
-                <div className="space-y-1">
-                  <div className="font-sans font-black text-sm text-neutral-900 leading-tight">
-                    {sc.title}
-                  </div>
-                  <div className="text-[11px] text-neutral-500 line-clamp-1 font-medium">
-                    {sc.description}
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-baseline mt-2 pt-2 border-t border-dashed border-neutral-100">
-                  <span className="text-[10px] font-mono text-neutral-400">{sc.publicPlace}</span>
-                  <span className="font-sans font-black text-sm text-rose-600">
-                    {sc.price} C
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+        <ScenarioSelector
+          scenarios={companion.scenarios}
+          selectedScenarioId={selectedScenarioId}
+          companionId={companion.companionId}
+        />
       </div>
 
       {/* CTA Booking */}
@@ -117,106 +90,15 @@ export const CompanionInfoCard: React.FC<CompanionInfoCardProps> = ({
       </div>
 
       {/* Accordions (Giống Product Accordions ở đáy của Nike PDP) */}
-      <div className="border-t-2 border-dashed border-neutral-200 pt-5">
-        <div className="space-y-2.5">
-          {/* Accordion 1: Cam kết an toàn & bảo mật */}
-          <details className="group border-b border-neutral-200 pb-3" open>
-            <summary className="flex items-center justify-between font-sans font-black text-sm text-neutral-900 cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none">
-              <span>Cam kết an toàn & bảo mật</span>
-              <span className="transition-transform duration-200 group-open:rotate-180">
-                <ChevronDownIcon size={16} strokeWidth={2.5} className="text-neutral-600" />
-              </span>
-            </summary>
-            <div className="mt-3 text-xs text-neutral-600 space-y-2.5 leading-relaxed font-medium">
-              <div className="flex items-start gap-2 pt-1">
-                <CheckIcon size={14} className="text-emerald-500 stroke-[3px] shrink-0 mt-0.5" />
-                <span>
-                  <b>An toàn 100%</b> — Kano-Coin chỉ giải ngân sau cuộc hẹn thành công.
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckIcon size={14} className="text-emerald-500 stroke-[3px] shrink-0 mt-0.5" />
-                <span>
-                  <b>Dịch vụ uy tín</b> — Bạn gái đã được xác minh hồ sơ và phong cách.
-                </span>
-              </div>
-            </div>
-          </details>
+      <div className="border-t-2 border-dashed border-neutral-200 pt-5 space-y-2.5">
+        <CommitmentAccordion />
+        
+        <ReviewsAccordion
+          reviews={companion.recentReviews}
+          totalReviews={companion.totalReviews}
+        />
 
-          {/* Accordion 2: Đánh giá gần đây */}
-          <details className="group border-b border-neutral-200 pb-3">
-            <summary className="flex items-center justify-between font-sans font-black text-sm text-neutral-900 cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none">
-              <span>Đánh giá khách hàng ({companion.totalReviews})</span>
-              <span className="transition-transform duration-200 group-open:rotate-180">
-                <ChevronDownIcon size={16} strokeWidth={2.5} className="text-neutral-600" />
-              </span>
-            </summary>
-            <div className="mt-4 space-y-3 max-h-[200px] overflow-y-auto pr-1 scrollbar-none">
-              {companion.recentReviews && companion.recentReviews.length > 0 ? (
-                companion.recentReviews.map((rev) => (
-                  <div
-                    key={rev.reviewId}
-                    className="p-3 border-2 border-neutral-900 rounded-xl bg-neutral-50 shadow-[2px_2px_0_var(--color-neutral-900)] space-y-1.5"
-                  >
-                    <div className="flex justify-between items-center text-xs">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full border border-neutral-900 overflow-hidden flex items-center justify-center bg-amber-100 font-mono text-[9px] font-bold">
-                          {rev.authorName ? rev.authorName.charAt(0) : 'A'}
-                        </span>
-                        <span className="font-bold text-neutral-800">{rev.authorName || 'Ẩn danh'}</span>
-                      </div>
-                      <span className="text-[10px] text-neutral-400 font-mono">{rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('vi-VN') : 'Gần đây'}</span>
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <StarIcon
-                          key={i}
-                          size={10}
-                          className={i < rev.rating ? "text-amber-400 fill-amber-400" : "text-neutral-200"}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-xs text-neutral-600 leading-relaxed">{rev.comment}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-xs text-neutral-500 italic py-2">
-                  Chưa có đánh giá nào. Hãy là người đầu tiên đặt lịch và để lại đánh giá nhé!
-                </p>
-              )}
-            </div>
-          </details>
-
-          {/* Accordion 3: Câu hỏi thường gặp */}
-          <details className="group pb-1">
-            <summary className="flex items-center justify-between font-sans font-black text-sm text-neutral-900 cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none">
-              <span>Câu hỏi thường gặp</span>
-              <span className="transition-transform duration-200 group-open:rotate-180">
-                <ChevronDownIcon size={16} strokeWidth={2.5} className="text-neutral-600" />
-              </span>
-            </summary>
-            <div className="mt-4 text-xs text-neutral-600 space-y-3.5 leading-relaxed font-medium">
-              <div className="space-y-1">
-                <h4 className="font-sans font-black text-neutral-900 text-xs">
-                  Mình có thể hủy lịch hẹn không?
-                </h4>
-                <p className="text-neutral-500">
-                  Có. Bạn được hủy lịch miễn phí trước 24 giờ. Coin sẽ được tự động hoàn trả 100%
-                  vào ví của bạn.
-                </p>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-sans font-black text-neutral-900 text-xs">
-                  Làm thế nào để liên lạc với bạn gái?
-                </h4>
-                <p className="text-neutral-500">
-                  Sau khi yêu cầu đặt lịch được chấp nhận, kênh chat riêng giữa hai bạn sẽ tự động
-                  kích hoạt.
-                </p>
-              </div>
-            </div>
-          </details>
-        </div>
+        <FAQAccordion />
       </div>
     </div>
   );

@@ -19,14 +19,13 @@ interface GlobalNavBarPresentationProps {
 export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> = ({ user, balance }) => {
   const pathname = usePathname();
 
-  // Xác định active tab dựa trên pathname
   const activeId = useMemo(() => {
     if (pathname.startsWith('/explore')) return 'home';
     if (pathname.startsWith('/bookings')) return 'bookings';
     if (pathname.startsWith('/chat')) return 'chat';
     if (pathname.startsWith('/notifications')) return 'notifications';
     if (pathname.startsWith('/me') || pathname.startsWith('/profile')) return 'profile';
-    return 'home'; // default
+    return 'home';
   }, [pathname]);
 
   const items: NavItem[] = useMemo(() => [
@@ -67,7 +66,7 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
       <div className="hidden md:block w-48 lg:w-64">
         <SearchInput placeholder="Search names, traits..." />
       </div>
-      {user && <WalletButton user={user} balance={balance} />}
+      {user && <WalletButton balance={balance} />}
       <AvatarDropdown />
     </>
   );
