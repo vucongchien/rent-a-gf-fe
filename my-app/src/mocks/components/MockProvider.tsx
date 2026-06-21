@@ -27,6 +27,9 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
         if (!isWorkerStarted) {
           isWorkerStarted = true
           await worker.start({
+            serviceWorker: {
+              url: '/sw.js',
+            },
             onUnhandledRequest: 'bypass', // không warn với các request không phải /api/*
           })
           console.log('[MSW] Mock worker started')
