@@ -49,7 +49,7 @@ export default function NotificationsPage() {
         {/* Khung nội dung trắng đơn giản tinh tế */}
         <main 
           id="notifications-container"
-          className="bg-white rounded-none border-none p-0 shadow-none md:rounded-3xl md:border md:border-neutral-100/80 md:p-8 md:shadow-[0_8px_30px_rgba(0,0,0,0.015)]"
+          className="bg-transparent rounded-none border-none p-0 shadow-none md:bg-white md:rounded-3xl md:border md:border-neutral-100/80 md:p-8 md:shadow-[0_8px_30px_rgba(0,0,0,0.015)]"
         >
           <Suspense fallback={<NotificationSkeleton />}>
             <NotificationsLoader />

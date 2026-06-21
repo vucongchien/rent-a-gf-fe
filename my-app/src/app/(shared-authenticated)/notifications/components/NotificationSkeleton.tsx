@@ -4,11 +4,11 @@ import React from 'react';
 
 export const NotificationSkeleton: React.FC = () => {
   return (
-    <div className="flex flex-col gap-3 w-full" aria-busy="true" aria-label="Đang tải thông báo">
+    <div className="flex flex-col gap-3 w-full px-4 md:px-0 pt-2 md:pt-0" aria-busy="true" aria-label="Đang tải thông báo">
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
-          className="flex items-start gap-4 py-3.5 px-4 md:p-4 rounded-none md:rounded-2xl bg-white border-none md:border md:border-neutral-100/80 animate-pulse shadow-none md:shadow-sm"
+          className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-neutral-100/80 animate-pulse shadow-sm"
         >
           {/* Avatar / Icon Placeholder */}
           <div className="w-12 h-12 rounded-full bg-neutral-100 shrink-0" />

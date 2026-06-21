@@ -150,7 +150,7 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
 
       {/* Danh sách các thông báo hiển thị */}
       {filteredNotifications.length > 0 ? (
-        <div className="flex flex-col gap-2 md:gap-3">
+        <div className="flex flex-col gap-3 px-4 md:px-0">
           {filteredNotifications.map((notif) => (
             <NotificationItem
               key={notif.id}
@@ -176,7 +176,7 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
         </div>
       ) : (
         /* Empty State */
-        <div className="flex flex-col items-center justify-center py-16 px-4 text-center rounded-none border-none shadow-none bg-transparent md:rounded-2xl md:border md:border-dashed md:border-neutral-200 md:bg-white md:shadow-sm">
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center mx-4 md:mx-0 rounded-2xl border border-dashed border-neutral-200 bg-white shadow-sm">
           <div className="w-16 h-16 rounded-full bg-chizuru-50/30 flex items-center justify-center mb-4">
             <SakuraIcon size={32} className="text-chizuru-300 opacity-80" />
           </div>
