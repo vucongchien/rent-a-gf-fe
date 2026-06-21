@@ -476,3 +476,9 @@ export const CalendarXIcon: React.FC<IconProps> = ({ size = 28, className = '', 
   </svg>
 );
 
+export const OfflineIcon: React.FC<IconProps> = ({ size = 24, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="M18.364 5.636a9 9 0 0 1 0 12.728m0-12.728l-1.286 1.286m1.286-1.286a9 9 0 0 0-12.728 0M12 2v2m-9 9H2m20 0h-1m-1.114-6.364l-1.414 1.414M6.364 17.636l-1.414 1.414m11.536 0l-1.414-1.414M6.364 6.364l-1.414-1.414" />
+  </svg>
+);
+

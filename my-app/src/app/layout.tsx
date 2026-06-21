@@ -24,6 +24,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Rent-a-Girlfriend",
   description: "Companion booking platform",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "RentGF",
+  },
+  icons: {
+    apple: "/icon-192.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -43,6 +52,28 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-surface text-text">
         <RootClientLayout>{children}</RootClientLayout>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                const register = function() {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(function(reg) {
+                      console.log('ServiceWorker registered with scope: ', reg.scope);
+                    })
+                    .catch(function(err) {
+                      console.error('ServiceWorker registration failed: ', err);
+                    });
+                };
+                if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                  register();
+                } else {
+                  window.addEventListener('load', register);
+                }
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
