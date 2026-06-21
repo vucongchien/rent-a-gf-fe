@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { Button } from '../atoms/Button';
 import { Avatar } from '../atoms/Avatar';
 import { LogOutIcon } from '../atoms/Icons';
 
+
 export const AvatarDropdown: React.FC = () => {
   const { user, logout, login, isLoading } = useAuth();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
 
   // Đóng khi click ngoài
   useEffect(() => {
@@ -72,9 +76,7 @@ export const AvatarDropdown: React.FC = () => {
                 onClick={async () => {
                   setOpen(false);
                   await login('client');
-                  if (typeof window !== 'undefined') {
-                    window.location.href = '/explore';
-                  }
+                  router.push('/explore');
                 }}
                 className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
               >
@@ -87,9 +89,7 @@ export const AvatarDropdown: React.FC = () => {
                 onClick={async () => {
                   setOpen(false);
                   await login('companion');
-                  if (typeof window !== 'undefined') {
-                    window.location.href = '/bookings';
-                  }
+                  router.push('/bookings');
                 }}
                 className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
               >
@@ -102,15 +102,14 @@ export const AvatarDropdown: React.FC = () => {
                 onClick={async () => {
                   setOpen(false);
                   await login('admin');
-                  if (typeof window !== 'undefined') {
-                    window.location.href = '/explore';
-                  }
+                  router.push('/explore');
                 }}
                 className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
               >
                 🔑 Admin
               </Button>
             )}
+
           </div>
           {/* Actions */}
           <Button

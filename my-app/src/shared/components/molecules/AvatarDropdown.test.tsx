@@ -4,6 +4,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AvatarDropdown } from './AvatarDropdown';
 import { useAuth } from '@/shared/contexts/AuthContext';
 
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 // Mock hook useAuth
 vi.mock('@/shared/contexts/AuthContext', () => ({
   useAuth: vi.fn(),

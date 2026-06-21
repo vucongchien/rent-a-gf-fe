@@ -14,7 +14,10 @@ export interface NavItem {
   icon: ReactNode | ((props: { active: boolean }) => ReactNode);
   href?: string;
   badge?: number | string;
+  /** Nếu true, ẩn nhãn chữ bên dưới icon (chỉ hiển thị icon đơn thuần) */
+  hideLabel?: boolean;
 }
+
 
 export interface NavBarProps {
   items: NavItem[];
@@ -175,7 +178,6 @@ const NavBarItem: React.FC<NavBarItemProps> = ({
   onPick,
 }) => {
   const on = item.id === active;
-  const showLabel = true; // Always show label below icon
   const isBouncing = item.id === active && wobble > 0;
 
   const content = (
@@ -186,7 +188,7 @@ const NavBarItem: React.FC<NavBarItemProps> = ({
       >
         {renderIcon(item.icon, on)}
       </span>
-      {showLabel && (
+      {!item.hideLabel && (
         <span className="nb-label text-[10.5px] font-sans mt-[3px] text-center truncate w-full px-1 select-none">
           {item.label}
         </span>
