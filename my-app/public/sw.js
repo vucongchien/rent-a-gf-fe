@@ -1,7 +1,13 @@
-try {
-  importScripts('/mockServiceWorker.js');
-} catch (e) {
-  console.warn('[Service Worker] MSW import failed, running without mock:', e);
+// MSW chỉ chạy trong môi trường development (localhost)
+const IS_DEV = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+
+if (IS_DEV) {
+  try {
+    importScripts('/mockServiceWorker.js');
+    console.log('[Service Worker] MSW loaded (dev mode)');
+  } catch (e) {
+    console.warn('[Service Worker] MSW import failed, running without mock:', e);
+  }
 }
 
 const CACHE_NAME = 'rentgf-offline-cache-v1';

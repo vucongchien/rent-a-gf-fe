@@ -63,8 +63,23 @@ export const mockUsers = {
 
 export let currentMockUser: User | null = mockUsers.client
 
+/** Đọc role đã lưu từ localStorage để persist qua page reload */
+if (typeof window !== 'undefined') {
+  const savedRole = localStorage.getItem('msw_mock_role') as keyof typeof mockUsers | null
+  if (savedRole && savedRole in mockUsers) {
+    currentMockUser = mockUsers[savedRole]
+  }
+}
+
 export function setMockUser(role: keyof typeof mockUsers) {
   currentMockUser = mockUsers[role]
+  if (typeof window !== 'undefined') {
+    if (role === 'guest') {
+      localStorage.removeItem('msw_mock_role')
+    } else {
+      localStorage.setItem('msw_mock_role', role)
+    }
+  }
   console.log('[MSW] Switched user role to:', role)
 }
 
