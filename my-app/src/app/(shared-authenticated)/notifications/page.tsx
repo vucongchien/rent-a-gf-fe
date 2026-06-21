@@ -32,12 +32,12 @@ async function NotificationsLoader() {
 
 export default function NotificationsPage() {
   return (
-    <div className="min-h-screen bg-neutral-50/40 pt-24 pb-20 px-4 md:px-8">
+    <div className="min-h-screen bg-neutral-50/40 pt-24 pb-20 px-0 md:px-8">
       {/* Container căn giữa rộng 720px tối ưu thị giác */}
       <div className="max-w-2xl mx-auto flex flex-col gap-6">
         
         {/* Header chính của trang */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 px-4 md:px-0">
           <h1 className="text-2xl font-bold tracking-tight text-neutral-900 font-sans">
             Thông báo
           </h1>
@@ -49,7 +49,7 @@ export default function NotificationsPage() {
         {/* Khung nội dung trắng đơn giản tinh tế */}
         <main 
           id="notifications-container"
-          className="bg-white rounded-3xl border border-neutral-100/80 p-6 md:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.015)]"
+          className="bg-white rounded-none border-none p-0 shadow-none md:rounded-3xl md:border md:border-neutral-100/80 md:p-8 md:shadow-[0_8px_30px_rgba(0,0,0,0.015)]"
         >
           <Suspense fallback={<NotificationSkeleton />}>
             <NotificationsLoader />

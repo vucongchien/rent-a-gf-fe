@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { NotificationItem } from './NotificationItem';
 import { useNotifications } from '@/shared/contexts/NotificationContext';
 import { SakuraIcon, SpinnerIcon } from '@/shared/components/atoms/Icons';
+import { Button } from '@/shared/components/atoms/Button';
 import type { Notification, NotificationCategory } from '@/shared/types';
 
 interface NotificationListClientProps {
@@ -111,23 +112,24 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
   return (
     <div className="w-full flex flex-col gap-6 font-sans">
       {/* Tabs lọc & Hành động Đọc tất cả */}
-      <div className="flex flex-col gap-3 pb-3 border-b border-neutral-100/60">
+      <div className="flex flex-col gap-3 pb-3 border-b border-neutral-100/60 px-4 md:px-0 pt-4 md:pt-0">
         {/* Navigation Tabs - Dàn đều 100% không cuộn ngang, style nút cũ tinh tế, chống giật bằng border-transparent */}
         <div className="flex w-full justify-between gap-1.5">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
-              <button
+              <Button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-1.5 px-1 text-[11px] sm:text-xs md:text-sm font-medium transition-all duration-200 rounded-xl flex-1 text-center truncate ${
+                variant="unstyled"
+                className={`py-1.5 px-1 text-[11px] sm:text-xs md:text-sm font-medium transition-all duration-200 rounded-xl flex-1 text-center truncate cursor-pointer ${
                   isActive
                     ? 'bg-chizuru-50/50 text-chizuru-600 border border-chizuru-100/30 shadow-sm'
                     : 'text-neutral-500 hover:text-neutral-700 border border-transparent'
                 }`}
               >
                 {tab.label}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -135,19 +137,20 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
         {/* Nút Đọc tất cả - Dạt sang bên phải */}
         {notifications.some((n) => !n.isRead) && (
           <div className="flex justify-end">
-            <button
+            <Button
               onClick={handleMarkAllAsRead}
-              className="text-xs font-semibold text-chizuru-600 hover:text-chizuru-700 transition-colors px-1"
+              variant="unstyled"
+              className="text-xs font-semibold text-chizuru-600 hover:text-chizuru-700 transition-colors px-1 cursor-pointer"
             >
               Đánh dấu tất cả đã đọc
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
       {/* Danh sách các thông báo hiển thị */}
       {filteredNotifications.length > 0 ? (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2 md:gap-3">
           {filteredNotifications.map((notif) => (
             <NotificationItem
               key={notif.id}
@@ -158,21 +161,22 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
 
           {/* Load More Button */}
           {hasMore && (
-            <div className="flex justify-center mt-4">
-              <button
+            <div className="flex justify-center mt-4 px-4 pb-6 md:px-0 md:pb-0">
+              <Button
                 onClick={handleLoadMore}
                 disabled={isLoadingMore}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-neutral-200 text-sm font-medium text-neutral-600 hover:bg-neutral-50 active:bg-neutral-100 disabled:opacity-50 transition-all shadow-sm"
+                variant="unstyled"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-neutral-200 text-sm font-medium text-neutral-600 hover:bg-neutral-50 active:bg-neutral-100 disabled:opacity-50 transition-all shadow-sm cursor-pointer"
               >
                 {isLoadingMore && <SpinnerIcon size={16} className="text-neutral-400" />}
                 {isLoadingMore ? 'Đang tải...' : 'Xem các thông báo cũ hơn'}
-              </button>
+              </Button>
             </div>
           )}
         </div>
       ) : (
         /* Empty State */
-        <div className="flex flex-col items-center justify-center py-16 px-4 text-center rounded-2xl bg-white border border-dashed border-neutral-200 shadow-sm">
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center rounded-none border-none shadow-none bg-transparent md:rounded-2xl md:border md:border-dashed md:border-neutral-200 md:bg-white md:shadow-sm">
           <div className="w-16 h-16 rounded-full bg-chizuru-50/30 flex items-center justify-center mb-4">
             <SakuraIcon size={32} className="text-chizuru-300 opacity-80" />
           </div>

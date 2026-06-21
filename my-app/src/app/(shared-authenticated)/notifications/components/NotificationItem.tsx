@@ -130,10 +130,10 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
   return (
     <div
       onClick={handleClick}
-      className={`flex items-start gap-4 p-4 rounded-2xl border transition-all duration-300 ease-out cursor-pointer shadow-sm select-none ${
+      className={`flex items-start gap-4 py-3.5 px-4 md:p-4 rounded-none md:rounded-2xl border-none md:border transition-all duration-300 ease-out cursor-pointer shadow-none md:shadow-sm select-none ${
         isRead
-          ? 'bg-white border-neutral-100/60 hover:bg-neutral-50/40 hover:-translate-y-[1px] hover:shadow-md'
-          : 'bg-chizuru-50/10 border-chizuru-100/20 hover:bg-chizuru-50/20 hover:-translate-y-[1px] hover:shadow-md'
+          ? 'bg-white md:border-neutral-100/60 md:hover:bg-neutral-50/40 md:hover:-translate-y-[1px] md:hover:shadow-md'
+          : 'bg-chizuru-50/10 md:border-chizuru-100/20 md:hover:bg-chizuru-50/20 md:hover:-translate-y-[1px] md:hover:shadow-md'
       }`}
       role="button"
       tabIndex={0}
