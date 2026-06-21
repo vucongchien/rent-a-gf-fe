@@ -26,5 +26,11 @@ pnpm dev
 *   📑 **[ADR 0001: Kiến trúc Monorepo 5 tầng, BFF & Event-Driven SSE Chat](file:///e:/LEARN/rent-a-gf-fe/docs/adr/0001-frontend-architecture.md)**: Quyết định nền tảng về tổ chức source code, bảo mật token qua lớp BFF và giao thức truyền tin thời gian thực.
 *   📑 **[ADR 0002: Điều hướng và Quản lý luồng giao diện trên Next.js App Router](file:///e:/LEARN/rent-a-gf-fe/docs/adr/0002-nextjs-route-driven-flows.md)**: Quyết định kiến trúc về Route-driven UX, Intercepting/Parallel Routes cho Booking Modal, Global Persistent Chat và mobile navigation fallbacks.
 *   📑 **[ADR 0003: MSW Mock Infrastructure làm nền tảng mô phỏng BFF API Gateway](file:///e:/LEARN/rent-a-gf-fe/docs/adr/0003-msw-mock-infrastructure.md)**: Thiết lập Mock Layer chặn request HTTP thực tế thông qua Service Worker, lưu trữ dynamic in-memory fixtures, hỗ trợ stateful mock và mô phỏng lỗi nghiệp vụ không nợ kỹ thuật (no tech debt).
+*   📑 **[ADR 0004: Kiến trúc Mobile PWA cho Next.js 16](file:///e:/LEARN/rent-a-gf-fe/docs/adr/0004-mobile-pwa-architecture.md)**: Quyết định kiến trúc Mobile-First sử dụng Progressive Web App (PWA) với Vanilla Service Worker & Workbox v7+, tối ưu hóa offline, Web Push API và thiết kế các chiến lược lưu trữ đệm cho từng loại tài nguyên.
+*   📑 **[ADR 0005: Dịch vụ cấu hình hệ thống qua Vercel Edge Config](file:///e:/LEARN/rent-a-gf-fe/docs/adr/0005-vercel-edge-config-service.md)**: Quyết định kiến trúc và tích hợp Vercel Edge Config làm ConfigService trừu tượng, tối ưu hóa Edge reads và REST API PATCH writes, phân tích chi tiết các Edge Cases.
+
+## 📌 Các Tính Năng & Dịch Vụ Mới Tích Hợp
+
+*   ⚙️ **ConfigService (Vercel Edge Config)**: Dịch vụ cấu hình key-value trừu tượng hóa backend. Hỗ trợ chế độ đọc siêu nhanh ở Edge thông qua SDK `@vercel/edge-config` và ghi ở runtime qua Vercel REST API, chuyển đổi backend linh hoạt qua biến môi trường `CONFIG_BACKEND` (giữa `edge-config` và `in-memory` mock). Đường dẫn code tại [configService.ts](file:///e:/LEARN/rent-a-gf-fe/my-app/src/shared/services/config/configService.ts).
 
 ---
