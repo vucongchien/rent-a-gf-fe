@@ -10,19 +10,10 @@ export const metadata: Metadata = {
 
 export default function ChatPage() {
   return (
-    <div className="min-h-[calc(100vh-84px)] md:min-h-screen bg-neutral-50/40 pt-20 pb-24 md:pt-24 md:pb-12 px-0 md:px-8">
+    <div className="h-[calc(100vh-96px)] overflow-hidden md:h-[calc(100vh-84px)] md:overflow-hidden bg-neutral-50/40 pt-20 pb-4 md:pt-4 md:pb-6 px-0 md:px-8 flex flex-col">
       {/* Container chính rộng 5xl tối ưu cho giao diện chat 2 cột */}
-      <div className="max-w-5xl mx-auto flex flex-col gap-4 md:gap-6 h-[calc(100vh-170px)] min-h-[500px] md:h-[650px] lg:h-[700px]">
+      <div className="max-w-5xl w-full mx-auto flex flex-col gap-4 md:gap-4 flex-1 min-h-0">
         
-        {/* Header ẩn trên mobile để tối ưu diện tích chat, hiện trên desktop */}
-        <div className="hidden md:flex flex-col gap-1 px-4 md:px-0">
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-900 font-sans">
-            Tin nhắn
-          </h1>
-          <p className="text-xs text-neutral-500 font-normal leading-relaxed">
-            Trao đổi chi tiết với Companion về địa điểm, thời gian và kịch bản hẹn hò.
-          </p>
-        </div>
 
         {/* Khung chat chính */}
         <main className="flex-1 min-h-0 h-full">

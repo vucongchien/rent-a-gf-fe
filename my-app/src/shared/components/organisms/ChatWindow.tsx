@@ -34,15 +34,20 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Cuộn xuống cuối
+  // Cuộn xuống cuối bằng container nội bộ để tránh cuộn toàn trang
   const scrollToBottom = (behavior: 'smooth' | 'auto' = 'smooth') => {
-    messagesEndRef.current?.scrollIntoView({ behavior });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior,
+      });
+    }
   };
 
-  // Cuộn ngay khi đổi phòng, cuộn mượt khi có tin mới
+  // Cuộn mượt khi đổi phòng và khi có tin nhắn mới
   useEffect(() => {
     if (room?.chatRoomId) {
-      scrollToBottom('auto');
+      scrollToBottom('smooth');
     }
   }, [room?.chatRoomId]);
 
