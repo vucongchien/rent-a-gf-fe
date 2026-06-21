@@ -4,23 +4,23 @@ import { ChatContainer } from '@/shared/components/organisms/ChatContainer';
 import { SpinnerIcon } from '@/shared/components/atoms/Icons';
 
 export const metadata: Metadata = {
-  title: 'Hộp thư tin nhắn | Kanojo',
-  description: 'Trò chuyện thời gian thực và trao đổi trực tiếp với Companion của bạn trên ứng dụng Kanojo.',
+  title: 'Tin nhắn khách hàng | Kanojo Dashboard',
+  description: 'Quản lý tin nhắn, trao đổi thông tin và thảo luận kịch bản với khách hàng của bạn.',
 };
 
-export default function ChatPage() {
+export default function CompanionChatPage() {
   return (
     <div className="min-h-[calc(100vh-84px)] md:min-h-screen bg-neutral-50/40 pt-20 pb-24 md:pt-24 md:pb-12 px-0 md:px-8">
-      {/* Container chính rộng 5xl tối ưu cho giao diện chat 2 cột */}
+      {/* Container chính rộng 5xl tương tự Client để giao diện đối xứng */}
       <div className="max-w-5xl mx-auto flex flex-col gap-4 md:gap-6 h-[calc(100vh-170px)] min-h-[500px] md:h-[650px] lg:h-[700px]">
         
-        {/* Header ẩn trên mobile để tối ưu diện tích chat, hiện trên desktop */}
+        {/* Header ẩn trên mobile, hiện trên desktop */}
         <div className="hidden md:flex flex-col gap-1 px-4 md:px-0">
           <h1 className="text-2xl font-bold tracking-tight text-neutral-900 font-sans">
-            Tin nhắn
+            Tin nhắn khách hàng
           </h1>
           <p className="text-xs text-neutral-500 font-normal leading-relaxed">
-            Trao đổi chi tiết với Companion về địa điểm, thời gian và kịch bản hẹn hò.
+            Hộp thư trao đổi nhanh các chi tiết hẹn hò với khách hàng đã đặt lịch.
           </p>
         </div>
 
@@ -33,7 +33,7 @@ export default function ChatPage() {
               </div>
             }
           >
-            <ChatContainer role="CLIENT" />
+            <ChatContainer role="COMPANION" />
           </Suspense>
         </main>
       </div>

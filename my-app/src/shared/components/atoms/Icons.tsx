@@ -36,6 +36,12 @@ export const ChevronRightIcon: React.FC<IconProps> = ({ size = 16, className = '
   </svg>
 );
 
+export const ChevronLeftIcon: React.FC<IconProps> = ({ size = 16, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={className} {...props}>
+    <path d="m15 18-6-6 6-6"/>
+  </svg>
+);
+
 export const CompassIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
     <circle cx="12" cy="12" r="10"/>
@@ -481,4 +487,161 @@ export const OfflineIcon: React.FC<IconProps> = ({ size = 24, className = '', ..
     <path d="M18.364 5.636a9 9 0 0 1 0 12.728m0-12.728l-1.286 1.286m1.286-1.286a9 9 0 0 0-12.728 0M12 2v2m-9 9H2m20 0h-1m-1.114-6.364l-1.414 1.414M6.364 17.636l-1.414 1.414m11.536 0l-1.414-1.414M6.364 6.364l-1.414-1.414" />
   </svg>
 );
+
+/**
+ * BriefcaseIcon — Icon túi xách làm việc, style stroke đồng bộ với nav icons
+ * Dùng cho nút CompanionModeToggle
+ */
+export const BriefcaseIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+    <line x1="12" y1="12" x2="12" y2="12"/>
+    <path d="M2 13h20"/>
+  </svg>
+);
+
+/**
+ * CalendarLineIcon — Icon lịch biểu dạng stroke-only đồng bộ trên NavBar
+ */
+export const CalendarLineIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+    <line x1="16" y1="2" x2="16" y2="6"/>
+    <line x1="8" y1="2" x2="8" y2="6"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+  </svg>
+);
+
+/**
+ * CheckLineIcon — Icon dấu check dạng stroke-only đồng bộ trên NavBar
+ */
+export const CheckLineIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
+/**
+ * SwitchIcon — Icon hai mũi tên đảo chiều dùng cho nút chuyển đổi không gian trên NavBar
+ */
+export const SwitchIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="m21 9-4-4-4 4"/>
+    <path d="M3 9h18"/>
+    <path d="m3 15 4 4 4-4"/>
+    <path d="M21 15H3"/>
+  </svg>
+);
+
+/**
+ * DashboardIcon — Icon dạng lưới đại diện cho trang tổng quan Dashboard của Companion
+ */
+export const DashboardIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <rect x="3" y="3" width="7" height="9" rx="1"/>
+    <rect x="14" y="3" width="7" height="5" rx="1"/>
+    <rect x="14" y="12" width="7" height="9" rx="1"/>
+    <rect x="3" y="16" width="7" height="5" rx="1"/>
+  </svg>
+);
+
+/**
+ * SmileLickDoodle — Nét vẽ tay mặt cười lè lưỡi lớn trên thẻ stats
+ */
+export const SmileLickDoodle: React.FC<IconProps> = ({ size = 80, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" className={`stroke-emerald-700 stroke-[4.5] stroke-linecap-round stroke-linejoin-round opacity-80 ${className}`} {...props}>
+    <circle cx="50" cy="50" r="38" strokeDasharray="5 5" className="opacity-25" />
+    <circle cx="36" cy="40" r="3.5" fill="currentColor" className="text-emerald-700" />
+    <circle cx="64" cy="40" r="3.5" fill="currentColor" className="text-emerald-700" />
+    <path d="M 40 59 Q 45 74 54 74 Q 59 70 56 59" fill="var(--color-chizuru-100)" className="stroke-emerald-700 stroke-[3.5]" />
+    <path d="M 30 55 Q 50 63 70 55" />
+  </svg>
+);
+
+/**
+ * SmileDoodleBlue — Nét vẽ mặt cười xanh trên quick actions card
+ */
+export const SmileDoodleBlue: React.FC<IconProps> = ({ size = 48, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 60 60" fill="none" className={`stroke-blue-700 stroke-[3] stroke-linecap-round stroke-linejoin-round ${className}`} {...props}>
+    <circle cx="22" cy="25" r="2" fill="currentColor" className="text-blue-800" />
+    <circle cx="38" cy="25" r="2" fill="currentColor" className="text-blue-800" />
+    <path d="M 18 35 Q 30 45 42 35" />
+    <path d="M 26 12 Q 28 8 32 10" />
+    <path d="M 28 11 Q 33 5 36 11" />
+  </svg>
+);
+
+/**
+ * SmileDoodleYellow — Nét vẽ mặt cười vàng trên quick actions card
+ */
+export const SmileDoodleYellow: React.FC<IconProps> = ({ size = 48, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 60 60" fill="none" className={`stroke-amber-800 stroke-[3] stroke-linecap-round stroke-linejoin-round ${className}`} {...props}>
+    <circle cx="22" cy="25" r="2" fill="currentColor" className="text-amber-800" />
+    <circle cx="38" cy="25" r="2" fill="currentColor" className="text-amber-800" />
+    <path d="M 20 38 Q 30 32 40 38" />
+    <path d="M 42 20 Q 48 22 45 26 T 46 32" />
+    <path d="M 18 20 Q 12 22 15 26 T 14 32" />
+  </svg>
+);
+
+/**
+ * SmileDoodlePurple — Nét vẽ mặt cười tím trên quick actions card
+ */
+export const SmileDoodlePurple: React.FC<IconProps> = ({ size = 48, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 60 60" fill="none" className={`stroke-purple-700 stroke-[3] stroke-linecap-round stroke-linejoin-round ${className}`} {...props}>
+    <path d="M 18 25 L 24 23 L 18 21" />
+    <path d="M 42 25 L 36 23 L 42 21" />
+    <path d="M 22 36 Q 30 46 38 36" />
+    <path d="M 12 14 Q 10 10 13 8 Q 15 8 16 11 Q 17 8 19 8 Q 22 10 20 14 L 16 18 Z" fill="var(--color-chizuru-50)" className="stroke-purple-700 stroke-[2]" />
+  </svg>
+);
+
+/**
+ * AvatarGreenDoodle — Avatar xanh lá cho danh sách booking
+ */
+export const AvatarGreenDoodle: React.FC<IconProps> = ({ size = 28, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={`stroke-emerald-700 stroke-[3.5] stroke-linecap-round ${className}`} {...props}>
+    <circle cx="15" cy="18" r="1.5" fill="currentColor" className="text-emerald-700" />
+    <circle cx="25" cy="18" r="1.5" fill="currentColor" className="text-emerald-700" />
+    <path d="M 13 26 Q 20 31 27 26" />
+    <path d="M 14 11 Q 17 6 20 11 T 26 11" />
+  </svg>
+);
+
+/**
+ * AvatarOrangeDoodle — Avatar cam cho danh sách booking
+ */
+export const AvatarOrangeDoodle: React.FC<IconProps> = ({ size = 28, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={`stroke-orange-600 stroke-[3.5] stroke-linecap-round ${className}`} {...props}>
+    <path d="M 12 17 Q 15 14 17 17" />
+    <path d="M 23 17 Q 25 14 28 17" />
+    <path d="M 15 25 Q 20 20 25 25" />
+    <path d="M 18 24 Q 20 31 22 30 Q 23 28 22 24" fill="var(--color-mami-100)" className="stroke-orange-600 stroke-[2.5]" />
+  </svg>
+);
+
+/**
+ * AvatarPinkDoodle — Avatar hồng cho danh sách booking
+ */
+export const AvatarPinkDoodle: React.FC<IconProps> = ({ size = 28, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={`stroke-rose-600 stroke-[3.5] stroke-linecap-round ${className}`} {...props}>
+    <circle cx="15" cy="18" r="1.5" fill="currentColor" className="text-rose-600" />
+    <circle cx="25" cy="18" r="1.5" fill="currentColor" className="text-rose-600" />
+    <path d="M 14 25 Q 20 31 26 24" />
+    <path d="M 8 13 Q 6 10 9 8 Q 11 8 12 11 Q 13 8 15 8 Q 18 10 16 13 L 12 17 Z" fill="var(--color-chizuru-100)" stroke="none" />
+  </svg>
+);
+
+
+/**
+ * TrendingUpIcon — Icon biểu diễn xu hướng tăng, stroke-only đồng bộ
+ */
+export const TrendingUpIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+    <polyline points="17 6 23 6 23 12"/>
+  </svg>
+);
+
 

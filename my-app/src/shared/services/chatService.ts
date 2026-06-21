@@ -30,17 +30,23 @@ export const chatService = {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
 
     if (isMock) {
-      const rooms: ChatRoom[] = mockChatRooms.map((r) => ({
-        chatRoomId: r.chatRoomId,
-        bookingId: r.bookingId,
-        companionId: r.companionId,
-        companionName: r.companionName,
-        companionAvatarUrl: r.companionAvatarUrl,
-        status: r.status,
-        lastMessage: r.lastMessage,
-        lastMessageAt: r.lastMessageAt,
-        unreadCount: r.unreadCount,
-      }));
+      const { currentMockUser, mockBookings } = await import('@/mocks/fixtures/data');
+      const isComp = currentMockUser?.role === 'COMPANION';
+
+      const rooms: ChatRoom[] = mockChatRooms.map((r) => {
+        const bk = mockBookings.find(b => b.bookingId === r.bookingId);
+        return {
+          chatRoomId: r.chatRoomId,
+          bookingId: r.bookingId,
+          companionId: r.companionId,
+          companionName: isComp && bk ? bk.clientName : r.companionName,
+          companionAvatarUrl: isComp && bk ? bk.clientAvatarUrl : r.companionAvatarUrl,
+          status: r.status,
+          lastMessage: r.lastMessage,
+          lastMessageAt: r.lastMessageAt,
+          unreadCount: r.unreadCount,
+        };
+      });
       return rooms;
     }
 
