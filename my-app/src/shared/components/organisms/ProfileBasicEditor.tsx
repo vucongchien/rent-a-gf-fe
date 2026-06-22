@@ -83,10 +83,9 @@ export const ProfileBasicEditor: React.FC<ProfileBasicEditorProps> = ({ initial 
       <div className="sticky bottom-0 bg-surface/95 backdrop-blur py-3 -mx-4 px-4 border-t border-neutral-200">
         <Button
           type="submit"
-          variant="primary"
-          size="md"
+          variant="accent-flat"
           disabled={!dirty || isPending}
-          className="w-full"
+          className="w-full h-11 rounded-xl"
         >
           {isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
         </Button>

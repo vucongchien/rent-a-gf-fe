@@ -30,6 +30,7 @@ const COPY: Record<
 };
 
 export const ProfileStatusBanner: React.FC<ProfileStatusBannerProps> = ({ status, reason }) => {
+  if (status === 'APPROVED') return null;
   const copy = COPY[status];
   if (!copy) return null;
 

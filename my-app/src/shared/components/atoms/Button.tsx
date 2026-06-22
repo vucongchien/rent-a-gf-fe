@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "accent" | "quick-select" | "unstyled";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "accent" | "quick-select" | "unstyled" | "accent-flat";
   size?: "sm" | "md" | "lg";
   isActive?: boolean;
   activeBorderColor?: string;
@@ -26,6 +26,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const isQuickSelect = variant === "quick-select";
     const isUnstyled = variant === "unstyled";
+    const isAccentFlat = variant === "accent-flat";
+
+    // CSS classes cho accent-flat (vàng nhạt phẳng, chữ đen, viền xám nhẹ, hover nền vàng tươi và viền vàng đậm)
+    const accentFlatClasses = `
+      font-sans font-bold transition-all duration-100 flex items-center justify-center cursor-pointer select-none active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none
+      bg-mami-50 hover:bg-mami-500 text-neutral-900 border border-neutral-300 hover:border-mami-600 shadow-none
+      ${className}
+    `;
 
     // CSS classes cho quick select (nút nạp nhanh)
     const quickSelectClasses = `
@@ -41,7 +49,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ? className
       : isQuickSelect 
         ? quickSelectClasses 
-        : `btn-base ${variantClasses[variant as keyof typeof variantClasses]} ${sizeClasses[size]} ${className}`;
+        : isAccentFlat
+          ? `${accentFlatClasses} ${sizeClasses[size]}`
+          : `btn-base ${variantClasses[variant as keyof typeof variantClasses]} ${sizeClasses[size]} ${className}`;
 
     // Truyền style border color động cho quick select active
     const inlineStyle = isQuickSelect && isActive

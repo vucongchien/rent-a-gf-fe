@@ -10,7 +10,6 @@ async function ProfileContent() {
 
   return (
     <div className="space-y-4">
-      <ProfileStatusBanner status={profile.status} />
       <ProfileBasicEditor initial={profile} />
       <MediaSection initial={profile} />
     </div>
