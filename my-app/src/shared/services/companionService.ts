@@ -187,7 +187,29 @@ export const companionService = {
     const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
     if (isMock) return { success: true };
     return serverFetch(`/profile/me/scenarios/${scenarioId}`, { method: 'DELETE', req: options?.req });
-  }
+  },
+
+  /**
+   * Request presigned upload URL theo SSOT POST /profile/me/media/presigned-urls.
+   * Bám ràng buộc INV-P04 (voice) / INV-P05 (image).
+   */
+  async requestUploadUrl(
+    input: { assetType: 'IMAGE' | 'VOICE'; sizeBytes: number; durationSeconds?: number; contentType?: string },
+    options?: ServiceRequestOptions,
+  ): Promise<{ uploadUrl: string; fileUrl: string }> {
+    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+    if (isMock) {
+      const ext = input.assetType === 'IMAGE' ? 'png' : 'mp3';
+      const id = `mock-${Date.now()}`;
+      const fileUrl = `https://storage.rent-a-gf.com/mock/${input.assetType.toLowerCase()}/${id}.${ext}`;
+      return { uploadUrl: `${fileUrl}?X-Amz-Signature=mock-${id}`, fileUrl };
+    }
+    return serverFetch('/profile/me/media/presigned-urls', {
+      method: 'POST',
+      body: input,
+      req: options?.req,
+    });
+  },
 };
 export type CompanionService = typeof companionService;
 
