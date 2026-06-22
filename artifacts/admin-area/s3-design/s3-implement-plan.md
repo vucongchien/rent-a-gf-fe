@@ -10,7 +10,7 @@
 
 ## 1. Tóm Tắt
 
-Xây 4 page admin trong route group `(admin)` của app Next.js đã có sẵn. Kiến trúc lấy **Server Components làm mặc định**, chỉ tách Client Island ở chỗ thật sự cần tương tác. Mutation đi qua **Server Actions** + `revalidatePath`, fetch luôn `no-store` + React `cache()` per-request (vì admin data là user-specific, không được dùng tag-based global cache), **không** dùng TanStack Query, **không** dùng route handler BFF.
+Xây 4 page admin trong route group `(admin)` của app Next.js đã có sẵn. Kiến trúc lấy **Server Components làm mặc định**, chỉ tách Client Island ở chỗ thật sự cần tương tác. Service fetch dùng `"use cache"` + `cacheTag()` per-entity (theo AGENTS.md cập nhật 2026-06-22), Mutation đi qua **Server Actions** + `revalidateTag()`, **không** dùng TanStack Query, **không** dùng route handler BFF.
 
 **Lý do triết lý:**
 - Codebase hiện tại (`bookings/page.tsx`) đã theo pattern Server Component → Suspense → Client Island. Plan này align thay vì áp pattern mới.
@@ -56,7 +56,7 @@ Quy ước đặt tên: client component có suffix `Client` hoặc đặt trong
 | Vấn đề | Solution không TanStack | Đủ chưa? |
 |---|---|---|
 | Initial load | Server Component fetch trực tiếp | ✅ Nhanh hơn, không spinner client |
-| Sau mutation, refresh list | Server Action + `revalidatePath('/admin/...')` | ✅ Next tự refetch RSC |
+| Sau mutation, refresh list | Server Action + `revalidateTag(adminTags.account(id))` | ✅ Next tự refetch RSC |
 | Loading state | `loading.tsx` + `<Suspense>` | ✅ Streaming built-in |
 | Error state | `error.tsx` per segment | ✅ Boundary built-in |
 | Optimistic UI | KHÔNG cần (action sub-second, pending spinner đủ) | ✅ Skip |
@@ -77,14 +77,60 @@ Server Component và Server Action gọi BE trực tiếp qua module service (`a
 
 Cả 3 không có ở scope này → bỏ.
 
-### D4. Mutation qua Server Action + `revalidatePath`
+### D4. Mutation qua Server Action + `revalidateTag()`
 
-**Quan trọng:** dữ liệu admin là **user-specific** (token-bound). Theo `my-app/AGENTS.md` §"Caching Rules" — CẤM `"use cache"` / `cacheTag()` / `cacheLife()` cho user-specific. Vì vậy invalidation dùng **`revalidatePath`** (xóa Router Cache cho route) thay vì `revalidateTag` (global tag cache).
+Theo `my-app/AGENTS.md` (cập nhật 2026-06-22): user-specific data VẪN dùng `"use cache"` được — **bắt buộc** kèm `cacheTag()` chứa identifier riêng để mỗi entity có slot cache riêng và invalidate chính xác bằng `revalidateTag()`.
 
-```tsx
+**Tag registry** mở rộng `my-app/src/shared/lib/cacheTags.ts` (đã có sẵn pattern):
+
+```ts
+// shared/lib/cacheTags.ts (extend)
+export const CACHE_TAGS = {
+  // ... existing
+  ADMIN_UPGRADE_REQUESTS_LIST: 'admin-upgrade-requests-list',
+  ADMIN_DISPUTES_LIST_ALL: 'admin-disputes-list-all',
+  adminAccount: (id: string) => `admin-account-${id}`,
+  adminDispute: (id: string) => `admin-dispute-${id}`,
+  adminDisputesList: (scope: string) => `admin-disputes-list-${scope}`,
+} as const;
+```
+
+**Service fetch — cache theo entity:**
+
+```ts
+// services/admin/adminAccountService.ts
+import 'server-only';
+import { unstable_cacheTag as cacheTag } from 'next/cache';
+import { CACHE_TAGS } from '@/shared/lib/cacheTags';
+import { fetchBE } from './fetchBE';
+
+export const adminAccountService = {
+  async getById(id: string) {
+    'use cache';
+    cacheTag(CACHE_TAGS.adminAccount(id));
+    return fetchBE<AdminAccount>(`/admin/accounts/${id}`);
+  },
+};
+```
+
+> Tag key theo entity id — mọi admin viewer dùng chung slot của entity X (data về X, không về viewer). Mutate X → `revalidateTag(adminAccount(id))` xoá đúng slot đó.
+
+**Ngoại lệ — `adminAuthService.me()`** không tag được an toàn vì data là về viewer (token-bound, không có entity id rõ trong arg). Dùng React `cache()` cho per-request dedup:
+
+```ts
+import { cache } from 'react';
+export const adminAuthService = {
+  me: cache(async () => fetchBE<MeResponse>('/api/auth/me', { cache: 'no-store' })),
+};
+```
+
+**Mutation (Server Action):**
+
+```ts
 // actions/admin/upgradeRequest.actions.ts
 'use server';
-import { revalidatePath } from 'next/cache';
+import { revalidateTag } from 'next/cache';
+import { CACHE_TAGS } from '@/shared/lib/cacheTags';
 import { requireAdmin } from '@/services/admin/requireAdmin';
 import { adminUpgradeRequestService } from '@/services/admin/adminUpgradeRequestService';
 
@@ -92,26 +138,13 @@ export async function approveUpgradeRequest(id: string) {
   await requireAdmin();
   try {
     await adminUpgradeRequestService.approve(id);
-    revalidatePath('/admin/companions');
-    revalidatePath(`/admin/companions/${id}`);
+    revalidateTag(CACHE_TAGS.ADMIN_UPGRADE_REQUESTS_LIST);
+    revalidateTag(CACHE_TAGS.adminAccount(id));
     return { ok: true } as const;
   } catch (e) {
     return { ok: false, error: normalizeError(e) } as const;
   }
 }
-```
-
-Service fetch — dynamic, không cache:
-
-```tsx
-// services/admin/adminUpgradeRequestService.ts
-import 'server-only';
-import { cache } from 'react';
-
-// React cache() = dedupe trong CÙNG request (per-request scope), KHÔNG share cross-user
-export const adminUpgradeRequestService = {
-  list: cache(() => fetchBE('/admin/upgrade-requests', { cache: 'no-store' })),
-};
 ```
 
 Form Client Component dùng `useActionState`:
@@ -142,21 +175,35 @@ const [state, formAction, pending] = useActionState(rejectUpgradeRequest, null);
 
 3 lớp defense in depth; chi phí thấp vì hai lớp sau đã chạy trong cùng request cycle.
 
-### D7. Caching strategy — TẤT CẢ admin fetch dùng `cache: 'no-store'`
+### D7. Caching strategy — `"use cache"` + tag per-entity
 
-**Quy tắc cứng:** admin data luôn đi qua `Authorization: Bearer ${token}` — là **user-specific**. Theo `my-app/AGENTS.md`: CẤM TUYỆT ĐỐI dùng `"use cache"` hay `cacheTag()` cho user-specific (cache global → leak cross-admin).
+**Quy tắc:** admin data về một entity (account, dispute, upgrade request) cache an toàn bằng `"use cache"` + `cacheTag(entityKey)`. Data về viewer (`/api/auth/me`) dùng React `cache()` per-request.
 
-| Page | Cache | Invalidation sau mutation |
+| Service method | Cache strategy | Tag |
 |---|---|---|
-| Mọi `/admin/*` page | `fetch(url, { cache: 'no-store' })` | `revalidatePath('/admin/...')` trong Server Action |
+| `adminUpgradeRequestService.list()` | `"use cache"` | `ADMIN_UPGRADE_REQUESTS_LIST` |
+| `adminAccountService.getById(id)` | `"use cache"` | `adminAccount(id)` |
+| `adminDisputeService.list(params)` | `"use cache"` | `ADMIN_DISPUTES_LIST_ALL` + `adminDisputesList(hash(params))` |
+| `adminDisputeService.getById(id)` | `"use cache"` | `adminDispute(id)` |
+| `adminAuthService.me()` | React `cache()` (per-request) | — |
 
-**De-dup trong cùng 1 request:** wrap service method bằng React `cache()` (per-request scope, KHÔNG cross-user) để 1 page render gọi cùng API nhiều lần chỉ fetch 1 lần. Đây là cách thay tag-based mà vẫn nhanh.
+**Invalidate chính xác sau mutation:**
 
-```tsx
-import { cache } from 'react';
-export const adminAccountService = {
-  getById: cache((id: string) => fetchBE(`/admin/accounts/${id}`, { cache: 'no-store' })),
-};
+| Mutation | Tags revalidate |
+|---|---|
+| approve/reject upgrade | `ADMIN_UPGRADE_REQUESTS_LIST`, `adminAccount(id)` |
+| lock/unlock account | `adminAccount(id)`, `ADMIN_UPGRADE_REQUESTS_LIST` (nếu account đang trong list pending) |
+| resolve dispute | `adminDispute(id)`, `ADMIN_DISPUTES_LIST_ALL` |
+
+**Pattern đa-tag cho list có filter:** mỗi list call gắn đồng thời tag chung (`ADMIN_DISPUTES_LIST_ALL`) và tag scoped theo filter hash. Mutation đơn lẻ revalidate tag chung — nuke mọi filter combo, đơn giản và an toàn:
+
+```ts
+async list(params: { status?: string; page?: number }) {
+  'use cache';
+  cacheTag(CACHE_TAGS.ADMIN_DISPUTES_LIST_ALL);
+  cacheTag(CACHE_TAGS.adminDisputesList(stableHash(params)));
+  return fetchBE<DisputeList>(`/disputes?${stringify(params)}`);
+}
 ```
 
 ### D8. Form validation: thủ công (3 form đơn giản)
@@ -278,7 +325,7 @@ CompanionDetailPage (Server, async)
 ```
 
 - Mỗi action button là Client Component nhận `id` qua prop; gọi Server Action import từ `actions/admin/*`.
-- Sau action: action gọi `revalidatePath` → Next tự re-render Server Component → UI update.
+- Sau action: action gọi `revalidateTag` → Next tự re-render Server Component → UI update.
 
 ### 5.3. Form Page — `/admin/disputes/[id]`
 
@@ -295,7 +342,7 @@ DisputeDetailPage (Server)
 ResolveDisputeForm dùng `useActionState(resolveDispute, null)`:
 - 3 radio: `REFUND_CLIENT` / `PAYOUT_COMPANION` / `REJECT_DISPUTE`
 - Textarea notes (required, length > 0 validate cả client + server)
-- Submit → Server Action → trả `{ ok }` hoặc `{ error }` → toast + `revalidatePath`
+- Submit → Server Action → trả `{ ok }` hoặc `{ error }` → toast + `revalidateTag`
 
 ---
 
@@ -352,8 +399,9 @@ Bỏ hoàn toàn: KpiCard, DateRangePicker, FilterBar, AuditLogTrail (page liên
 | W0.2 | `middleware.ts` thêm match `/admin/:path*` — check cookie tồn tại, redirect login nếu thiếu | guard nhẹ | D6 |
 | W0.3 | `services/admin/fetchBE.ts` — token forward (cookies) + error normalize (gRPC-Gateway → app shape) + Origin/CSRF check for Server Actions | helper | §6, D10, R7 |
 | W0.4 | `services/admin/adminAuthService.ts` + `requireAdmin()` guard | auth | D6 |
-| W0.5 | 3 service modules (`adminAccountService`, `adminUpgradeRequestService`, `adminDisputeService`) — `import 'server-only'` + wrap `React.cache()` + `cache: 'no-store'` | data layer | §6, D7 |
-| W0.6 | `actions/admin/*.actions.ts` skeleton — `'use server'` + `requireAdmin()` + try/catch + `revalidatePath` + `ActionResult` shape | mutation layer | D4, D10 |
+| W0.5a | Mở rộng `shared/lib/cacheTags.ts`: thêm `ADMIN_UPGRADE_REQUESTS_LIST`, `ADMIN_DISPUTES_LIST_ALL`, builder `adminAccount(id)`, `adminDispute(id)`, `adminDisputesList(scope)` | tag registry | D4, D7 |
+| W0.5b | 3 service modules (`adminAccountService`, `adminUpgradeRequestService`, `adminDisputeService`) — `import 'server-only'` + `"use cache"` + `cacheTag()` per-entity. `adminAuthService.me()` dùng React `cache()` | data layer | §6, D7 |
+| W0.6 | `actions/admin/*.actions.ts` skeleton — `'use server'` + `requireAdmin()` + try/catch + `revalidateTag` (tags từ registry) + `ActionResult` shape | mutation layer | D4, D10 |
 | W0.7a | Shared components nhóm 1 (server-pure): `AdminPageHeader`, `StatusBadge`, `EmptyState` | server kit | §7 |
 | W0.7b | Shared components nhóm 2 (client interactive): `Pagination` | client kit | §7 |
 | W0.8 | `app/(admin)/layout.tsx` shell: sidebar 2 nhóm (Companions, Disputes) + topbar (logout) — align với design tokens pastel hiện có (`ruka-500`, etc.) | shell | §3, R8 |
@@ -380,7 +428,7 @@ Bỏ hoàn toàn: KpiCard, DateRangePicker, FilterBar, AuditLogTrail (page liên
 | Loại | Phạm vi |
 |---|---|
 | **Unit (Vitest)** | `fetchBE` (mock global `fetch`), error normalize, `requireAdmin`, service methods, validation helper |
-| **Action test** | Server actions test với `fetch` mocked — verify gọi đúng endpoint + `revalidatePath` được trigger (spy `next/cache`) + đúng `ActionResult` shape cho success/validation/conflict |
+| **Action test** | Server actions test với `fetch` mocked — verify gọi đúng endpoint + `revalidateTag` được trigger với đúng tag (spy `next/cache`) + đúng `ActionResult` shape cho success/validation/conflict |
 | **Component (RTL)** | `Pagination` (page boundaries), `RejectReasonModal` & `LockToggle` (disable submit khi reason rỗng), `ResolveDisputeForm` (radio + notes validation, focus trap) |
 | **E2E (Playwright)** | 5 golden path (giữ nguyên từ v1) |
 
@@ -401,7 +449,7 @@ G1–G3, G5–G8: giữ từ v1 (contract chưa rõ: pagination, account fields,
 - **R1 — Server Action gọi sai layer**: kỹ luật `'use server'` + `import 'server-only'`. Mitigation: linter rule + code review.
 - **R3 — Không có admin booking management**: vẫn open.
 - **R4 — Pagination cho upgrade-requests**: nếu volume > 200 mà BE chưa pagination, cân nhắc client-side truncate + warning banner.
-- ~~R6 cache tag~~ — không còn relevant vì D7 đã chuyển sang `cache: 'no-store'` + `revalidatePath` (không có tag string).
+- **R6 — Cache tag typo / mismatch**: tag sai làm `revalidateTag` không trigger, UI stale. Mitigation: dùng builder ở `shared/lib/cacheTags.ts` (đã có pattern), không dùng raw string trong action; unit test verify action gọi đúng tag function.
 - **R7 — Server Action sau reverse proxy**: Next 16 chống CSRF bằng Origin check + Action ID. Sau reverse-proxy mất Origin → config `experimental.serverActions.allowedOrigins` trong `next.config.ts`. **Acceptance:** test 1 Server Action behind production proxy trước khi gate S4.
 - **R8 (mới) — Design system drift**: codebase dùng tokens pastel (`ruka-500`, `chizuru-*`, `mami-*`, `sumi-*`) và component như `WipeReveal`. Admin area phải dùng cùng tokens (lấy từ `globals.css`), không tạo palette mới. Layout admin desktop-first nhưng phải reuse Button/Input atoms hiện có nếu có.
 - **R9 (mới) — a11y**: modal cần focus trap + restore focus; radio group cần `role="radiogroup"` + label; nút action có aria-label rõ. Sai → user dùng bàn phím/screen reader không thao tác được. Acceptance: axe-core scan pass ở W1.
@@ -413,7 +461,7 @@ G1–G3, G5–G8: giữ từ v1 (contract chưa rõ: pagination, account fields,
 
 | Bỏ | Lý do |
 |---|---|
-| TanStack Query | Server Components + Server Actions + `revalidatePath` + React `cache()` đã đủ; thêm RQ là tax bundle + 2 lớp cache đồng bộ tay |
+| TanStack Query | Server Components + Server Actions + `"use cache"` + `revalidateTag` đã đủ; thêm RQ là tax bundle + 2 lớp cache đồng bộ tay |
 | Route handler BFF (`app/api/admin/*`) | Server Components chạy server-side, gọi BE trực tiếp tiết kiệm 1 hop. Sẽ thêm khi có client cần fetch (mobile, webhook) |
 | Zustand/Jotai | Không có cross-component client state đáng kể; searchParams + form state là đủ |
 | PPR | Admin page auth-gated, dynamic-only |
@@ -427,7 +475,7 @@ G1–G3, G5–G8: giữ từ v1 (contract chưa rõ: pagination, account fields,
 ## 13. GATE để sang S4
 
 - [ ] Tech Lead approve: Server-first, no TanStack, no BFF route handler.
-- [ ] Tech Lead approve: D7 `cache: 'no-store'` + React `cache()` per-request (compliance với AGENTS.md user-specific rule).
+- [ ] Tech Lead approve: D7 `"use cache"` + `cacheTag(entityKey)` (theo AGENTS.md cập nhật 2026-06-22). `adminAuthService.me()` dùng React `cache()` per-request.
 - [ ] BE confirm G1, G2, G7 (HIGH gaps) và G9 (version/ETag policy).
 - [ ] Verify Server Action behind reverse proxy (R7) — POC ở W0 build.
 - [ ] Design lead xác nhận admin layout dùng tokens pastel hiện có (R8).
