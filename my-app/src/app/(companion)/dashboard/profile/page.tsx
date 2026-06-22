@@ -1,10 +1,25 @@
+import React, { Suspense } from 'react';
+import { companionService } from '@/shared/services/companionService';
+import { ProfileStatusBanner } from '@/shared/components/molecules/ProfileStatusBanner';
+import { ProfileSkeleton } from '@/shared/components/organisms/ProfileSkeleton';
+import { ProfileBasicEditor } from '@/shared/components/organisms/ProfileBasicEditor';
+import { MediaSection } from '@/shared/components/organisms/MediaSection';
+
+async function ProfileContent() {
+  const profile = await companionService.getMyProfile();
+
+  return (
+    <div className="space-y-4">
+      <ProfileBasicEditor initial={profile} />
+      <MediaSection initial={profile} />
+    </div>
+  );
+}
+
 export default function CompanionProfilePage() {
   return (
-    <div className="flex flex-col h-full bg-surface">
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center text-neutral-500">
-        <p className="font-sans font-medium text-[15px]">Trang quản lý hồ sơ cá nhân của Bạn gái.</p>
-        <p className="font-sans text-[12.5px] text-neutral-400 mt-1">Nơi chỉnh sửa thông tin dịch vụ, hình ảnh và sở thích.</p>
-      </div>
-    </div>
+    <Suspense fallback={<ProfileSkeleton />}>
+      <ProfileContent />
+    </Suspense>
   );
 }
