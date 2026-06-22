@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { CITIES } from '@/shared/constants/cities';
+import { FilterChip } from '@/shared/components/atoms/FilterChip';
 
 interface CityChipsInputProps {
   name: string;
@@ -22,20 +23,14 @@ export const CityChipsInput: React.FC<CityChipsInputProps> = ({ name, value, onC
   return (
     <div>
       <div className="flex flex-wrap gap-2">
-        {CITIES.map((c) => {
-          const active = value.includes(c.code);
-          return (
-            <button
-              type="button"
-              key={c.code}
-              onClick={() => toggle(c.code)}
-              data-active={active}
-              className="px-3 py-1.5 rounded-full font-sans text-[12.5px] border transition-colors data-[active=true]:bg-neutral-900 data-[active=true]:text-white data-[active=true]:border-neutral-900 data-[active=false]:bg-white data-[active=false]:text-neutral-700 data-[active=false]:border-neutral-300 data-[active=false]:hover:border-neutral-500"
-            >
-              {c.label}
-            </button>
-          );
-        })}
+        {CITIES.map((c) => (
+          <FilterChip
+            key={c.code}
+            label={c.label}
+            active={value.includes(c.code)}
+            onClick={() => toggle(c.code)}
+          />
+        ))}
       </div>
       {value.map((code) => (
         <input key={code} type="hidden" name={name} value={code} />

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/shared/components/atoms/Button';
+import { CloseButton } from '@/shared/components/atoms/CloseButton';
 import {
   DURATION_OPTIONS,
   MAX_SCENARIO_DESC_LEN,
@@ -63,9 +64,7 @@ export const ScenarioFormModal: React.FC<ScenarioFormModalProps> = ({
           <h2 className="font-sans font-bold text-[15px] text-neutral-900">
             {initial ? 'Sửa kịch bản' : 'Tạo kịch bản mới'}
           </h2>
-          <button onClick={onClose} className="text-neutral-500 text-[20px] leading-none px-2" aria-label="Đóng">
-            ×
-          </button>
+          <CloseButton onClose={onClose} aria-label="Đóng" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
