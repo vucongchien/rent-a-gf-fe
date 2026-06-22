@@ -66,13 +66,14 @@ export const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
         </span>
         
         <div className="flex items-center gap-3">
-          <button
+          <Button
             disabled={loadingId !== null}
             onClick={() => onReject(booking.bookingId)}
+            variant="unstyled"
             className="px-2 py-1 text-[11px] font-sans font-semibold text-neutral-400 hover:text-neutral-600 active:scale-95 transition-all cursor-pointer"
           >
             Từ chối
-          </button>
+          </Button>
           
           <Button
             disabled={loadingId !== null}
