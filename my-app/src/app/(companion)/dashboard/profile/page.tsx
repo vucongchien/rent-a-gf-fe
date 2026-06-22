@@ -9,7 +9,7 @@ async function ProfileContent() {
   const profile = await companionService.getMyProfile();
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-xl mx-auto space-y-4">
       <ProfileStatusBanner status={profile.status} />
       <ProfileBasicEditor initial={profile} />
       <MediaSection initial={profile} />

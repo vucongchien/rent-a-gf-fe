@@ -12,7 +12,7 @@ export function ProfileTabs() {
   const pathname = usePathname();
   return (
     <nav
-      className="flex gap-2 mb-4 sticky top-0 bg-surface/90 backdrop-blur z-10 py-2"
+      className="flex gap-2 mb-4 py-2"
       aria-label="Profile sections"
     >
       {TABS.map((tab) => {
