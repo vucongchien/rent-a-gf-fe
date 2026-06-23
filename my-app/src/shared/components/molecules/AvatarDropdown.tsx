@@ -102,7 +102,7 @@ export const AvatarDropdown: React.FC = () => {
                 onClick={async () => {
                   setOpen(false);
                   await login('admin');
-                  router.push('/explore');
+                  router.push('/admin');
                 }}
                 className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
               >

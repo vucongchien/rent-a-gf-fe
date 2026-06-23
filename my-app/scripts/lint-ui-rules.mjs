@@ -34,13 +34,14 @@ function getFilesRecursively(dir) {
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
     if (stat && stat.isDirectory()) {
-      // Loại trừ thư mục mock, node_modules, build, test, design-system
+      // Loại trừ thư mục mock, node_modules, build, test, design-system, admin
       if (
         file !== 'mocks' &&
         file !== 'node_modules' &&
         file !== '.next' &&
         file !== 'test' &&
-        file !== 'design-system'
+        file !== 'design-system' &&
+        file !== 'admin'
       ) {
         results = results.concat(getFilesRecursively(filePath));
       }

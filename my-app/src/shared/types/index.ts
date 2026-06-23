@@ -2,6 +2,7 @@
  * index.ts — Re-export tất cả shared types.
  * Import từ '@/shared/types' thay vì từng file riêng.
  */
+export * from './admin'
 export * from './api'
 export * from './actionState'
 export * from './auth'
