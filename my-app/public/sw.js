@@ -1,17 +1,23 @@
-// MSW chỉ chạy trong môi trường development (localhost)
-const IS_DEV = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
-
-if (IS_DEV) {
-  try {
-    importScripts('/mockServiceWorker.js');
-    console.log('[Service Worker] MSW loaded (dev mode)');
-  } catch (e) {
-    console.warn('[Service Worker] MSW import failed, running without mock:', e);
-  }
+// Project chỉ deploy demo bằng MSW (chưa có backend thật), nên luôn nạp MSW worker
+// trong mọi môi trường (localhost + Vercel preview/production).
+try {
+  importScripts('/mockServiceWorker.js');
+  console.log('[Service Worker] MSW loaded');
+} catch (e) {
+  console.warn('[Service Worker] MSW import failed, running without mock:', e);
 }
 
 const CACHE_NAME = 'rentgf-offline-cache-v1';
 const OFFLINE_URL = '/offline';
+
+// Cờ bật bởi page khi NEXT_PUBLIC_PWA_ENABLED=true. SW không đọc được env.
+let pwaEnabled = false;
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'PWA_ENABLE') {
+    pwaEnabled = true;
+  }
+});
 
 // Lắng nghe sự kiện install để cache trang offline dự phòng
 self.addEventListener('install', (event) => {
@@ -25,6 +31,7 @@ self.addEventListener('install', (event) => {
 
 // Lắng nghe sự kiện fetch để trả về trang offline khi mất mạng
 self.addEventListener('fetch', (event) => {
+  if (!pwaEnabled) return;
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => {

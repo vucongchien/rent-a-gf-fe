@@ -1,8 +1,8 @@
+import { CITIES } from '@/shared/constants/cities';
+
 export const EXPLORE_FILTERS = [
   { id: 'all', label: 'All companions' },
-  { id: 'TP.HCM', label: 'TP.HCM' },
-  { id: 'Hà Nội', label: 'Hà Nội' },
-  { id: 'Đà Nẵng', label: 'Đà Nẵng' },
+  ...CITIES.map((c) => ({ id: c.code, label: c.label })),
 ];
 
 export const SORT_OPTIONS = [

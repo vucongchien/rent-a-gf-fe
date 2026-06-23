@@ -185,6 +185,12 @@ export const GlobalNavBar: React.FC = () => {
   const { user } = useAuth();
   const { balance } = useWallet();
   const { unreadCount } = useNotifications();
+  const pathname = usePathname();
+
+  // Admin console có sidebar riêng — không render global navbar
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <GlobalNavBarPresentation

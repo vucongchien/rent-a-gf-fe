@@ -30,6 +30,17 @@ export const BellIcon: React.FC<IconProps> = ({ size = 20, className = '', ...pr
   </svg>
 );
 
+export const MicIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => (
+      <svg
+        viewBox="0 0 24 24"
+        className="w-4 h-4 stroke-current stroke-2 fill-none"
+      >
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+        <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
+        <line x1="12" y1="19" x2="12" y2="22" />
+      </svg>
+);
+
 export const ChevronRightIcon: React.FC<IconProps> = ({ size = 16, className = '', ...props }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={className} {...props}>
     <path d="m9 18 6-6-6-6"/>

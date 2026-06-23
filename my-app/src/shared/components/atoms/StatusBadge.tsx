@@ -6,7 +6,10 @@ export type StatusBadgeVariant =
   | "online"
   | "offline"
   | "available"
-  | "booked";
+  | "booked"
+  | "pending"
+  | "approved"
+  | "rejected";
 
 export interface StatusBadgeProps {
   variant: StatusBadgeVariant;
@@ -33,6 +36,12 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
         return "Available";
       case "booked":
         return "Booked";
+      case "pending":
+        return "Chờ duyệt";
+      case "approved":
+        return "Đã duyệt";
+      case "rejected":
+        return "Bị từ chối";
       default:
         return "";
     }
@@ -52,6 +61,12 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
         return "bg-brand-muted text-brand-hover";
       case "booked":
         return "bg-neutral-300 text-neutral-700";
+      case "pending":
+        return "bg-amber-100 text-amber-900";
+      case "approved":
+        return "bg-emerald-100 text-emerald-900";
+      case "rejected":
+        return "bg-rose-100 text-rose-900";
       default:
         return "bg-white text-neutral-900";
     }

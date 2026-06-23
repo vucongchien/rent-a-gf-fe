@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 
 export default function ChatPage() {
   return (
-    <div className="h-[calc(100vh-96px)] overflow-hidden md:h-[calc(100vh-84px)] md:overflow-hidden bg-neutral-50/40 pt-20 pb-4 md:pt-4 md:pb-6 px-0 md:px-8 flex flex-col">
+    <div className="h-[calc(100vh-96px)] md:h-auto md:min-h-screen bg-neutral-50/40 pt-20 pb-4 md:pt-4 md:pb-6 px-0 md:px-8 flex flex-col">
       {/* Container chính rộng 5xl tối ưu cho giao diện chat 2 cột */}
-      <div className="max-w-5xl w-full mx-auto flex flex-col gap-4 md:gap-4 flex-1 min-h-0">
-        
+      <div className="max-w-5xl w-full mx-auto flex flex-col gap-4 md:gap-4 flex-1 min-h-0 md:flex-none">
+
 
         {/* Khung chat chính */}
-        <main className="flex-1 min-h-0 h-full">
+        <main className="flex-1 min-h-0 h-full md:flex-none md:h-[calc(100vh-120px)]">
           <Suspense
             fallback={
               <div className="w-full h-full flex items-center justify-center bg-white rounded-3xl border border-neutral-100/85">
