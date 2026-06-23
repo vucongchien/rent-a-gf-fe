@@ -52,28 +52,19 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-surface text-text">
         <RootClientLayout>{children}</RootClientLayout>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                const register = function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(reg) {
-                      console.log('ServiceWorker registered with scope: ', reg.scope);
-                    })
-                    .catch(function(err) {
-                      console.error('ServiceWorker registration failed: ', err);
-                    });
-                };
-                if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                  register();
-                } else {
-                  window.addEventListener('load', register);
+        {process.env.NEXT_PUBLIC_PWA_ENABLED === 'true' && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.ready.then(function(reg) {
+                    if (reg.active) reg.active.postMessage({ type: 'PWA_ENABLE' });
+                  });
                 }
-              }
-            `,
-          }}
-        />
+              `,
+            }}
+          />
+        )}
       </body>
     </html>
   );

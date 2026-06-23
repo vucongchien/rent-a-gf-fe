@@ -10,6 +10,15 @@ try {
 const CACHE_NAME = 'rentgf-offline-cache-v1';
 const OFFLINE_URL = '/offline';
 
+// Cờ bật bởi page khi NEXT_PUBLIC_PWA_ENABLED=true. SW không đọc được env.
+let pwaEnabled = false;
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'PWA_ENABLE') {
+    pwaEnabled = true;
+  }
+});
+
 // Lắng nghe sự kiện install để cache trang offline dự phòng
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -22,6 +31,7 @@ self.addEventListener('install', (event) => {
 
 // Lắng nghe sự kiện fetch để trả về trang offline khi mất mạng
 self.addEventListener('fetch', (event) => {
+  if (!pwaEnabled) return;
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => {
