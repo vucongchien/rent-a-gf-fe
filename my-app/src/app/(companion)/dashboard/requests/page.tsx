@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function DashboardRequestsPage() {
   return (
-    <main className="w-full max-w-2xl mx-auto px-4 pt-20 md:pt-6 pb-12">
+    <main className="w-full max-w-2xl mx-auto px-4 pt-6 md:pt-6 pb-12">
       <header className="flex flex-col gap-1 mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-neutral-900 font-sans">
           Yêu cầu đặt lịch

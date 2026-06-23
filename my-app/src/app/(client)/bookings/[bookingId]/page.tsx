@@ -23,7 +23,7 @@ export default async function BookingDetailPage({ params, searchParams }: PagePr
   const { reviewed } = await searchParams;
 
   return (
-    <div className="w-full pt-20 md:pt-4 pb-12">
+    <div className="w-full pt-6 md:pt-4 pb-12">
       <div className="max-w-[680px] mx-auto w-full px-4">
         <Link
           href="/bookings"

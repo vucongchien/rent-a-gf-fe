@@ -14,7 +14,7 @@ export default async function BookingReviewPage({ params }: PageProps) {
   const { bookingId } = await params;
 
   return (
-    <div className="w-full pt-20 md:pt-4 pb-12">
+    <div className="w-full pt-6 md:pt-4 pb-12">
       <div className="max-w-[680px] mx-auto w-full px-4">
         <Link
           href={`/bookings/${bookingId}`}

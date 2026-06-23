@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function CompanionChatPage() {
   return (
-    <div className="h-[calc(100vh-96px)] md:h-[calc(100vh-84px)] bg-neutral-50/40 pt-20 pb-4 md:pt-4 md:pb-6 px-0 md:px-8 flex flex-col">
+    <div className="h-[calc(100vh-96px)] md:h-[calc(100vh-84px)] bg-neutral-50/40 pt-6 pb-4 md:pt-4 md:pb-6 px-0 md:px-8 flex flex-col">
       {/* Container chính rộng 5xl tương tự Client để giao diện đối xứng */}
       <div className="max-w-5xl w-full mx-auto flex flex-col gap-4 md:gap-4 flex-1 min-h-0">
         

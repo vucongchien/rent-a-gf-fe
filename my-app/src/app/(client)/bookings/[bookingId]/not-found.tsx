@@ -3,7 +3,7 @@ import { CalendarXIcon } from '@/shared/components/atoms/Icons';
 
 export default function BookingNotFound() {
   return (
-    <div className="w-full pt-20 md:pt-10 pb-12">
+    <div className="w-full pt-6 md:pt-10 pb-12">
       <div className="max-w-[680px] mx-auto w-full px-4">
         <div className="flex flex-col items-center justify-center py-16 px-4 bg-white border border-neutral-200 rounded-[24px] text-center shadow-sm">
           <div className="w-16 h-16 rounded-full bg-chizuru-50 flex items-center justify-center text-chizuru-500 mb-4 border border-chizuru-100">
