@@ -176,6 +176,20 @@ export const companionService = {
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch(`/profile/me/scenarios/${scenarioId}`, { method: 'DELETE', req });
   },
+
+  async requestUploadUrl(
+    body: { assetType: 'IMAGE' | 'VOICE'; sizeBytes: number; durationSeconds?: number; contentType?: string },
+    options?: ServiceRequestOptions,
+  ): Promise<{ uploadUrl: string; fileUrl: string }> {
+    if (isMockMode()) {
+      const ext = body.assetType === 'IMAGE' ? 'png' : 'mp3';
+      const id = `mock-${Date.now()}`;
+      const fileUrl = `https://storage.rent-a-gf.com/mock/${body.assetType.toLowerCase()}/${id}.${ext}`;
+      return { uploadUrl: `${fileUrl}?X-Amz-Signature=mock-${id}`, fileUrl };
+    }
+    const req = await getRequestCookieHeader(options?.req);
+    return serverFetch('/profile/me/media/presigned-urls', { method: 'POST', body, req });
+  },
 };
 
 export type CompanionService = typeof companionService;
