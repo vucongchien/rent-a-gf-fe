@@ -1,5 +1,4 @@
 import React, { Suspense } from 'react';
-import { companionService } from '@/shared/services/companionService';
 import { bookingService } from '@/shared/services/bookingService';
 import { DashboardStats } from '@/shared/components/organisms/DashboardStats';
 import { PendingRequests } from '@/shared/components/organisms/PendingRequests';

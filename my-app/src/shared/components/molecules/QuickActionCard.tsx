@@ -5,7 +5,6 @@ interface QuickActionCardProps {
   href: string;
   bgClass: string;
   bgHoverClass: string;
-  borderClass: string;
   textClass: string;
   title: string;
   countText?: string;
@@ -17,7 +16,6 @@ export const QuickActionCard: React.FC<QuickActionCardProps> = ({
   href,
   bgClass,
   bgHoverClass,
-  borderClass, // Vẫn nhận để tương thích ngược nhưng sẽ được custom phẳng hơn
   textClass,
   title,
   countText,
