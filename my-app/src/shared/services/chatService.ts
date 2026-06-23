@@ -1,35 +1,15 @@
 import { serverFetch } from '@/shared/lib/apiClient';
+import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
+import { isMockMode } from '@/shared/lib/env';
 import { mockChatRooms, mockMessages } from '@/mocks/fixtures/data';
 import type { ChatRoom, ChatMessage, ServiceRequestOptions } from '@/shared/types';
-import { cookies } from 'next/headers';
-
-async function getRequestCookieHeader(req?: { headers: { get(name: string): string | null } }) {
-  if (req) return req;
-  try {
-    const cookieStore = await cookies();
-    return {
-      headers: {
-        get: (name: string) => {
-          if (name.toLowerCase() === 'cookie') {
-            return cookieStore.toString();
-          }
-          return null;
-        }
-      }
-    };
-  } catch {
-    return undefined;
-  }
-}
 
 export const chatService = {
   /**
    * Lấy danh sách phòng chat của user hiện tại
    */
   async getChatRooms(options?: ServiceRequestOptions): Promise<ChatRoom[]> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       const { currentMockUser, mockBookings } = await import('@/mocks/fixtures/data');
       const isComp = currentMockUser?.role === 'COMPANION';
 
@@ -51,13 +31,7 @@ export const chatService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<ChatRoom[]>('/interaction/rooms', { req });
-    } catch (err) {
-      console.error('[chatService] Lỗi fetch chat rooms:', err);
-      return [];
-    }
+    return serverFetch<ChatRoom[]>('/interaction/rooms', { req });
   },
 
   /**
@@ -67,24 +41,16 @@ export const chatService = {
     roomId: string,
     options?: ServiceRequestOptions & { searchParams?: URLSearchParams }
   ): Promise<ChatMessage[]> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       const roomMessages = mockMessages[roomId] || [];
       return roomMessages;
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<ChatMessage[]>(`/interaction/rooms/${roomId}/messages`, {
-        req,
-        searchParams: options?.searchParams,
-      });
-    } catch (err) {
-      console.error(`[chatService] Lỗi fetch chat messages cho room ${roomId}:`, err);
-      return [];
-    }
+    return serverFetch<ChatMessage[]>(`/interaction/rooms/${roomId}/messages`, {
+      req,
+      searchParams: options?.searchParams,
+    });
   },
 
   /**
@@ -95,9 +61,7 @@ export const chatService = {
     body: { text: string },
     options?: ServiceRequestOptions
   ): Promise<ChatMessage> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       const newMessage: ChatMessage = {
         messageId: `msg-${Date.now()}`,
         roomId,
@@ -105,7 +69,6 @@ export const chatService = {
         content: body.text,
         createdAt: new Date().toISOString(),
       };
-      // Mock push tin nhắn mới vào store tạm thời
       if (!mockMessages[roomId]) {
         mockMessages[roomId] = [];
       }
@@ -115,17 +78,10 @@ export const chatService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<ChatMessage>(`/interaction/rooms/${roomId}/messages`, {
-        req,
-        method: 'POST',
-        body,
-      });
-    } catch (err) {
-      console.error(`[chatService] Lỗi gửi tin nhắn cho room ${roomId}:`, err);
-      throw err;
-    }
+    return serverFetch<ChatMessage>(`/interaction/rooms/${roomId}/messages`, {
+      req,
+      method: 'POST',
+      body,
+    });
   }
 };
-
