@@ -100,6 +100,7 @@ export const BookingsClientView: React.FC<BookingsClientViewProps> = ({ initialB
             <BookingCard
               key={booking.bookingId}
               booking={booking}
+              href={`/bookings/${booking.bookingId}`}
               actions={
                 <BookingCardMenu
                   bookingId={booking.bookingId}

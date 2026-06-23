@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import type { BookingListItem } from '@/shared/types';
 import { BulletDot } from '@/shared/components/atoms/BulletDot';
 
@@ -8,9 +9,11 @@ export interface BookingCardProps {
   booking: BookingListItem;
   /** Slot góc phải card (vd: dropdown menu hành động). Caller tự chịu positioning. */
   actions?: React.ReactNode;
+  /** Khi truyền, content (avatar + thông tin) bọc trong Link tới href này. */
+  href?: string;
 }
 
-export const BookingCard: React.FC<BookingCardProps> = ({ booking, actions }) => {
+export const BookingCard: React.FC<BookingCardProps> = ({ booking, actions, href }) => {
   const formatBookingTime = (startStr: string) => {
     const start = new Date(startStr);
     const pad = (n: number) => n.toString().padStart(2, '0');
@@ -57,10 +60,8 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking, actions }) =>
 
   const statusConfig = getStatusConfig(booking.status);
 
-  return (
-    <article className="relative flex flex-row items-center gap-4 sm:gap-10 w-full pt-2 pr-9">
-      {actions}
-
+  const inner = (
+    <>
       {/* Companion Avatar (Capsule style: aspect 2:1) */}
       <div className="relative w-[90px] sm:w-[180px] h-[45px] sm:h-[90px] flex-shrink-0 rounded-full overflow-hidden border border-neutral-100 bg-neutral-50 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
         {booking.partnerAvatar ? (
@@ -108,7 +109,25 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking, actions }) =>
           </li>
         </ul>
       </div>
+    </>
+  );
 
+  const contentClass = 'flex flex-row items-center gap-4 sm:gap-10 w-full';
+
+  return (
+    <article className="relative pt-2 pr-9">
+      {actions}
+      {href ? (
+        <Link
+          href={href}
+          aria-label={`Xem chi tiết lịch hẹn với ${booking.partnerName}`}
+          className={`${contentClass} rounded-2xl -mx-2 px-2 py-1 hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chizuru-300`}
+        >
+          {inner}
+        </Link>
+      ) : (
+        <div className={contentClass}>{inner}</div>
+      )}
     </article>
   );
 };
