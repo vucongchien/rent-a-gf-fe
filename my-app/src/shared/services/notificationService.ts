@@ -42,21 +42,15 @@ export const notificationService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<{
-        items: Notification[];
-        total: number;
-        page: number;
-        pageSize: number;
-      }>('/notifications', {
-        req,
-        searchParams: options?.searchParams,
-      });
-    } catch (err: unknown) {
-      console.error('[notificationService] Lỗi fetch notifications:', err);
-      return { items: [], total: 0, page: 1, pageSize: 20 };
-    }
+    return serverFetch<{
+      items: Notification[];
+      total: number;
+      page: number;
+      pageSize: number;
+    }>('/notifications', {
+      req,
+      searchParams: options?.searchParams,
+    });
   },
 
   /**

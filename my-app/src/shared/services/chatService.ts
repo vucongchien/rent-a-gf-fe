@@ -31,13 +31,7 @@ export const chatService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<ChatRoom[]>('/interaction/rooms', { req });
-    } catch (err: unknown) {
-      console.error('[chatService] Lỗi fetch chat rooms:', err);
-      return [];
-    }
+    return serverFetch<ChatRoom[]>('/interaction/rooms', { req });
   },
 
   /**
@@ -53,16 +47,10 @@ export const chatService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<ChatMessage[]>(`/interaction/rooms/${roomId}/messages`, {
-        req,
-        searchParams: options?.searchParams,
-      });
-    } catch (err: unknown) {
-      console.error(`[chatService] Lỗi fetch chat messages cho room ${roomId}:`, err);
-      return [];
-    }
+    return serverFetch<ChatMessage[]>(`/interaction/rooms/${roomId}/messages`, {
+      req,
+      searchParams: options?.searchParams,
+    });
   },
 
   /**
@@ -90,16 +78,10 @@ export const chatService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<ChatMessage>(`/interaction/rooms/${roomId}/messages`, {
-        req,
-        method: 'POST',
-        body,
-      });
-    } catch (err: unknown) {
-      console.error(`[chatService] Lỗi gửi tin nhắn cho room ${roomId}:`, err);
-      throw err;
-    }
+    return serverFetch<ChatMessage>(`/interaction/rooms/${roomId}/messages`, {
+      req,
+      method: 'POST',
+      body,
+    });
   }
 };

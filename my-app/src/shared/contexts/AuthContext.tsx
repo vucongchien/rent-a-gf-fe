@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { User, UserRole } from '@/shared/types';
+import { logoutAction } from '@/app/actions/auth';
 
 // Re-export cho backward compatibility
 export type { User, UserRole };
@@ -61,7 +62,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
   const logout = async () => {
     try {
       setIsLoading(true);
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await logoutAction();
       setUser(null);
     } catch (err) {
       console.error('Failed to logout', err);

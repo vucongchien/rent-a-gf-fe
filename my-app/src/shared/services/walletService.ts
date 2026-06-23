@@ -25,13 +25,7 @@ export const walletService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<Wallet>('/finance/wallet', { req });
-    } catch (err: unknown) {
-      console.error('[walletService] Lỗi fetch wallet:', err);
-      throw err;
-    }
+    return serverFetch<Wallet>('/finance/wallet', { req });
   },
 
   /**
@@ -49,20 +43,14 @@ export const walletService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<TopupResponse>('/finance/topup', {
-        req,
-        method: 'POST',
-        body: { amount: body.amount },
-        extraHeaders: options?.idempotencyKey
-          ? { 'x-idempotency-key': options.idempotencyKey }
-          : undefined,
-      });
-    } catch (err: unknown) {
-      console.error('[walletService] Lỗi initiate topup:', err);
-      throw err;
-    }
+    return serverFetch<TopupResponse>('/finance/topup', {
+      req,
+      method: 'POST',
+      body: { amount: body.amount },
+      extraHeaders: options?.idempotencyKey
+        ? { 'x-idempotency-key': options.idempotencyKey }
+        : undefined,
+    });
   },
 
   /**
@@ -74,12 +62,6 @@ export const walletService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-
-    try {
-      return await serverFetch<WalletTransaction[]>('/finance/transactions', { req });
-    } catch (err: unknown) {
-      console.error('[walletService] Lỗi fetch transactions:', err);
-      return [];
-    }
+    return serverFetch<WalletTransaction[]>('/finance/transactions', { req });
   }
 };
