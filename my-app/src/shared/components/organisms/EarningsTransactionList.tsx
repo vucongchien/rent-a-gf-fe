@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import type { WalletTransaction } from '@/shared/types';
 import { TransactionListItem } from '../molecules/TransactionListItem';
+import { Button } from '../atoms/Button';
 
 interface EarningsTransactionListProps {
   transactions: WalletTransaction[];
@@ -36,13 +37,14 @@ export const EarningsTransactionList: React.FC<EarningsTransactionListProps> = (
   transactions,
 }) => {
   const [range, setRange] = useState<Range>('30d');
+  const [nowTs] = useState(() => Date.now());
 
   const filtered = useMemo(() => {
     if (range === 'all') return transactions;
     const days = range === '7d' ? 7 : 30;
-    const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
+    const threshold = nowTs - days * 24 * 60 * 60 * 1000;
     return transactions.filter((tx) => new Date(tx.createdAt).getTime() >= threshold);
-  }, [transactions, range]);
+  }, [transactions, range, nowTs]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, WalletTransaction[]>();
@@ -71,9 +73,10 @@ export const EarningsTransactionList: React.FC<EarningsTransactionListProps> = (
         {RANGE_OPTIONS.map((opt) => {
           const active = opt.value === range;
           return (
-            <button
+            <Button
               key={opt.value}
               type="button"
+              variant="unstyled"
               onClick={() => setRange(opt.value)}
               className={`px-3 py-1 rounded-full text-[11.5px] font-sans font-semibold transition-all ${
                 active
@@ -82,7 +85,7 @@ export const EarningsTransactionList: React.FC<EarningsTransactionListProps> = (
               }`}
             >
               {opt.label}
-            </button>
+            </Button>
           );
         })}
       </div>

@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { walletService } from '@/shared/services/walletService';
+import { Button } from '@/shared/components/atoms/Button';
 import { EarningsSummaryCard } from '@/shared/components/molecules/EarningsSummaryCard';
 import { EarningsStatsGrid } from '@/shared/components/molecules/EarningsStatsGrid';
 import { EarningsTransactionList } from '@/shared/components/organisms/EarningsTransactionList';
@@ -56,8 +57,9 @@ async function EarningsContent() {
       />
 
       {/* CTA Rút tiền — stub */}
-      <button
+      <Button
         type="button"
+        variant="unstyled"
         disabled
         className="w-full rounded-[20px] py-3 px-4 bg-gradient-to-r from-amber-400 to-orange-400 text-white font-sans font-bold text-[14px] shadow-sm border border-amber-300/60 opacity-70 cursor-not-allowed flex items-center justify-center gap-2"
         title="Tính năng sắp ra mắt"
@@ -66,7 +68,7 @@ async function EarningsContent() {
         <span className="text-[10px] font-mono uppercase tracking-[0.12em] bg-white/20 px-1.5 py-0.5 rounded-full">
           Sắp ra mắt
         </span>
-      </button>
+      </Button>
 
       <EarningsStatsGrid
         monthIncome={stats.monthIncome}

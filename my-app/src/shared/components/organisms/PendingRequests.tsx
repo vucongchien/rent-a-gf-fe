@@ -27,11 +27,10 @@ export const PendingRequests: React.FC<PendingRequestsProps> = ({ initialBooking
         </div>
       ) : (
         <div className="space-y-3">
-          {bookings.map((booking, index) => (
+          {bookings.map((booking) => (
             <PendingRequestItem
               key={booking.bookingId}
               booking={booking}
-              index={index}
               loadingId={loadingId}
               onAccept={handleAccept}
               onReject={handleReject}

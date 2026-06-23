@@ -5,7 +5,6 @@ import { Button } from '../atoms/Button';
 
 interface PendingRequestItemProps {
   booking: BookingListItem;
-  index: number;
   loadingId: string | null;
   onAccept: (bookingId: string) => void;
   onReject: (bookingId: string) => void;
@@ -13,7 +12,6 @@ interface PendingRequestItemProps {
 
 export const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
   booking,
-  index,
   loadingId,
   onAccept,
   onReject,

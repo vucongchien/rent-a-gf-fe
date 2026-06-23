@@ -9,7 +9,6 @@ describe('QuickActionCard', () => {
         href="#test-anchor"
         bgClass="bg-cream"
         bgHoverClass="hover:bg-neutral-50"
-        borderClass="border-neutral-200"
         textClass="text-neutral-800"
         title="Test Action"
         countText="(5)"
