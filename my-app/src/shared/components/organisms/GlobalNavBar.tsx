@@ -150,10 +150,9 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
         <Link
           href={isCompanionMode ? '/explore' : '/dashboard'}
           title="Chuyển đổi không gian"
-          className="h-9 px-3 gap-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-50 active:scale-95 text-[13px] font-sans font-medium text-neutral-700 inline-flex items-center justify-center shrink-0 transition-all"
+          className="w-9 h-9 rounded-lg border border-neutral-200 hover:bg-neutral-50 active:scale-95 text-neutral-700 inline-flex items-center justify-center shrink-0 transition-all"
         >
           <SwitchIcon size={16} />
-          <span className="hidden sm:inline">Không gian</span>
         </Link>
       )}
       {user && <WalletButton balance={balance} />}
@@ -162,7 +161,6 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
   );
 
   const brand = {
-    name: 'kanojo',
     node: (
       <div className="w-[30px] h-[30px] rounded-[10px] grid place-items-center bg-gradient-to-br from-white via-chizuru-100 to-chizuru-500 shadow-[0_4px_10px_-4px_rgba(251,105,153,0.6),inset_0_1px_0_#fff]">
         <HeartIcon fill="#fff" size={16} className="text-white" />
@@ -177,6 +175,7 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
       accent={navAccent}
       brand={brand}
       actions={desktopActions}
+      scrollHide={false}
     />
   );
 };

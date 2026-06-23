@@ -318,10 +318,10 @@ export function NavBar({
 
   // Định nghĩa các phần tử giao diện con để lắp ghép
   const brandElement = brand && (
-    <div className="nb-logo">
+    <Link href="/explore" className="nb-logo cursor-pointer hover:opacity-90 active:scale-95 transition-all">
       {brand.node ?? <span className="nb-logo-dot" style={{ background: accent }} />}
       {brand.name && <span className="nb-logo-text font-semibold text-base">{brand.name}</span>}
-    </div>
+    </Link>
   );
 
   const listElement = (
@@ -372,36 +372,37 @@ export function NavBar({
 
   // 4. Rẽ nhánh render Mobile / Desktop
   if (mobile) {
-    // Style trượt ẩn hiện của Top Bar trên mobile (đồng bộ như Desktop)
-    const mobileTopBarStyle = {
-      position: 'fixed' as const,
-      top: '12px',
-      left: '0',
-      right: '0',
-      zIndex: 50,
-      display: 'flex',
-      justifyContent: 'center',
-      pointerEvents: 'none' as const,
-      transition: 'transform 420ms cubic-bezier(0.34, 1.3, 0.5, 1), opacity 300ms ease',
-      transform: hidden ? 'translateY(-160%)' : 'translateY(0)',
-      opacity: hidden ? 0 : 1,
-    };
-
     return (
       <>
-        {/* Top Bar: Chỉ hiển thị <right> (Actions) */}
-        {rightSection && (
-          <nav
-            className={className}
-            style={mobileTopBarStyle}
-          >
-            <div className="nb-bar flex justify-end px-5" style={barStyle}>
-              {rightSection}
-            </div>
-          </nav>
-        )}
+        {/* Top Header trên Mobile: 100% width dính sát mép trên */}
+        <nav
+          className={'nb-header-flat-mobile ' + className}
+          style={{
+            position: 'sticky',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 50,
+            width: '100%',
+            background: scrolled ? 'rgba(255,255,255,0.82)' : 'rgba(255,255,255,0.68)',
+            backdropFilter: `blur(${glass}px) saturate(150%)`,
+            WebkitBackdropFilter: `blur(${glass}px) saturate(150%)`,
+            borderBottom: '1px solid var(--color-border)',
+            boxShadow: scrolled ? '0 4px 16px -10px rgba(30,28,40,0.08)' : 'none',
+            transition: 'background 280ms ease, box-shadow 280ms ease',
+          } as React.CSSProperties}
+        >
+          <div className="w-full px-4 py-2.5 flex items-center justify-between pointer-events-auto">
+            {brandElement}
+            {rightSection && (
+              <div className="flex items-center gap-2">
+                {rightSection}
+              </div>
+            )}
+          </div>
+        </nav>
         
-        {/* Bottom Bar: Hiển thị <left> (Menu điều hướng) */}
+        {/* Bottom Bar: Hiển thị Menu điều hướng lơ lửng phía dưới */}
         <nav
           className={'nb-wrap nb-mobile' + (hidden ? ' nb-hidden' : '') + (className ? ' ' + className : '')}
           style={{ '--wobble': wobbleAmt } as React.CSSProperties}
@@ -414,16 +415,39 @@ export function NavBar({
     );
   }
 
-  // Giao diện Desktop mặc định: <left> <right> song song
+  // Giao diện Desktop mặc định: Thanh Flat Header 100% width dính sát mép trên
   return (
     <nav
-      className={'nb-wrap nb-desktop' + (hidden ? ' nb-hidden' : '') + (className ? ' ' + className : '')}
-      style={{ '--wobble': wobbleAmt } as React.CSSProperties}
+      className={'nb-header-flat-desktop nb-desktop relative ' + className}
+      style={{
+        position: 'sticky',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        width: '100%',
+        background: scrolled ? 'rgba(255,255,255,0.82)' : 'rgba(255,255,255,0.68)',
+        backdropFilter: `blur(${glass}px) saturate(150%)`,
+        WebkitBackdropFilter: `blur(${glass}px) saturate(150%)`,
+        borderBottom: '1px solid var(--color-border)',
+        boxShadow: scrolled ? '0 4px 20px -10px rgba(30,28,40,0.08)' : 'none',
+        transition: 'background 280ms ease, box-shadow 280ms ease',
+      } as React.CSSProperties}
     >
-      <div className="nb-bar" style={barStyle}>
-        {leftSection}
+      {/* Logo đi ra ngoài luôn, sát lề trái màn hình */}
+      <div className="absolute left-6 md:left-10 top-1/2 -translate-y-1/2 pointer-events-auto flex items-center">
+        {brandElement}
+      </div>
+
+      {/* Container nội dung ở giữa (chứa Nav List và Actions ở các vị trí ban đầu của chúng) */}
+      <div className="max-w-[1180px] mx-auto w-full px-4 md:px-8 py-3.5 flex items-center pointer-events-auto">
+        {/* Nav List nằm ở bên trái container */}
+        <div className="flex items-center">
+          {listElement}
+        </div>
+        {/* Actions nằm ở bên phải container */}
         {rightSection && (
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
             {rightSection}
           </div>
         )}

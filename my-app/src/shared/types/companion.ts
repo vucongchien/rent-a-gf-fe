@@ -63,6 +63,15 @@ export interface CompanionReview {
   authorAvatarUrl?: string
 }
 
+/** Request body khi Client submit review cho 1 booking đã COMPLETED */
+export interface CreateReviewBody {
+  rating: number
+  comment: string
+}
+
+/** Phản hồi khi submit review thành công */
+export interface CreateReviewResponse extends CompanionReview {}
+
 
 export interface CreateScenarioBody {
   title: string

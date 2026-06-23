@@ -32,7 +32,7 @@ async function NotificationsLoader() {
 
 export default function NotificationsPage() {
   return (
-    <div className="min-h-screen bg-neutral-50/40 pt-24 pb-20 px-0 md:px-8">
+    <div className="min-h-screen bg-neutral-50/40 pt-6 pb-20 px-0 md:px-8">
       {/* Container căn giữa rộng 720px tối ưu thị giác */}
       <div className="max-w-2xl mx-auto flex flex-col gap-6">
         

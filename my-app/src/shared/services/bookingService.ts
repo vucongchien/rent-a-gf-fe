@@ -10,6 +10,8 @@ import type {
   CreateBookingBody,
   CreateBookingResponse,
   BookingsResponse,
+  CreateReviewBody,
+  CreateReviewResponse,
   RejectBookingResponse,
   ServiceRequestOptions,
 } from '@/shared/types';
@@ -115,6 +117,43 @@ export const bookingService = {
     }
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch<AcceptBookingResponse>(`/bookings/${bookingId}/accept`, { req, method: 'PUT' });
+  },
+
+  /**
+   * Submit review cho booking đã COMPLETED (Client).
+   * BE contract giả định: POST /bookings/:id/review { rating, comment } → CompanionReview.
+   * Mock mode: tự sinh review id + flip hasReviewed=true trong fixture để flow test được.
+   */
+  async submitReview(
+    bookingId: string,
+    body: CreateReviewBody,
+    options?: ServiceRequestOptions,
+  ): Promise<CreateReviewResponse> {
+    if (isMockMode()) {
+      const found = mockBookings.find(b => b.bookingId === bookingId);
+      if (!found) throw new Error('Booking không tồn tại');
+      if (found.status !== 'COMPLETED') throw new Error('Chỉ review được booking đã hoàn thành');
+      if (found.hasReviewed) throw new Error('Bạn đã đánh giá booking này');
+      found.hasReviewed = true;
+      const now = new Date().toISOString();
+      return {
+        reviewId: `rv-${Date.now()}`,
+        bookingId,
+        clientId: found.clientId,
+        companionId: found.companionId,
+        rating: body.rating,
+        comment: body.comment,
+        createdAt: now,
+        updatedAt: now,
+      };
+    }
+
+    const req = await getRequestCookieHeader(options?.req);
+    return serverFetch<CreateReviewResponse>(`/bookings/${bookingId}/review`, {
+      req,
+      method: 'POST',
+      body,
+    });
   },
 
   /** Từ chối đặt lịch (Companion) */

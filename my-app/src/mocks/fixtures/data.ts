@@ -586,6 +586,31 @@ const rawBookings = [
     }
   },
   {
+    bookingId: 'bk-4',
+    clientId: 'u-client-1',
+    clientName: 'Minh Khách',
+    clientAvatarUrl: 'https://i.pravatar.cc/100?u=u-client-1',
+    companionId: 'comp-3',
+    companionName: 'Phạm Minh Anh',
+    companionAvatarUrl: 'https://i.pravatar.cc/100?u=comp-3',
+    scenarioTitle: 'Đi dạo & chụp ảnh',
+    startTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    endTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000 + 90 * 60 * 1000).toISOString(),
+    status: 'COMPLETED' as const,
+    price: 200,
+    chatRoomId: 'room-bk-4',
+    publicPlace: 'Quận 2, TP.HCM',
+    escrowStatus: 'released',
+    chatRoomStatus: 'INACTIVE' as const,
+    hasReviewed: false,
+    scenarioSnapshot: {
+      title: 'Đi dạo & chụp ảnh',
+      price: 200,
+      durationMinutes: 90,
+      publicPlace: 'Quận 2, TP.HCM'
+    }
+  },
+  {
     bookingId: 'bk-3',
     clientId: 'u-client-1',
     clientName: 'Minh Khách',
