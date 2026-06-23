@@ -318,10 +318,10 @@ export function NavBar({
 
   // Định nghĩa các phần tử giao diện con để lắp ghép
   const brandElement = brand && (
-    <div className="nb-logo">
+    <Link href="/explore" className="nb-logo cursor-pointer hover:opacity-90 active:scale-95 transition-all">
       {brand.node ?? <span className="nb-logo-dot" style={{ background: accent }} />}
       {brand.name && <span className="nb-logo-text font-semibold text-base">{brand.name}</span>}
-    </div>
+    </Link>
   );
 
   const listElement = (
@@ -418,7 +418,7 @@ export function NavBar({
   // Giao diện Desktop mặc định: Thanh Flat Header 100% width dính sát mép trên
   return (
     <nav
-      className={'nb-header-flat-desktop nb-desktop ' + className}
+      className={'nb-header-flat-desktop nb-desktop relative ' + className}
       style={{
         position: 'sticky',
         top: 0,
@@ -434,11 +434,18 @@ export function NavBar({
         transition: 'background 280ms ease, box-shadow 280ms ease',
       } as React.CSSProperties}
     >
-      <div className="max-w-[1180px] mx-auto w-full px-4 md:px-8 py-3.5 flex items-center justify-between pointer-events-auto">
-        <div className="flex items-center gap-6">
-          {brandElement}
+      {/* Logo đi ra ngoài luôn, sát lề trái màn hình */}
+      <div className="absolute left-6 md:left-10 top-1/2 -translate-y-1/2 pointer-events-auto flex items-center">
+        {brandElement}
+      </div>
+
+      {/* Container nội dung ở giữa (chứa Nav List và Actions ở các vị trí ban đầu của chúng) */}
+      <div className="max-w-[1180px] mx-auto w-full px-4 md:px-8 py-3.5 flex items-center pointer-events-auto">
+        {/* Nav List nằm ở bên trái container */}
+        <div className="flex items-center">
           {listElement}
         </div>
+        {/* Actions nằm ở bên phải container */}
         {rightSection && (
           <div className="ml-auto flex items-center gap-3">
             {rightSection}
