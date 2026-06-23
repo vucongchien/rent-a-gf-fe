@@ -6,9 +6,11 @@ import { BulletDot } from '@/shared/components/atoms/BulletDot';
 
 export interface BookingCardProps {
   booking: BookingListItem;
+  /** Slot góc phải card (vd: dropdown menu hành động). Caller tự chịu positioning. */
+  actions?: React.ReactNode;
 }
 
-export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
+export const BookingCard: React.FC<BookingCardProps> = ({ booking, actions }) => {
   const formatBookingTime = (startStr: string) => {
     const start = new Date(startStr);
     const pad = (n: number) => n.toString().padStart(2, '0');
@@ -56,8 +58,9 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
   const statusConfig = getStatusConfig(booking.status);
 
   return (
-    <article className="relative flex flex-row items-center gap-4 sm:gap-10 w-full pt-2">
-      
+    <article className="relative flex flex-row items-center gap-4 sm:gap-10 w-full pt-2 pr-9">
+      {actions}
+
       {/* Companion Avatar (Capsule style: aspect 2:1) */}
       <div className="relative w-[90px] sm:w-[180px] h-[45px] sm:h-[90px] flex-shrink-0 rounded-full overflow-hidden border border-neutral-100 bg-neutral-50 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
         {booking.partnerAvatar ? (
