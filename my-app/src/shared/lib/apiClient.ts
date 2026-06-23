@@ -31,6 +31,8 @@ export interface ServerFetchOptions {
   body?: unknown
   /** HTTP method, mặc định GET */
   method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
+  /** Header bổ sung forward sang BE (ví dụ x-idempotency-key). Cookie/Authorization tự thêm. */
+  extraHeaders?: Record<string, string>
   /** Next.js cache option */
   cache?: RequestCache
   /** Next.js revalidate + tags */
@@ -71,7 +73,7 @@ export async function serverFetch<T = unknown>(
     )
   }
 
-  const { req, searchParams, body, method = 'GET', cache, next } = options
+  const { req, searchParams, body, method = 'GET', extraHeaders, cache, next } = options
 
   // Build URL
   const url = new URL(apiUrl.replace(/\/$/, '') + path)
@@ -87,6 +89,9 @@ export async function serverFetch<T = unknown>(
   const token = extractCookieValue(cookieHeader, AUTH_COOKIE_NAME)
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
+  }
+  if (extraHeaders) {
+    for (const [k, v] of Object.entries(extraHeaders)) headers[k] = v
   }
 
   // Timeout

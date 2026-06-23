@@ -1,27 +1,8 @@
 import { serverFetch } from '@/shared/lib/apiClient';
+import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
+import { isMockMode } from '@/shared/lib/env';
 import { mockBookings, currentMockUser } from '@/mocks/fixtures/data';
 import type { BookingListItem, BookingDetail, CreateBookingBody, CreateBookingResponse, CancelBookingResponse, BookingsResponse, ServiceRequestOptions } from '@/shared/types';
-import { cookies } from 'next/headers';
-
-// Helper tự động lấy cookie header từ next/headers nếu không truyền req từ Route Handler
-async function getRequestCookieHeader(req?: { headers: { get(name: string): string | null } }) {
-  if (req) return req;
-  try {
-    const cookieStore = await cookies();
-    return {
-      headers: {
-        get: (name: string) => {
-          if (name.toLowerCase() === 'cookie') {
-            return cookieStore.toString();
-          }
-          return null;
-        }
-      }
-    };
-  } catch {
-    return undefined;
-  }
-}
 
 export const bookingService = {
   /**
@@ -30,9 +11,7 @@ export const bookingService = {
   async getBookings(options?: ServiceRequestOptions & {
     searchParams?: URLSearchParams;
   }): Promise<BookingsResponse> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       if (!currentMockUser) {
         return {
           bookings: [],
@@ -82,9 +61,7 @@ export const bookingService = {
    * Lấy chi tiết lịch hẹn
    */
   async getBookingDetail(bookingId: string, options?: ServiceRequestOptions): Promise<BookingDetail | null> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       if (!currentMockUser) return null;
       const found = mockBookings.find(b => b.bookingId === bookingId);
       if (!found) return null;
@@ -117,9 +94,7 @@ export const bookingService = {
    * Tạo lịch hẹn mới (Client)
    */
   async createBooking(body: CreateBookingBody, options?: ServiceRequestOptions): Promise<CreateBookingResponse> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       if (!currentMockUser) {
         throw new Error('Unauthorized');
       }
@@ -159,9 +134,7 @@ export const bookingService = {
    * Hủy đặt lịch
    */
   async cancelBooking(bookingId: string, options?: ServiceRequestOptions): Promise<CancelBookingResponse> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       return {
         bookingId,
         status: 'CANCELLED',
@@ -182,9 +155,7 @@ export const bookingService = {
    * Chấp nhận đặt lịch (Companion)
    */
   async acceptBooking(bookingId: string, options?: ServiceRequestOptions): Promise<{ bookingId: string; status: string; chatRoomId: string }> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       return { bookingId, status: 'ACCEPTED', chatRoomId: `room-${bookingId}` };
     }
 
@@ -200,9 +171,7 @@ export const bookingService = {
    * Từ chối đặt lịch (Companion)
    */
   async rejectBooking(bookingId: string, options?: ServiceRequestOptions): Promise<{ bookingId: string; status: string }> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       return { bookingId, status: 'REJECTED' };
     }
 
