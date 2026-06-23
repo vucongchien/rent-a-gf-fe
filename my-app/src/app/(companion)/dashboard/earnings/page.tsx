@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
+import { cookies } from 'next/headers';
 import { walletService } from '@/shared/services/walletService';
-import { Button } from '@/shared/components/atoms/Button';
+import { AnimatedButton } from '@/shared/components/atoms/AnimatedButton';
 import { EarningsSummaryCard } from '@/shared/components/molecules/EarningsSummaryCard';
 import { EarningsStatsGrid } from '@/shared/components/molecules/EarningsStatsGrid';
 import { EarningsTransactionList } from '@/shared/components/organisms/EarningsTransactionList';
@@ -36,6 +37,9 @@ function computeStats(transactions: WalletTransaction[]) {
 }
 
 async function EarningsContent() {
+  // Đọc cookies để Next.js hiểu đây là dynamic route và tránh lỗi prerender current time khi mock
+  await cookies();
+
   const [wallet, transactions] = await Promise.all([
     walletService.getWallet().catch(() => ({
       walletId: '',
@@ -57,18 +61,17 @@ async function EarningsContent() {
       />
 
       {/* CTA Rút tiền — stub */}
-      <Button
+      <AnimatedButton
         type="button"
-        variant="unstyled"
         disabled
-        className="w-full rounded-[20px] py-3 px-4 bg-gradient-to-r from-amber-400 to-orange-400 text-white font-sans font-bold text-[14px] shadow-sm border border-amber-300/60 opacity-70 cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full rounded-[20px] py-3 px-4 bg-gradient-to-r from-amber-50/90 via-yellow-50/70 to-orange-50/50 text-neutral-800 font-sans font-bold text-[14px] shadow-sm border border-amber-200/80 opacity-90 cursor-not-allowed flex items-center justify-center gap-2 [--shine:rgba(245,158,11,0.6)]"
         title="Tính năng sắp ra mắt"
       >
         Rút tiền về ngân hàng
-        <span className="text-[10px] font-mono uppercase tracking-[0.12em] bg-white/20 px-1.5 py-0.5 rounded-full">
+        <span className="text-[10px] font-mono uppercase tracking-[0.12em] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full border border-amber-200/40 z-10">
           Sắp ra mắt
         </span>
-      </Button>
+      </AnimatedButton>
 
       <EarningsStatsGrid
         monthIncome={stats.monthIncome}
