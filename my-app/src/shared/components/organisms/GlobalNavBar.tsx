@@ -177,6 +177,7 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
       accent={navAccent}
       brand={brand}
       actions={desktopActions}
+      scrollHide={false}
     />
   );
 };

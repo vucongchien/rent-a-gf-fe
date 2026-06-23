@@ -21,7 +21,9 @@ export function RootClientLayout({ children }: { children: React.ReactNode }) {
                 <GlobalNavBar />
               </Suspense>
               <Suspense fallback={null}>
-                {children}
+                <div className="flex-1 pb-24 md:pb-0 flex flex-col">
+                  {children}
+                </div>
               </Suspense>
             </NotificationProvider>
           </ToastProvider>
