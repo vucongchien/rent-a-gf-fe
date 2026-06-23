@@ -1,12 +1,29 @@
 import { cache } from 'react';
+import { cookies } from 'next/headers';
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
 import { isMockMode } from '@/shared/lib/env';
-import { currentMockUser } from '@/mocks/fixtures/data';
+import { currentMockUser, mockUsers, setMockUser } from '@/mocks/fixtures/data';
 import type { LogoutResponse, ServiceRequestOptions, User } from '@/shared/types';
+
+function parseCookie(cookieString: string | null, name: string): string | null {
+  if (!cookieString) return null;
+  const match = cookieString.match(new RegExp(`(^|;)\\s*${name}\\s*=\\s*([^;]+)`));
+  return match ? decodeURIComponent(match[2]) : null;
+}
 
 async function getMeImpl(): Promise<User | null> {
   if (isMockMode()) {
+    let role: string | null = null;
+    try {
+      const cookieStore = await cookies();
+      role = cookieStore.get('msw_mock_role')?.value ?? null;
+    } catch {
+      // Ignore if called outside of request context
+    }
+    if (role && role in mockUsers) {
+      setMockUser(role as keyof typeof mockUsers);
+    }
     return currentMockUser as User;
   }
   const req = await getRequestCookieHeader();
@@ -34,7 +51,14 @@ export const authService = {
    */
   async getMe(options?: ServiceRequestOptions): Promise<User | null> {
     if (options?.req) {
-      if (isMockMode()) return currentMockUser as User;
+      if (isMockMode()) {
+        const cookieHeader = options.req.headers.get('cookie') ?? '';
+        const role = parseCookie(cookieHeader, 'msw_mock_role');
+        if (role && role in mockUsers) {
+          setMockUser(role as keyof typeof mockUsers);
+        }
+        return currentMockUser as User;
+      }
       try {
         return await serverFetch<User>('/auth/me', { req: options.req });
       } catch (err: unknown) {

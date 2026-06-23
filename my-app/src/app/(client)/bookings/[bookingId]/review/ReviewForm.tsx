@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { StarRating } from '@/shared/components/atoms/StarRating';
 import { SpinnerIcon } from '@/shared/components/atoms/Icons';
+import { Button } from '@/shared/components/atoms/Button';
 import { submitReviewAction, type SubmitReviewActionState } from './actions';
 
 interface ReviewFormProps {
@@ -92,14 +93,15 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ bookingId, companionId }
         >
           Để sau
         </Link>
-        <button
+        <Button
+          variant="unstyled"
           type="submit"
           disabled={!canSubmit}
           className="inline-flex items-center gap-2 h-11 px-6 rounded-full bg-chizuru-500 hover:bg-chizuru-600 text-white font-sans font-semibold text-[13.5px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {isPending && <SpinnerIcon size={14} className="animate-spin" />}
           Gửi đánh giá
-        </button>
+        </Button>
       </div>
     </form>
   );

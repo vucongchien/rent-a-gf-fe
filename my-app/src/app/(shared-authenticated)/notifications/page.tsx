@@ -1,7 +1,9 @@
 import React, { Suspense } from 'react';
 import { notificationService } from '@/shared/services/notificationService';
+import { authService } from '@/shared/services/authService';
 import { NotificationListClient } from './components/NotificationListClient';
 import { NotificationSkeleton } from './components/NotificationSkeleton';
+import { AuthRequiredPage } from '@/shared/components/organisms/AuthRequiredPage';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -30,7 +32,19 @@ async function NotificationsLoader() {
   );
 }
 
-export default function NotificationsPage() {
+export default async function NotificationsPage() {
+  // Auth guard: thông báo yêu cầu đăng nhập
+  const user = await authService.getMe();
+  if (!user) {
+    return (
+      <AuthRequiredPage
+        redirectPath="/notifications"
+        title="Đăng nhập để xem thông báo"
+        description="Bạn cần đăng nhập để xem các thông báo lịch hẹn, tin nhắn và cập nhật từ hệ thống."
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-neutral-50/40 pt-6 pb-20 px-0 md:px-8">
       {/* Container căn giữa rộng 720px tối ưu thị giác */}

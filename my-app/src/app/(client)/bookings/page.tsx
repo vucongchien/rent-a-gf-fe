@@ -1,9 +1,23 @@
 import React, { Suspense } from 'react';
 import { bookingService } from '@/shared/services/bookingService';
+import { authService } from '@/shared/services/authService';
 import { WipeReveal } from '@/shared/components/atoms/WipeReveal';
 import { BookingsClientView } from './BookingsClientView';
+import { AuthRequiredPage } from '@/shared/components/organisms/AuthRequiredPage';
 
 export default async function BookingsPage() {
+  // Auth guard: kiểm tra server-side trước khi render bất kỳ content nào
+  const user = await authService.getMe();
+  if (!user) {
+    return (
+      <AuthRequiredPage
+        redirectPath="/bookings"
+        title="Đăng nhập để xem lịch hẹn"
+        description="Bạn cần đăng nhập để xem các lịch đặt hẹn và trạng thái cuộc hẹn của mình."
+      />
+    );
+  }
+
   return (
     <div className="w-full pt-6 md:pt-4 pb-12">
       <div className="flex items-center gap-3 sm:gap-4 pt-4 pb-4 sm:pb-6 mb-2 sm:mb-4 w-full">

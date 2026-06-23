@@ -43,3 +43,24 @@ Dự án sử dụng **Mock Service Worker (MSW)** ở client-side để giả l
 
 Chi tiết về các quy tắc quét giao diện tự động (SVG, Button, Color, Font) và cách sửa lỗi khi gặp cảnh báo của linter, vui lòng xem tại tài liệu:
 👉 **[Quy tắc Kiểm tra Giao diện UI (UI Linting Rules)](./docs/ui-lint.md)**
+
+---
+
+## Cơ chế Đóng Vai (Mock Role Switcher) và Đồng bộ Client - Server
+
+Trong môi trường phát triển (Mock Mode `NEXT_PUBLIC_MOCK_ENABLED=true`), ứng dụng sử dụng MSW (Mock Service Worker) ở client-side để chuyển đổi vai trò (Client, Companion, Admin, Guest).
+
+Do Next.js 16 sử dụng kiến trúc Server Components chạy trực tiếp trên Server (NodeJS) không qua Service Worker của trình duyệt, trạng thái role mock cần được đồng bộ:
+- **Client-side**: Khi người dùng chọn vai trò mới, MSW Client lưu giá trị role mock vào `localStorage` và cập nhật cookie `msw_mock_role`.
+- **Server-side**: Khi render Server Components (như `AdminLayout`), hệ thống đọc cookie `msw_mock_role` để cập nhật trạng thái `currentMockUser` trên server tương ứng, đảm bảo kiểm tra quyền (`user.role === 'ADMIN'`) hoạt động nhất quán, tránh các lỗi redirect không mong muốn.
+ 
+---
+
+## Trang Đăng nhập Việt hóa & Thiết kế Thân thiện
+
+Trang đăng nhập (`/login`) đã được tinh chỉnh thiết kế và Việt hóa toàn bộ nội dung nhằm nâng cao trải nghiệm người dùng:
+- **Nhận diện thương hiệu**: Tích hợp Logo văn bản `RentGF 💖` với font chữ display `Cherry Bomb One` phong cách anime lãng mạn.
+- **Ngôn ngữ**: Việt hóa 100% nội dung cùng nút đăng nhập OAuth Google (`Tiếp tục với Google`), sử dụng các câu từ ấm áp, lịch thiệp.
+- **Lưu ý rõ ràng**: Loại bỏ các lưu ý mẫu của doanh nghiệp, thay vào đó là các cam kết bảo mật thông tin và hướng dẫn sử dụng chế độ Giả lập (Mock Mode) chi tiết để người dùng dễ dàng làm quen.
+
+

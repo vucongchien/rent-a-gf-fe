@@ -68,6 +68,7 @@ if (typeof window !== 'undefined') {
   const savedRole = localStorage.getItem('msw_mock_role') as keyof typeof mockUsers | null
   if (savedRole && savedRole in mockUsers) {
     currentMockUser = mockUsers[savedRole]
+    document.cookie = `msw_mock_role=${savedRole}; path=/; max-age=31536000`
   }
 }
 
@@ -76,12 +77,15 @@ export function setMockUser(role: keyof typeof mockUsers) {
   if (typeof window !== 'undefined') {
     if (role === 'guest') {
       localStorage.removeItem('msw_mock_role')
+      document.cookie = 'msw_mock_role=; path=/; max-age=0; SameSite=Lax'
     } else {
       localStorage.setItem('msw_mock_role', role)
+      document.cookie = `msw_mock_role=${role}; path=/; max-age=31536000; SameSite=Lax`
     }
   }
   console.log('[MSW] Switched user role to:', role)
 }
+
 
 // --- COMPANIONS ---
 const rawCompanions = [

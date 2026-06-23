@@ -64,6 +64,16 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
 
   // ─── Nav Items ──────────────────────────────────────────────────────────────
 
+  /** Danh sách 1 tab khi chưa đăng nhập — chỉ Explore là public */
+  const guestNavItems: NavItem[] = useMemo(() => [
+    {
+      id: 'home',
+      label: 'Explore',
+      icon: <CompassIcon />,
+      href: '/explore',
+    },
+  ], []);
+
   /** Danh sách 5 tab khi đang ở Companion Workspace */
   const companionNavItems: NavItem[] = useMemo(() => [
     {
@@ -99,7 +109,7 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
     },
   ], [unreadCount]);
 
-  /** Danh sách 5 tab khi ở Client Mode */
+  /** Danh sách 5 tab khi ở Client Mode (đã đăng nhập) */
   const clientNavItems: NavItem[] = useMemo(() => [
     {
       id: 'home',
@@ -134,16 +144,20 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
     },
   ], [unreadCount]);
 
-  // ─── Chọn bộ items theo mode ─────────────────────────────────────────────────
-  const items = isCompanionMode ? companionNavItems : clientNavItems;
+  // ─── Chọn bộ items theo mode và auth state ──────────────────────────────────
+  const items = isCompanionMode
+    ? companionNavItems
+    : user
+      ? clientNavItems
+      : guestNavItems;
 
-  // ─── Desktop Actions (luôn hiển thị) ─────────────────────────────────────────
+  // ─── Desktop Actions (hiện theo auth state) ──────────────────────────────────
   const desktopActions = (
     <>
       <div className="hidden md:block w-[210px] lg:w-64">
         <SearchInput placeholder="Search names, traits..." />
       </div>
-      {isCompanion && (
+      {user && isCompanion && (
         <Link
           href={isCompanionMode ? '/explore' : '/dashboard'}
           title="Chuyển đổi không gian"
@@ -152,6 +166,7 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
           <SwitchIcon size={16} />
         </Link>
       )}
+      {/* WalletButton chỉ hiện khi đã đăng nhập */}
       {user && <WalletButton balance={balance} />}
       <AvatarDropdown />
     </>

@@ -3,7 +3,8 @@
 import React, { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import type { BookingListItem } from '@/shared/types';
-import { ChatIcon, SpinnerIcon, XIcon } from '@/shared/components/atoms/Icons';
+import { ChatIcon, SpinnerIcon, XIcon, MoreHorizontalIcon } from '@/shared/components/atoms/Icons';
+import { Button } from '@/shared/components/atoms/Button';
 import { cancelBookingAction } from './actions';
 
 interface BookingCardMenuProps {
@@ -11,25 +12,6 @@ interface BookingCardMenuProps {
   status: BookingListItem['status'];
   chatRoomId: string | null;
 }
-
-const MoreHorizontalIcon: React.FC<{ size?: number; className?: string }> = ({ size = 18, className = '' }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <circle cx="12" cy="12" r="1" />
-    <circle cx="19" cy="12" r="1" />
-    <circle cx="5" cy="12" r="1" />
-  </svg>
-);
 
 export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({ bookingId, status, chatRoomId }) => {
   const [open, setOpen] = useState(false);
@@ -84,7 +66,8 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({ bookingId, sta
 
   return (
     <div ref={containerRef} className="absolute top-1 right-0 z-10">
-      <button
+      <Button
+        variant="unstyled"
         type="button"
         onClick={() => {
           setOpen((v) => !v);
@@ -97,7 +80,7 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({ bookingId, sta
         className="flex items-center justify-center w-8 h-8 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chizuru-300"
       >
         <MoreHorizontalIcon size={18} />
-      </button>
+      </Button>
 
       {open && (
         <div
@@ -119,7 +102,8 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({ bookingId, sta
               )}
 
               {canCancel && (
-                <button
+                <Button
+                  variant="unstyled"
                   type="button"
                   role="menuitem"
                   onClick={() => {
@@ -130,7 +114,7 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({ bookingId, sta
                 >
                   <XIcon size={15} className="flex-none" />
                   Hủy đặt lịch
-                </button>
+                </Button>
               )}
             </>
           )}
@@ -151,7 +135,8 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({ bookingId, sta
               )}
 
               <div className="flex items-center gap-1.5">
-                <button
+                <Button
+                  variant="unstyled"
                   type="button"
                   onClick={() => {
                     setConfirming(false);
@@ -161,8 +146,9 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({ bookingId, sta
                   className="flex-1 h-8 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-sans font-semibold text-[12px] transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   Quay lại
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="unstyled"
                   type="button"
                   onClick={handleCancel}
                   disabled={isPending}
@@ -170,7 +156,7 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({ bookingId, sta
                 >
                   {isPending && <SpinnerIcon size={13} className="animate-spin" />}
                   Xác nhận
-                </button>
+                </Button>
               </div>
             </div>
           )}

@@ -4,6 +4,7 @@ import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
 import type { BookingStatus } from '@/shared/types';
 import { ChatIcon, SpinnerIcon, XIcon } from '@/shared/components/atoms/Icons';
+import { Button } from '@/shared/components/atoms/Button';
 import { cancelBookingAction } from '../actions';
 
 interface BookingDetailActionsProps {
@@ -64,7 +65,8 @@ export const BookingDetailActions: React.FC<BookingDetailActionsProps> = ({
         )}
 
         {canCancel && !confirming && (
-          <button
+          <Button
+            variant="unstyled"
             type="button"
             onClick={() => {
               setConfirming(true);
@@ -74,7 +76,7 @@ export const BookingDetailActions: React.FC<BookingDetailActionsProps> = ({
           >
             <XIcon size={16} />
             Hủy đặt lịch
-          </button>
+          </Button>
         )}
       </div>
 
@@ -94,7 +96,8 @@ export const BookingDetailActions: React.FC<BookingDetailActionsProps> = ({
           )}
 
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="unstyled"
               type="button"
               onClick={() => {
                 setConfirming(false);
@@ -104,8 +107,9 @@ export const BookingDetailActions: React.FC<BookingDetailActionsProps> = ({
               className="h-10 px-4 rounded-full bg-white text-neutral-700 font-sans font-semibold text-[13px] border border-neutral-200 hover:bg-neutral-50 transition-colors disabled:opacity-50 cursor-pointer"
             >
               Quay lại
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="unstyled"
               type="button"
               onClick={handleCancel}
               disabled={isPending}
@@ -113,7 +117,7 @@ export const BookingDetailActions: React.FC<BookingDetailActionsProps> = ({
             >
               {isPending && <SpinnerIcon size={14} className="animate-spin" />}
               Xác nhận hủy
-            </button>
+            </Button>
           </div>
         </div>
       )}

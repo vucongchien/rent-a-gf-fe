@@ -70,7 +70,7 @@ export interface CreateReviewBody {
 }
 
 /** Phản hồi khi submit review thành công */
-export interface CreateReviewResponse extends CompanionReview {}
+export type CreateReviewResponse = CompanionReview
 
 
 export interface CreateScenarioBody {

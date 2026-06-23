@@ -8,8 +8,11 @@ interface WalletContextType {
   frozenBalance: number;
   isLoading: boolean;
   isOpen: boolean; // Trạng thái đóng/mở Wallet Modal
+  /** True khi user chưa đăng nhập và cố mở ví → mở AuthRequiredModal */
+  isAuthModalOpen: boolean;
   open: () => void;
   close: () => void;
+  closeAuthModal: () => void;
   fetchWallet: () => Promise<void>;
   topup: (amountInCoin: number) => Promise<boolean>;
 }
@@ -22,9 +25,18 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [frozenBalance, setFrozenBalance] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
 
-  const open = () => setIsOpen(true);
+  /** Mở Wallet Modal — nếu chưa đăng nhập thì mở AuthRequiredModal thay thế */
+  const open = () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+    } else {
+      setIsOpen(true);
+    }
+  };
   const close = () => setIsOpen(false);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
 
   const fetchWallet = useCallback(async () => {
     if (!user) {
@@ -81,8 +93,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         frozenBalance,
         isLoading,
         isOpen,
+        isAuthModalOpen,
         open,
         close,
+        closeAuthModal,
         fetchWallet,
         topup,
       }}

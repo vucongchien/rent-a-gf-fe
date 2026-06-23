@@ -1,14 +1,28 @@
 import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { authService } from '@/shared/services/authService';
 import { ChatContainer } from '@/shared/components/organisms/ChatContainer';
 import { SpinnerIcon } from '@/shared/components/atoms/Icons';
+import { AuthRequiredPage } from '@/shared/components/organisms/AuthRequiredPage';
 
 export const metadata: Metadata = {
   title: 'Hộp thư tin nhắn | Kanojo',
   description: 'Trò chuyện thời gian thực và trao đổi trực tiếp với Companion của bạn trên ứng dụng Kanojo.',
 };
 
-export default function ChatPage() {
+export default async function ChatPage() {
+  // Auth guard: chat yêu cầu đăng nhập
+  const user = await authService.getMe();
+  if (!user) {
+    return (
+      <AuthRequiredPage
+        redirectPath="/chat"
+        title="Đăng nhập để nhắn tin"
+        description="Bạn cần đăng nhập để trò chuyện và kết nối với các companion yêu thích của mình."
+      />
+    );
+  }
+
   return (
     <div className="h-[calc(100vh-96px)] md:h-auto md:min-h-screen bg-neutral-50/40 pt-6 pb-4 md:pt-4 md:pb-6 px-0 md:px-8 flex flex-col">
       {/* Container chính rộng 5xl tối ưu cho giao diện chat 2 cột */}
