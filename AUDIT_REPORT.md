@@ -2,23 +2,46 @@
 
 > Phạm vi: `my-app/` (Next.js 15 App Router). Rà soát theo luồng nghiệp vụ.
 > Ngày: 2026-06-23. Ngữ cảnh: FE + BFF; BE là microservice do team khác.
+> Cập nhật cuối: 2026-06-23 (sau Sprint 1 — xem mục **Tiến độ** bên dưới).
 
 ---
 
-## Tóm tắt mức độ ưu tiên
+## Tiến độ thực thi
+
+| Item | Status | Branch / Commit |
+|---|---|---|
+| P0-1. BookingCard dropdown menu | ✅ Hoàn thành | `feat/booking-card-dropdown-menu` · `5a6715d` |
+| P0-2. Booking Detail page + actions | ✅ Hoàn thành | `feat/booking-card-dropdown-menu` · `03fa092` |
+| P0-3. Payment / VNPay flow | ⏳ Chưa | — |
+| P0-4. `error.tsx` boundaries | ⏳ Chưa | — |
+| P1-1. Wallet UI | ⏳ Chưa | — |
+| P1-2a. Companion `/dashboard/requests` | ✅ Hoàn thành | `feat/companion-requests-page` · `fc41c56` |
+| P1-2b. `/dashboard/earnings` | ⏳ Chưa | — |
+| P1-2c. `/dashboard/schedule` | ⏳ Chưa | — |
+| P1-2d. `/dashboard/notifications` | ⏳ Chưa | — |
+| P1-3. Booking mock mapping align | ⏳ Chưa (gắn vào Phase 2 backlog) | — |
+| P2-1. Auth UI form | ⏳ Chưa | — |
+| P2-2. Review form | ⏳ Chưa (CTA đã có ở detail) | — |
+| P2-3. Client `/me` đầy đủ | ⏳ Chưa | — |
+| P2-4. recentReviews mapping | ✅ Hoàn thành | (cùng PR companion-requests, file `companionService.ts`) |
+| Mobile nav clearance (booking pages) | ✅ Hoàn thành | `feat/booking-card-dropdown-menu` · `03fa092` |
+
+---
+
+## Tóm tắt mức độ ưu tiên (còn lại)
 
 | Mức | Hạng mục | Lý do |
 |---|---|---|
-| 🔴 P0 | Booking Detail page, Payment flow, BookingCard dropdown menu, `error.tsx` boundaries | Đứt luồng core “đặt bạn đồng hành” — không có dropdown menu vi phạm trực tiếp `ORIGINAL_REQUEST.md` R2 |
-| 🟠 P1 | Wallet UI, Companion dashboard (requests/earnings/schedule) | Service đã sẵn nhưng thiếu page — companion không vận hành được |
-| 🟡 P2 | Auth UI (login/register/OTP/forgot), Review form, Client `/me` | Đang phụ thuộc Google OAuth — fallback cần thiết cho release |
+| 🔴 P0 | Payment flow, `error.tsx` boundaries | 2/4 P0 còn lại |
+| 🟠 P1 | Wallet UI, 3 page companion (earnings/schedule/notifications) | Service đã sẵn nhưng thiếu page |
+| 🟡 P2 | Auth UI (login/register/OTP/forgot), Review form, Client `/me` | Đang phụ thuộc Google OAuth |
 | 🟢 P3 | Phase 2–6 backlog (gỡ mock), SSE mock | Đã có lộ trình trong `docs/backlog` |
 
 ---
 
 ## P0 — Bắt buộc fix trước release
 
-### P0-1. BookingCard thiếu dropdown menu “…”
+### P0-1. BookingCard thiếu dropdown menu "…" ✅ DONE
 - **Nghiệp vụ**: `ORIGINAL_REQUEST.md` R2 (dòng 30–35) yêu cầu **bắt buộc** mỗi card phải có nút 3 chấm với menu `Trò chuyện` và `Hủy đặt lịch`. Acceptance Criteria dòng 49 cũng liệt kê đây là điều kiện nghiệm thu.
 - **Hiện trạng**: BookingCard render thông tin nhưng không có dropdown — vi phạm AC.
 - **Tác động**: User pending/accepted không có cách hủy từ list; user có chatRoomId không có lối tắt vào chat → vòng đời booking bị kẹt ở UI.
@@ -27,7 +50,7 @@
   - `Trò chuyện` chỉ hiện khi có `chatRoomId`, link `/chat?roomId={id}`.
   - `Hủy đặt lịch` chỉ hiện khi status ∈ {PENDING, ACCEPTED}, gọi `bookingService.cancelBooking(id)` và revalidate (R3 dòng 40).
 
-### P0-2. Booking Detail page chưa có
+### P0-2. Booking Detail page chưa có ✅ DONE
 - **Nghiệp vụ**: Luồng đặt lịch yêu cầu user xem chi tiết hợp đồng (giờ, kịch bản, địa điểm, tổng tiền, trạng thái thanh toán, lịch sử state machine) trước khi quyết định hủy / review. Đây là điểm chốt giao dịch.
 - **Hiện trạng**: `bookingService.getBookingDetail(id)` đã có nhưng không có route consume. Card list không click được vào detail.
 - **Tác động**: User không có nơi xem điều khoản, không thể tra cứu khi tranh chấp → admin dispute (đã có) không có nguồn dữ liệu hiển thị từ phía client.
@@ -61,7 +84,7 @@
 ### P1-2. Companion Dashboard — 4 page placeholder
 - **Nghiệp vụ**: Companion là một bên đối tác, cần đủ công cụ vận hành. Thiếu page = không onboard được companion thật.
 - **Hiện trạng**:
-  - `/dashboard/requests` → "Trang đang được xây dựng"
+  - ✅ `/dashboard/requests` — đã hoàn thành (commit `fc41c56`)
   - `/dashboard/earnings` → placeholder
   - `/dashboard/schedule` → placeholder
   - `/dashboard/notifications` → chưa xây
@@ -95,9 +118,9 @@
 - **Hiện trạng**: Chỉ có placeholder text.
 - **DoD**: Form edit profile + đổi mật khẩu + danh sách card/wallet.
 
-### P2-4. Companion Detail mapping `recentReviews`
+### P2-4. Companion Detail mapping `recentReviews` ✅ DONE
 - **Nghiệp vụ**: Page detail hiển thị section review nhưng field chưa map từ service.
-- **DoD**: Bổ sung mapping trong `companionService.getCompanionDetail()`.
+- **Fix**: `companionService.getCompanionDetail()` mock branch đã thêm `recentReviews: found.recentReviews ?? []`. Real API branch trả thẳng từ BE.
 
 ---
 

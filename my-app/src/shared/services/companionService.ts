@@ -128,6 +128,7 @@ export const companionService = {
         averageRating: found.averageRating,
         totalReviews: found.totalReviews,
         scenarios: found.scenarios || [],
+        recentReviews: found.recentReviews ?? [],
       };
     }
 
