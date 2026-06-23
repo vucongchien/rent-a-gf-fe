@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import type { BookingListItem } from '@/shared/types';
 import { BookingCard } from '@/shared/components/molecules/BookingCard';
 import { CalendarXIcon } from '@/shared/components/atoms/Icons';
+import { BookingCardMenu } from './BookingCardMenu';
 
 interface BookingsClientViewProps {
   initialBookings: BookingListItem[];
@@ -96,7 +97,18 @@ export const BookingsClientView: React.FC<BookingsClientViewProps> = ({ initialB
       ) : (
         <div className="flex flex-col gap-8 md:gap-10">
           {sortedBookings.map((booking) => (
-            <BookingCard key={booking.bookingId} booking={booking} />
+            <BookingCard
+              key={booking.bookingId}
+              booking={booking}
+              href={`/bookings/${booking.bookingId}`}
+              actions={
+                <BookingCardMenu
+                  bookingId={booking.bookingId}
+                  status={booking.status}
+                  chatRoomId={booking.chatRoomId}
+                />
+              }
+            />
           ))}
         </div>
       )}
