@@ -15,10 +15,12 @@ import { BookingDetailActions } from './BookingDetailActions';
 
 interface PageProps {
   params: Promise<{ bookingId: string }>;
+  searchParams: Promise<{ reviewed?: string }>;
 }
 
-export default async function BookingDetailPage({ params }: PageProps) {
+export default async function BookingDetailPage({ params, searchParams }: PageProps) {
   const { bookingId } = await params;
+  const { reviewed } = await searchParams;
 
   return (
     <div className="w-full pt-20 md:pt-4 pb-12">
@@ -30,6 +32,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <ChevronLeftIcon size={16} />
           Quay lại danh sách
         </Link>
+
+        {reviewed === '1' && (
+          <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3">
+            <p className="font-sans text-[13px] text-emerald-800">
+              Cảm ơn bạn đã gửi đánh giá! Cảm nhận của bạn đã được ghi lại.
+            </p>
+          </div>
+        )}
 
         <Suspense fallback={<BookingDetailSkeleton />}>
           <BookingDetailLoader bookingId={bookingId} />
