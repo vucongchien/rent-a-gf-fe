@@ -1,11 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ConfigService } from '../configService';
 import { get } from '@vercel/edge-config';
 
 // Mock edge-config
 vi.mock('@vercel/edge-config', () => ({
   get: vi.fn(),
 }));
+
+// Vitest không có Next.js runtime → mock next/cache helpers thành no-op.
+vi.mock('next/cache', () => ({
+  cacheLife: vi.fn(),
+  cacheTag: vi.fn(),
+  revalidateTag: vi.fn(),
+}));
+
+// Import sau khi mock để 'use cache' directive không kéo runtime thật.
+const { ConfigService } = await import('../configService');
 
 describe('ConfigService', () => {
   beforeEach(() => {

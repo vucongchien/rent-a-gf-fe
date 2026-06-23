@@ -72,6 +72,19 @@ export interface CancelBookingResponse {
   compensationAmount: number
 }
 
+/** Phản hồi khi Companion accept booking */
+export interface AcceptBookingResponse {
+  bookingId: string
+  status: string
+  chatRoomId: string
+}
+
+/** Phản hồi khi Companion reject booking */
+export interface RejectBookingResponse {
+  bookingId: string
+  status: string
+}
+
 /** Phản hồi danh sách bookings có phân trang */
 export interface BookingsResponse extends PaginatedMeta {
   bookings: BookingListItem[]

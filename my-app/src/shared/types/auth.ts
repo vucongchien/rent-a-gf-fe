@@ -21,6 +21,10 @@ export interface UserAccount {
   violationCount: number
 }
 
+export interface LogoutResponse {
+  message: string
+}
+
 export interface UpgradeRequest {
   requestId: string
   userId: string

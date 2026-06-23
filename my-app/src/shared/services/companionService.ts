@@ -1,36 +1,74 @@
-import { serverFetch } from '@/shared/lib/apiClient';
-import { companions as mockCompanions } from '@/mocks/fixtures/data';
-import type { Companion, CompanionDetail, CompanionProfileMe, CompanionsResponse, ServiceRequestOptions, CreateScenarioBody, UpdateScenarioBody } from '@/shared/types';
+import { cache } from 'react';
 import { cacheLife, cacheTag } from 'next/cache';
+import { serverFetch } from '@/shared/lib/apiClient';
+import { CACHE_TAGS } from '@/shared/lib/cacheTags';
+import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
+import { isMockMode } from '@/shared/lib/env';
+import { companions as mockCompanions } from '@/mocks/fixtures/data';
+import type {
+  Companion,
+  CompanionDetail,
+  CompanionProfileMe,
+  CompanionsResponse,
+  ServiceRequestOptions,
+  CreateScenarioBody,
+  UpdateScenarioBody,
+} from '@/shared/types';
+
+function listScopeKey(params?: { page?: number; city?: string }): string {
+  const page = params?.page ?? 1;
+  const city = params?.city && params.city !== 'all' ? params.city : 'all';
+  return `p${page}-${city}`;
+}
+
+async function getMyProfileImpl(): Promise<CompanionProfileMe> {
+  if (isMockMode()) {
+    const found = mockCompanions[0];
+    return {
+      companionId: found.companionId,
+      displayName: found.displayName,
+      biography: found.biography,
+      avatarUrl: found.avatarUrl,
+      albumUrls: found.albumUrls,
+      voiceIntroUrl: found.voiceIntroUrl,
+      availableCities: found.availableCities,
+      status: 'APPROVED',
+    };
+  }
+  const req = await getRequestCookieHeader();
+  return serverFetch<CompanionProfileMe>('/profile/me', { method: 'GET', req });
+}
+
+/**
+ * Per-render dedupe cho getMyProfile() — nhiều Server Component trong cùng
+ * 1 request (layout + page + nav) gọi sẽ chỉ hit BE 1 lần. KHÔNG cross-request
+ * cache (an toàn với user-specific data theo AGENTS.md).
+ */
+const getMyProfileCached = cache(getMyProfileImpl);
 
 export const companionService = {
   /**
-   * Lấy danh sách bạn đồng hành.
+   * Lấy danh sách bạn đồng hành (public, có cache).
+   * Tag granular theo page+city để invalidate 1 trang không nuke toàn bộ.
    */
   async getCompanions(params?: { page?: number; pageSize?: number; city?: string }): Promise<CompanionsResponse> {
     'use cache';
-    cacheLife('seconds');
-    cacheTag('companions-list');
+    cacheLife('minutes');
+    cacheTag(CACHE_TAGS.COMPANIONS_LIST);
+    cacheTag(CACHE_TAGS.companionsList(listScopeKey(params)));
 
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       let items = [...mockCompanions];
       if (params?.city && params.city !== 'all') {
         items = items.filter(c => c.availableCities.includes(params.city!));
       }
-      
+
       const total = items.length;
       const page = params?.page || 1;
       const pageSize = params?.pageSize || 9;
       const slicedItems = items.slice((page - 1) * pageSize, page * pageSize);
 
-      return {
-        companions: slicedItems,
-        total,
-        page,
-        pageSize,
-      };
+      return { companions: slicedItems, total, page, pageSize };
     }
 
     const searchParams = new URLSearchParams();
@@ -38,21 +76,7 @@ export const companionService = {
     if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
     if (params?.city && params.city !== 'all') searchParams.set('city', params.city);
 
-    try {
-      const raw = await serverFetch<CompanionsResponse>('/companions', {
-        searchParams,
-      });
-
-      return raw;
-    } catch (err) {
-      console.error('[companionService] Lỗi fetch danh sách companions:', err);
-      return {
-        companions: [],
-        total: 0,
-        page: 1,
-        pageSize: 9,
-      };
-    }
+    return serverFetch<CompanionsResponse>('/companions', { searchParams });
   },
 
   /**
@@ -66,56 +90,34 @@ export const companionService = {
     cacheLife('minutes');
     cacheTag('companions-featured');
 
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
+    if (isMockMode()) {
       const items = mockCompanions;
       const featured = items.length > 0 ? items[0] : null;
-      return {
-        featuredCompanion: featured,
-        totalCount: items.length,
-      };
+      return { featuredCompanion: featured, totalCount: items.length };
     }
 
-    try {
-      const searchParams = new URLSearchParams();
-      searchParams.set('pageSize', '1');
+    const searchParams = new URLSearchParams();
+    searchParams.set('pageSize', '1');
 
-      const raw = await serverFetch<CompanionsResponse>('/companions', {
-        searchParams,
-      });
-
-      const firstItem = raw.companions[0] || null;
-
-      return {
-        featuredCompanion: firstItem,
-        totalCount: raw.total || 0,
-      };
-    } catch (err) {
-      console.error('[companionService] Lỗi fetch featured companion:', err);
-      return {
-        featuredCompanion: null,
-        totalCount: 0,
-      };
-    }
+    const raw = await serverFetch<CompanionsResponse>('/companions', { searchParams });
+    return {
+      featuredCompanion: raw.companions[0] || null,
+      totalCount: raw.total || 0,
+    };
   },
 
   /**
-   * Lấy chi tiết thông tin bạn đồng hành theo ID.
+   * Lấy chi tiết bạn đồng hành theo ID (public, có cache).
    */
   async getCompanionDetail(companionId: string): Promise<CompanionDetail | null> {
     'use cache';
     cacheLife('minutes');
-    cacheTag(`companion-${companionId}`);
+    cacheTag(CACHE_TAGS.companion(companionId));
 
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-
-    if (isMock) {
-      const items = mockCompanions;
-      const found = items.find(c => c.companionId === companionId);
+    if (isMockMode()) {
+      const found = mockCompanions.find(c => c.companionId === companionId);
       if (!found) return null;
-      
-      const detail: CompanionDetail = {
+      return {
         companionId: found.companionId,
         displayName: found.displayName,
         biography: found.biography || 'Đây là bio mặc định cho mock.',
@@ -127,67 +129,53 @@ export const companionService = {
         totalReviews: found.totalReviews,
         scenarios: found.scenarios || [],
       };
-      
-      return detail;
     }
 
-    try {
-      const raw = await serverFetch<CompanionDetail>(`/companions/${companionId}`);
-      return raw;
-    } catch (err) {
-      console.error(`[companionService] Lỗi fetch companion detail cho ${companionId}:`, err);
-      return null;
-    }
+    return serverFetch<CompanionDetail>(`/companions/${companionId}`);
   },
 
   /** Companion Management API */
   async applyCompanion(options?: ServiceRequestOptions) {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-    if (isMock) return { status: 'PENDING' };
-    return serverFetch('/upgrade-requests', { method: 'POST', req: options?.req });
+    if (isMockMode()) return { status: 'PENDING' };
+    const req = await getRequestCookieHeader(options?.req);
+    return serverFetch('/upgrade-requests', { method: 'POST', req });
   },
-  
-  async getMyProfile(options?: ServiceRequestOptions): Promise<CompanionProfileMe> {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-    if (isMock) {
-      const found = mockCompanions[0];
-      return {
-        companionId: found.companionId,
-        displayName: found.displayName,
-        biography: found.biography,
-        avatarUrl: found.avatarUrl,
-        albumUrls: found.albumUrls,
-        voiceIntroUrl: found.voiceIntroUrl,
-        availableCities: found.availableCities,
-        status: 'APPROVED'
-      };
-    }
-    return serverFetch<CompanionProfileMe>('/profile/me', { method: 'GET', req: options?.req });
-  },
-  
-  async updateMyProfile(body: Partial<CompanionProfileMe>, options?: ServiceRequestOptions) {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-    if (isMock) return body; 
-    return serverFetch('/profile/me', { method: 'PUT', body, req: options?.req });
-  },
-  
-  async createMyScenario(body: CreateScenarioBody, options?: ServiceRequestOptions) {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-    if (isMock) return { scenarioId: `sc-new-${Date.now()}`, ...body };
-    return serverFetch('/profile/me/scenarios', { method: 'POST', body, req: options?.req });
-  },
-  
-  async updateMyScenario(scenarioId: string, body: UpdateScenarioBody, options?: ServiceRequestOptions) {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-    if (isMock) return body;
-    return serverFetch(`/profile/me/scenarios/${scenarioId}`, { method: 'PUT', body, req: options?.req });
-  },
-  
-  async deleteMyScenario(scenarioId: string, options?: ServiceRequestOptions) {
-    const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-    if (isMock) return { success: true };
-    return serverFetch(`/profile/me/scenarios/${scenarioId}`, { method: 'DELETE', req: options?.req });
-  }
-};
-export type CompanionService = typeof companionService;
 
+  /**
+   * Hồ sơ companion của user hiện tại — user-specific, KHÔNG `'use cache'`.
+   * Dùng React `cache()` cho per-render dedupe trong cùng 1 request.
+   */
+  getMyProfile(options?: ServiceRequestOptions): Promise<CompanionProfileMe> {
+    if (options?.req) {
+      // Route-handler path: req khác mỗi request → bypass dedupe.
+      return getMyProfileImpl();
+    }
+    return getMyProfileCached();
+  },
+
+  async updateMyProfile(body: Partial<CompanionProfileMe>, options?: ServiceRequestOptions) {
+    if (isMockMode()) return body;
+    const req = await getRequestCookieHeader(options?.req);
+    return serverFetch('/profile/me', { method: 'PUT', body, req });
+  },
+
+  async createMyScenario(body: CreateScenarioBody, options?: ServiceRequestOptions) {
+    if (isMockMode()) return { scenarioId: `sc-new-${Date.now()}`, ...body };
+    const req = await getRequestCookieHeader(options?.req);
+    return serverFetch('/profile/me/scenarios', { method: 'POST', body, req });
+  },
+
+  async updateMyScenario(scenarioId: string, body: UpdateScenarioBody, options?: ServiceRequestOptions) {
+    if (isMockMode()) return body;
+    const req = await getRequestCookieHeader(options?.req);
+    return serverFetch(`/profile/me/scenarios/${scenarioId}`, { method: 'PUT', body, req });
+  },
+
+  async deleteMyScenario(scenarioId: string, options?: ServiceRequestOptions) {
+    if (isMockMode()) return { success: true };
+    const req = await getRequestCookieHeader(options?.req);
+    return serverFetch(`/profile/me/scenarios/${scenarioId}`, { method: 'DELETE', req });
+  },
+};
+
+export type CompanionService = typeof companionService;
