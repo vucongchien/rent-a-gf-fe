@@ -26,7 +26,7 @@ export interface CompanionScenario {
 export interface CompanionDetail {
   companionId: string
   displayName: string
-  introText: string
+  biography: string
   avatarUrl: string
   albumUrls: string[]
   voiceIntroUrl: string | null
@@ -42,7 +42,7 @@ export interface CompanionDetail {
 export interface CompanionProfileMe {
   companionId: string
   displayName: string
-  introText: string
+  biography: string
   avatarUrl: string
   albumUrls: string[]
   voiceIntroUrl: string | null

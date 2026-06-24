@@ -68,8 +68,8 @@ export default async function AdminCompanionDetailPage({
                   {detail.companionId}
                 </p>
                 <p className="text-[13.5px] text-neutral-700 mt-3 leading-relaxed">
-                  {detail.introText || (
-                    <span className="text-text-muted italic">Chưa có introText</span>
+                  {detail.biography || (
+                    <span className="text-text-muted italic">Chưa có biography</span>
                   )}
                 </p>
                 <div className="flex flex-wrap gap-x-6 gap-y-1.5 mt-4 text-[12.5px]">

@@ -21,12 +21,12 @@ export const ProfileBasicEditor: React.FC<ProfileBasicEditorProps> = ({ initial 
 
   // Form-controlled state (so we can mark dirty + render city chips inline)
   const [displayName, setDisplayName] = useState(initial.displayName);
-  const [introText, setBiography] = useState(initial.introText ?? '');
+  const [biography, setBiography] = useState(initial.biography ?? '');
   const [cities, setCities] = useState<string[]>(initial.availableCities ?? []);
 
   const dirty =
     displayName !== initial.displayName ||
-    introText !== (initial.introText ?? '') ||
+    biography !== (initial.biography ?? '') ||
     JSON.stringify(cities) !== JSON.stringify(initial.availableCities ?? []);
 
   const fieldErrors = state.status === 'error' ? state.fieldErrors ?? {} : {};
@@ -55,10 +55,10 @@ export const ProfileBasicEditor: React.FC<ProfileBasicEditorProps> = ({ initial 
           />
         </Field>
 
-        <Field label="Tiểu sử" error={fieldErrors.introText} hint={`${introText.length}/${MAX_BIO_LEN}`}>
+        <Field label="Tiểu sử" error={fieldErrors.biography} hint={`${biography.length}/${MAX_BIO_LEN}`}>
           <textarea
-            name="introText"
-            value={introText}
+            name="biography"
+            value={biography}
             onChange={(e) => setBiography(e.target.value)}
             maxLength={MAX_BIO_LEN}
             rows={4}

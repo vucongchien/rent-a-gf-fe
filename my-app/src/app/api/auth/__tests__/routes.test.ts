@@ -34,17 +34,51 @@ describe('BFF OAuth Route Handlers', () => {
       expect(location).toContain('state=')
     })
 
-    it('Real Mode: redirect sang BE /auth/google/init', async () => {
+    it('Real Mode: gọi BE init lấy authUrl rồi redirect popup sang IdP', async () => {
       const { isMockMode } = await import('@/shared/lib/env')
       vi.mocked(isMockMode).mockReturnValue(false)
       process.env.API_URL = 'http://mock-backend.com'
+
+      const idpUrl = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=test'
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({ authUrl: idpUrl }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
 
       const { GET } = await import('../google/route')
       const req = new NextRequest('http://localhost:3000/api/auth/google')
       const response = await GET(req)
 
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'http://mock-backend.com/api/v1/auth/google/init',
+        expect.objectContaining({ method: 'GET' }),
+      )
       expect(response.status).toBe(307)
-      expect(response.headers.get('location')).toBe('http://mock-backend.com/api/v1/auth/google/init')
+      expect(response.headers.get('location')).toBe(idpUrl)
+
+      fetchSpy.mockRestore()
+    })
+
+    it('Real Mode: trả 502 khi BE init không có authUrl', async () => {
+      const { isMockMode } = await import('@/shared/lib/env')
+      vi.mocked(isMockMode).mockReturnValue(false)
+      process.env.API_URL = 'http://mock-backend.com'
+
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({}), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
+
+      const { GET } = await import('../google/route')
+      const req = new NextRequest('http://localhost:3000/api/auth/google')
+      const response = await GET(req)
+
+      expect(response.status).toBe(502)
+      fetchSpy.mockRestore()
     })
   })
 

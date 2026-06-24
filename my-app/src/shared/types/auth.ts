@@ -29,7 +29,7 @@ export interface UpgradeRequest {
   requestId: string
   userId: string
   email: string
-  introText: string
+  biography: string
   availableCities: string[]
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
 }

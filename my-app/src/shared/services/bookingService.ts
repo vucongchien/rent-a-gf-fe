@@ -183,7 +183,7 @@ export const bookingService = {
       }
       return {
         bookingId,
-        status: 'BOOKING_STATUS_COMPLETED',
+        status: 'COMPLETED',
         message: 'Booking completed successfully',
       };
     }
@@ -201,7 +201,8 @@ export const bookingService = {
     options?: ServiceRequestOptions,
   ): Promise<RejectBookingResponse> {
     if (isMockMode()) {
-      return { bookingId, status: 'REJECTED' };
+      // SSOT: reject trả status CANCELLED (cọc unfreeze về Client).
+      return { bookingId, status: 'CANCELLED' };
     }
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch<RejectBookingResponse>(`/bookings/${bookingId}/reject`, {

@@ -55,7 +55,7 @@ export const CompanionInfoCard: React.FC<CompanionInfoCardProps> = ({
       <div className="border-t-2 border-dashed border-neutral-200 pt-5 space-y-2">
         <h2 className="font-sans font-black text-lg text-neutral-900">Về mình...</h2>
         <p className="text-neutral-600 leading-relaxed text-sm italic font-medium">
-          {"\""}{companion.introText}{"\""}
+          {"\""}{companion.biography}{"\""}
         </p>
       </div>
 

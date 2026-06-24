@@ -22,7 +22,7 @@ const mockCompanion: CompanionDetail = {
   voiceIntroUrl: '/audio.mp3',
   metadata: ['Nữ', 'Vui vẻ', 'Dịu dàng'],
   albumUrls: ['/photo-1.jpg'],
-  introText: 'Mình là Mochi, thích cà phê và trò chuyện cùng mọi người.',
+  biography: 'Mình là Mochi, thích cà phê và trò chuyện cùng mọi người.',
   scenarios: [],
 }
 

@@ -22,10 +22,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const c = companion
   return {
     title: `${c.displayName} · Sổ tay hẹn hò`,
-    description: c.introText,
+    description: c.biography,
     openGraph: {
       title: c.displayName,
-      description: c.introText,
+      description: c.biography,
       images: c.albumUrls[0] ? [{ url: c.albumUrls[0] }] : [],
     },
   }

@@ -47,7 +47,7 @@ export interface AdminAuditLogEntry {
 }
 
 export interface AdminCompanionDetail extends AdminCompanionRow {
-  introText: string;
+  biography: string;
   albumUrls: string[];
   voiceIntroUrl: string | null;
   scenarios: CompanionScenario[];
@@ -227,10 +227,7 @@ export interface AdminDisputeResolveResult {
 
 // ─── UPGRADE REQUESTS (Client → Companion) ────────────────────────────────
 
-export type AdminUpgradeRequestStatus =
-  | 'UPGRADE_STATUS_PENDING'
-  | 'UPGRADE_STATUS_APPROVED'
-  | 'UPGRADE_STATUS_REJECTED';
+export type AdminUpgradeRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface AdminUpgradeRequest {
   id: string;

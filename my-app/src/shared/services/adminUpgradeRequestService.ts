@@ -24,7 +24,7 @@ const MOCK_REQUESTS: AdminUpgradeRequest[] = [
   {
     id: 'req_up_001',
     userId: 'u-client-1',
-    status: 'UPGRADE_STATUS_PENDING',
+    status: 'PENDING',
     reason: 'Tôi muốn trở thành Companion để chia sẻ thời gian với khách hàng.',
     rejectReason: '',
     reviewedBy: '',
@@ -34,7 +34,7 @@ const MOCK_REQUESTS: AdminUpgradeRequest[] = [
   {
     id: 'req_up_002',
     userId: 'u-client-2',
-    status: 'UPGRADE_STATUS_PENDING',
+    status: 'PENDING',
     reason: 'Tôi đã có kinh nghiệm làm host/hostess tại các sự kiện.',
     rejectReason: '',
     reviewedBy: '',
@@ -74,10 +74,10 @@ export const adminUpgradeRequestService = {
     if (isMockMode()) {
       const found = MOCK_REQUESTS.find(r => r.id === id);
       if (!found) throw new Error('Không tìm thấy yêu cầu nâng cấp');
-      if (found.status !== 'UPGRADE_STATUS_PENDING') {
+      if (found.status !== 'PENDING') {
         throw new Error(`Yêu cầu đang ở trạng thái ${found.status}, không thể approve`);
       }
-      found.status = 'UPGRADE_STATUS_APPROVED';
+      found.status = 'APPROVED';
       found.reviewedAt = new Date().toISOString();
       found.reviewedBy = 'u-admin-1';
       return {
@@ -102,10 +102,10 @@ export const adminUpgradeRequestService = {
     if (isMockMode()) {
       const found = MOCK_REQUESTS.find(r => r.id === id);
       if (!found) throw new Error('Không tìm thấy yêu cầu nâng cấp');
-      if (found.status !== 'UPGRADE_STATUS_PENDING') {
+      if (found.status !== 'PENDING') {
         throw new Error(`Yêu cầu đang ở trạng thái ${found.status}, không thể reject`);
       }
-      found.status = 'UPGRADE_STATUS_REJECTED';
+      found.status = 'REJECTED';
       found.rejectReason = reason;
       found.reviewedAt = new Date().toISOString();
       found.reviewedBy = 'u-admin-1';

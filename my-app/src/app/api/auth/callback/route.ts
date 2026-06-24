@@ -5,6 +5,8 @@ import { isMockMode } from '@/shared/lib/env'
 interface BackendCallbackResponse {
   accessToken: string
   refreshToken: string
+  /** Spec §2.1: BE trả "Bearer". FE chưa dùng nhưng giữ type cho khớp SSOT. */
+  tokenType?: string
   expiresIn: number
 }
 

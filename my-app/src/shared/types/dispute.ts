@@ -3,7 +3,28 @@
  * SSOT: docs/api_draft.md §2.6 Dispute & Report Service.
  */
 
-export type DisputeStatus = 'OPEN' | 'RESOLVING' | 'RESOLVED';
+export type DisputeStatus =
+  | 'OPEN'
+  | 'RESOLVING'
+  | 'REFUNDED'
+  | 'PAID_OUT'
+  | 'REJECTED'
+  // RESOLVED giữ lại cho client cũ còn map sang RESOLVING/REFUNDED; sẽ remove sau khi UI migrate.
+  | 'RESOLVED';
+
+/** SSOT §2.6 GET /disputes/{id}/saga — trạng thái Saga phân xử dòng tiền (REFUND / PAYOUT). */
+export type DisputeSagaType = 'REFUND' | 'PAYOUT';
+
+export interface DisputeSaga {
+  sagaId: string;
+  disputeId: string;
+  bookingId: string;
+  sagaType: DisputeSagaType;
+  currentState: string;
+  retryCount: number;
+  lastError: string | null;
+  version: number;
+}
 
 export type DisputeEvidenceType = 'IMAGE' | 'VIDEO' | 'TEXT' | 'AUDIO';
 

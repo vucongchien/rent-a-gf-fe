@@ -28,7 +28,7 @@ async function getMyProfileImpl(): Promise<CompanionProfileMe> {
     return {
       companionId: found.companionId,
       displayName: found.displayName,
-      introText: found.introText,
+      biography: found.biography,
       avatarUrl: found.avatarUrl,
       albumUrls: found.albumUrls,
       voiceIntroUrl: found.voiceIntroUrl,
@@ -77,15 +77,15 @@ export const companionService = {
     if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
     if (params?.city && params.city !== 'all') searchParams.set('city', params.city);
 
-    // SSOT trả `{ data, total, page, pageSize }` — map sang FE shape `{ companions, ... }`.
+    // SSOT trả `{ companions, total, page, pageSize }`.
     const raw = await serverFetch<{
-      data: Companion[];
+      companions: Companion[];
       total: number;
       page: number;
       pageSize: number;
     }>('/companions', { searchParams });
     return {
-      companions: raw.data ?? [],
+      companions: raw.companions ?? [],
       total: raw.total ?? 0,
       page: raw.page ?? 1,
       pageSize: raw.pageSize ?? (params?.pageSize ?? 9),
@@ -112,15 +112,15 @@ export const companionService = {
     const searchParams = new URLSearchParams();
     searchParams.set('pageSize', '1');
 
-    // SSOT: `/companions` trả `{ data, total, page, pageSize }`.
+    // SSOT: `/companions` trả `{ companions, total, page, pageSize }`.
     const raw = await serverFetch<{
-      data: Companion[];
+      companions: Companion[];
       total: number;
       page: number;
       pageSize: number;
     }>('/companions', { searchParams });
     return {
-      featuredCompanion: raw.data?.[0] || null,
+      featuredCompanion: raw.companions?.[0] || null,
       totalCount: raw.total || 0,
     };
   },
@@ -139,7 +139,7 @@ export const companionService = {
       return {
         companionId: found.companionId,
         displayName: found.displayName,
-        introText: found.introText || 'Đây là bio mặc định cho mock.',
+        biography: found.biography || 'Đây là bio mặc định cho mock.',
         avatarUrl: found.avatarUrl,
         albumUrls: found.albumUrls || [],
         voiceIntroUrl: found.voiceIntroUrl,

@@ -15,9 +15,9 @@ const STATUS_META: Record<
   AdminUpgradeRequestStatus,
   { label: string; bg: string; text: string }
 > = {
-  UPGRADE_STATUS_PENDING: { label: 'Đang chờ', bg: 'bg-amber-100', text: 'text-amber-800' },
-  UPGRADE_STATUS_APPROVED: { label: 'Đã duyệt', bg: 'bg-emerald-100', text: 'text-emerald-800' },
-  UPGRADE_STATUS_REJECTED: { label: 'Từ chối', bg: 'bg-rose-100', text: 'text-rose-700' },
+  PENDING: { label: 'Đang chờ', bg: 'bg-amber-100', text: 'text-amber-800' },
+  APPROVED: { label: 'Đã duyệt', bg: 'bg-emerald-100', text: 'text-emerald-800' },
+  REJECTED: { label: 'Từ chối', bg: 'bg-rose-100', text: 'text-rose-700' },
 };
 
 function truncate(s: string, max = 80): string {
@@ -99,7 +99,7 @@ export default async function AdminUpgradeRequestsPage({
       header: 'Hành động',
       className: 'w-[18%]',
       render: (row) =>
-        row.status === 'UPGRADE_STATUS_PENDING' ? (
+        row.status === 'PENDING' ? (
           <UpgradeRequestActions id={row.id} />
         ) : (
           <span className="text-text-muted text-[12px]">

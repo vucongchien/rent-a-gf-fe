@@ -15,6 +15,7 @@ import type {
   CreateDisputeBody,
   CreateDisputeResponse,
   Dispute,
+  DisputeSaga,
   ServiceRequestOptions,
 } from '@/shared/types';
 
@@ -64,6 +65,22 @@ export const disputeService = {
     }
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch<Dispute>(`/disputes/${disputeId}`, { req });
+  },
+
+  /**
+   * Lấy trạng thái SAGA phân xử dòng tiền (REFUND / PAYOUT) của một dispute.
+   * SSOT §2.6: GET /disputes/{id}/saga → DisputeSaga | null (chưa start = null).
+   * Dùng cho Admin theo dõi trạng thái xử lý bất đồng bộ.
+   */
+  async getDisputeSaga(
+    disputeId: string,
+    options?: ServiceRequestOptions,
+  ): Promise<DisputeSaga | null> {
+    if (isMockMode()) {
+      return null;
+    }
+    const req = await getRequestCookieHeader(options?.req);
+    return serverFetch<DisputeSaga | null>(`/disputes/${disputeId}/saga`, { req });
   },
 };
 
