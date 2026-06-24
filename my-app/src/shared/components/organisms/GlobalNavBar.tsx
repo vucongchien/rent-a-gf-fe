@@ -43,23 +43,22 @@ export const GlobalNavBarPresentation: React.FC<GlobalNavBarPresentationProps> =
 
   // ─── ActiveId ───────────────────────────────────────────────────────────────
 
+  // Trả '' khi pathname không thuộc nhánh nào → NavBar coi là controlled nhưng không item nào match → không tab active
   const activeId = useMemo(() => {
     if (isCompanionMode) {
-      // Companion workspace: matching theo các route con của /dashboard
       if (pathname === '/dashboard' || pathname === '/dashboard/') return 'cp-overview';
       if (pathname.startsWith('/dashboard/earnings'))  return 'cp-earnings';
       if (pathname.startsWith('/dashboard/chat'))      return 'cp-chat';
       if (pathname.startsWith('/dashboard/notifications')) return 'cp-notifications';
       if (pathname.startsWith('/dashboard/profile'))   return 'cp-profile';
-      return 'cp-overview';
+      return '';
     }
-    // Client mode: matching route thông thường
     if (pathname.startsWith('/explore'))                             return 'home';
     if (pathname.startsWith('/bookings'))                            return 'bookings';
     if (pathname.startsWith('/chat'))                                return 'chat';
     if (pathname.startsWith('/notifications'))                       return 'notifications';
     if (pathname.startsWith('/me') || pathname.startsWith('/profile')) return 'profile';
-    return 'home';
+    return '';
   }, [pathname, isCompanionMode]);
 
   // ─── Nav Items ──────────────────────────────────────────────────────────────
