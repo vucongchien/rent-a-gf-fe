@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, type CSSProperties, type MouseEvent } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { CompanionCard, type CompanionCardProps } from '@/shared/components/molecules/CompanionCard';
 
@@ -10,18 +10,6 @@ const HERO_VIDEO_URL = 'https://commondatastorage.googleapis.com/gtv-videos-buck
 interface Props {
   companions: CompanionCardProps[];
 }
-
-const css = (str: string): CSSProperties =>
-  Object.fromEntries(
-    str
-      .split(';')
-      .filter(Boolean)
-      .map((r) => {
-        const i = r.indexOf(':');
-        const k = r.slice(0, i).trim().replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
-        return [k, r.slice(i + 1).trim()];
-      }),
-  ) as CSSProperties;
 
 const STEPS = [
   { n: '01', t: 'Tạo hồ sơ', d: 'Đăng ký nhanh và cho chúng tôi biết bạn mong muốn điều gì ở người đồng hành.' },
@@ -121,12 +109,10 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
       });
     };
 
-    const hero = q('#hero');
-    const screen = q('#heroScreen');
     const head = q('#heroHeadline');
     const flash = q('#heroFlash');
     const bars = root.querySelectorAll<HTMLElement>('.letterbar');
-    if (hero && screen && head && flash && bars.length >= 2) {
+    if (head && flash && bars.length >= 2) {
       const b0 = bars[0];
       const b1 = bars[1];
       flash.style.transition = 'none';
@@ -164,32 +150,15 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
     };
   }, []);
 
-  const toggleFaq = (e: MouseEvent<HTMLDivElement>) => {
-    const item = (e.currentTarget as HTMLElement).closest<HTMLElement>('[data-faq]');
-    if (!item) return;
-    const ans = item.querySelector<HTMLElement>('[data-ans]');
-    const chev = item.querySelector<HTMLElement>('[data-chev]');
-    if (!ans || !chev) return;
-    const open = item.getAttribute('data-open') === '1';
-    item.setAttribute('data-open', open ? '0' : '1');
-    ans.style.maxHeight = open ? '0px' : ans.scrollHeight + 'px';
-    chev.textContent = open ? '+' : '×';
-  };
-
-  const eyebrow = "font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:#b08597";
-  const h2 = "font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(34px,5.5vw,64px);line-height:1.02;margin:14px 0 0";
-  const reveal = (extra?: string) => css('opacity:0;transform:translateY(28px)' + (extra ? ';' + extra : ''));
-
   return (
-    <div ref={rootRef} style={css("position:relative;width:100%;overflow-x:clip;background:#f5f2ef;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#3a3338")}>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" />
+    <div ref={rootRef} className="relative w-full overflow-x-clip bg-surface text-text font-sans">
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes scrollcue{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(9px);opacity:.25}}
+        @keyframes landing-scrollcue{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(9px);opacity:.25}}
       ` }} />
 
-      <section id="hero" style={css('position:relative;width:100%;height:100vh;background:#f5f2ef')}>
-        <div id="heroStage" style={css('position:sticky;top:0;height:100vh;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden')}>
-          <div id="heroScreen" style={css('position:absolute;inset:0;width:100%;height:100%;background:#1c1822;overflow:hidden')}>
+      <section id="hero" className="relative w-full h-screen bg-surface">
+        <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+          <div id="heroScreen" className="absolute inset-0 w-full h-full bg-surface-inverted overflow-hidden">
             <video
               autoPlay
               muted
@@ -197,53 +166,78 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
               playsInline
               preload="auto"
               src={HERO_VIDEO_URL}
-              style={css('position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1')}
+              className="absolute inset-0 w-full h-full object-cover z-[1]"
             />
-            <div className="letterbar" style={css('position:absolute;top:0;left:0;width:100%;background:#14101a;z-index:6')} />
-            <div className="letterbar" style={css('position:absolute;bottom:0;left:0;width:100%;background:#14101a;z-index:6')} />
-            <div id="heroFlash" style={css('position:absolute;inset:0;background:#fff;z-index:8;pointer-events:none')} />
+            <div className="letterbar absolute top-0 left-0 w-full bg-neutral-900 z-[6]" />
+            <div className="letterbar absolute bottom-0 left-0 w-full bg-neutral-900 z-[6]" />
+            <div id="heroFlash" className="absolute inset-0 bg-white z-[8] pointer-events-none" />
           </div>
 
-          <div id="heroHeadline" style={css('position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;pointer-events:none')}>
-            <div style={css("font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:#e8b9c8;margin-bottom:18px")}>DỊCH VỤ NGƯỜI ĐỒNG HÀNH</div>
-            <h1 style={css("font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(44px,9vw,118px);line-height:.98;color:#f5f2ef;margin:0;text-shadow:0 4px 40px rgba(0,0,0,.35)")}>Rent-a-Girlfriend</h1>
-            <p style={css('max-width:560px;margin:22px auto 0;font-size:clamp(15px,1.6vw,18px);line-height:1.6;color:rgba(245,242,239,.82)')}>Người đồng hành dịu dàng cho từng khoảnh khắc — trò chuyện, dạo phố, hay đơn giản là có ai đó bên cạnh.</p>
-            <div style={css('display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:34px;pointer-events:auto')}>
-              <Link href="/explore" style={css('font-family:inherit;font-size:15px;font-weight:600;padding:14px 30px;border-radius:999px;background:#f5f2ef;color:#221d27;text-decoration:none')}>Tìm người đồng hành</Link>
-              <a href="#how" style={css('font-family:inherit;font-size:15px;font-weight:500;padding:14px 28px;border:1.5px solid rgba(245,242,239,.55);border-radius:999px;background:transparent;color:#f5f2ef;text-decoration:none')}>Xem cách hoạt động</a>
+          <div id="heroHeadline" className="absolute inset-0 z-[4] flex flex-col items-center justify-center text-center p-6 pointer-events-none">
+            <div className="font-mono text-[12px] tracking-[3px] text-chizuru-600 mb-[18px]">DỊCH VỤ NGƯỜI ĐỒNG HÀNH</div>
+            <h1
+              className="font-display font-medium text-[clamp(44px,9vw,118px)] leading-[.98] text-text-inverted m-0"
+              style={{ textShadow: '0 4px 40px rgba(0,0,0,.35)' }}
+            >
+              Rent-a-Girlfriend
+            </h1>
+            <p className="max-w-[560px] mx-auto mt-[22px] text-[clamp(15px,1.6vw,18px)] leading-[1.6] text-text-inverted/80 font-sans">
+              Người đồng hành dịu dàng cho từng khoảnh khắc — trò chuyện, dạo phố, hay đơn giản là có ai đó bên cạnh.
+            </p>
+            <div className="flex gap-[14px] flex-wrap justify-center mt-[34px] pointer-events-auto">
+              <Link
+                href="/explore"
+                className="font-sans text-[15px] font-semibold py-[14px] px-[30px] rounded-full bg-white text-text no-underline"
+              >
+                Tìm người đồng hành
+              </Link>
+              <a
+                href="#how"
+                className="font-sans text-[15px] font-medium py-[14px] px-[28px] border-[1.5px] border-white/55 rounded-full bg-transparent text-text-inverted no-underline"
+              >
+                Xem cách hoạt động
+              </a>
             </div>
-            <div style={css("margin-top:46px;display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(245,242,239,.7);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px")}>CUỘN ĐỂ KHÁM PHÁ<span style={css('font-size:18px;animation:scrollcue 1.8s ease-in-out infinite')}>↓</span></div>
+            <div className="mt-[46px] flex flex-col items-center gap-2 text-text-inverted/70 font-mono text-[11px] tracking-[1px]">
+              CUỘN ĐỂ KHÁM PHÁ
+              <span className="text-[18px]" style={{ animation: 'landing-scrollcue 1.8s ease-in-out infinite' }}>↓</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="how" style={css('position:relative;padding:clamp(80px,12vh,140px) clamp(18px,5vw,90px);max-width:1280px;margin:0 auto')}>
-        <div data-reveal style={reveal('max-width:720px')}>
-          <div style={css(eyebrow)}>QUY TRÌNH 4 BƯỚC</div>
-          <h2 style={css(h2)}>Cách hoạt động</h2>
+      <section id="how" className="relative py-[clamp(80px,12vh,140px)] px-[clamp(18px,5vw,90px)] max-w-[1280px] mx-auto">
+        <div data-reveal className="max-w-[720px]">
+          <div className="font-mono text-[12px] tracking-[3px] text-chizuru-600">QUY TRÌNH 4 BƯỚC</div>
+          <h2 className="font-sans font-medium text-[clamp(34px,5.5vw,64px)] leading-[1.02] mt-[14px] text-text">Cách hoạt động</h2>
         </div>
-        <div style={css('display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:26px;margin-top:54px')}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-[26px] mt-[54px]">
           {STEPS.map((s) => (
-            <div key={s.n} data-reveal style={reveal('border:1.5px solid #ddd6d1;border-radius:14px;padding:26px;background:#fbf9f7')}>
-              <div style={css("font-family:'Space Mono',monospace;font-size:13px;color:#b08597")}>{s.n}</div>
-              <h3 style={css("font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;margin:10px 0 12px")}>{s.t}</h3>
-              <p style={css('font-size:14.5px;line-height:1.6;color:#6d6369;margin:0')}>{s.d}</p>
+            <div key={s.n} data-reveal className="border-[1.5px] border-border rounded-[14px] p-[26px] bg-surface-muted">
+              <div className="font-mono text-[13px] text-chizuru-600">{s.n}</div>
+              <h3 className="font-sans font-semibold text-[24px] mt-[10px] mb-[12px] text-text">{s.t}</h3>
+              <p className="text-[14.5px] leading-[1.6] text-text-muted m-0 font-sans">{s.d}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section id="profiles" style={css('position:relative;padding:clamp(60px,9vh,110px) clamp(18px,5vw,90px);background:#efe9e4')}>
-        <div style={css('max-width:1280px;margin:0 auto')}>
-          <div data-reveal style={reveal('display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px')}>
+      <section id="profiles" className="relative py-[clamp(60px,9vh,110px)] px-[clamp(18px,5vw,90px)] bg-surface-muted">
+        <div className="max-w-[1280px] mx-auto">
+          <div data-reveal className="flex justify-between items-end flex-wrap gap-4">
             <div>
-              <div style={css(eyebrow)}>GẶP GỠ</div>
-              <h2 style={css(h2)}>Hồ sơ người đồng hành</h2>
+              <div className="font-mono text-[12px] tracking-[3px] text-chizuru-600">GẶP GỠ</div>
+              <h2 className="font-sans font-medium text-[clamp(34px,5.5vw,64px)] leading-[1.02] mt-[14px] text-text">Hồ sơ người đồng hành</h2>
             </div>
-            <Link href="/explore" style={css("font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1.5px;color:#3a3338;text-decoration:underline")}>XEM TẤT CẢ →</Link>
+            <Link
+              href="/explore"
+              className="font-mono text-[12px] tracking-[1.5px] text-text underline"
+            >
+              XEM TẤT CẢ →
+            </Link>
           </div>
           {companions.length > 0 ? (
-            <div data-reveal style={reveal('margin-top:48px')}>
+            <div data-reveal className="mt-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px] md:gap-[22px]">
                 {companions.map((c) => (
                   <CompanionCard key={c.id} {...c} />
@@ -251,28 +245,28 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
               </div>
             </div>
           ) : (
-            <div data-reveal style={reveal('margin-top:48px;text-align:center;padding:60px;color:#6d6369')}>
+            <div data-reveal className="mt-12 text-center py-[60px] text-text-muted font-sans">
               Chưa có người đồng hành nào. Quay lại sau nhé!
             </div>
           )}
         </div>
       </section>
 
-      <section id="reviews" style={css('position:relative;padding:clamp(80px,12vh,140px) clamp(18px,5vw,90px);max-width:1280px;margin:0 auto')}>
-        <div data-reveal style={reveal('text-align:center;max-width:620px;margin:0 auto')}>
-          <div style={css(eyebrow)}>TRẢI NGHIỆM THẬT</div>
-          <h2 style={css(h2)}>Người dùng nói gì</h2>
+      <section id="reviews" className="relative py-[clamp(80px,12vh,140px)] px-[clamp(18px,5vw,90px)] max-w-[1280px] mx-auto">
+        <div data-reveal className="text-center max-w-[620px] mx-auto">
+          <div className="font-mono text-[12px] tracking-[3px] text-chizuru-600">TRẢI NGHIỆM THẬT</div>
+          <h2 className="font-sans font-medium text-[clamp(34px,5.5vw,64px)] leading-[1.02] mt-[14px] text-text">Người dùng nói gì</h2>
         </div>
-        <div style={css('display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:54px')}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6 mt-[54px]">
           {TESTIMONIALS.map((t) => (
-            <div key={t.name} data-reveal style={reveal('border:1.5px solid #ddd6d1;border-radius:16px;padding:28px;background:#fbf9f7')}>
-              <div style={css("font-size:34px;font-family:'Cormorant Garamond',serif;color:#e8b9c8;line-height:.6")}>“</div>
-              <p style={css('font-size:15.5px;line-height:1.7;color:#4a4047;margin:14px 0 22px')}>{t.quote}</p>
-              <div style={css('display:flex;align-items:center;gap:12px')}>
-                <div style={css('width:42px;height:42px;border-radius:50%;background:repeating-linear-gradient(135deg,#e7dfd9 0 6px,#efe9e4 6px 12px);border:1px solid #ddd6d1')} />
+            <div key={t.name} data-reveal className="border-[1.5px] border-border rounded-2xl p-7 bg-surface-muted">
+              <div className="font-sans text-[34px] text-chizuru-600 leading-[.6]">“</div>
+              <p className="text-[15.5px] leading-[1.7] text-text mt-[14px] mb-[22px] font-sans">{t.quote}</p>
+              <div className="flex items-center gap-3">
+                <div className="w-[42px] h-[42px] rounded-full bg-checkerboard-neutral border border-border" />
                 <div>
-                  <div style={css('font-weight:600;font-size:14px')}>{t.name}</div>
-                  <div style={css('font-size:12px;color:#9a8f86')}>{t.role}</div>
+                  <div className="font-semibold text-[14px] text-text font-sans">{t.name}</div>
+                  <div className="text-[12px] text-text-muted font-sans">{t.role}</div>
                 </div>
               </div>
             </div>
@@ -280,70 +274,77 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
         </div>
       </section>
 
-      <section id="safety" style={css('position:relative;padding:clamp(70px,10vh,130px) clamp(18px,5vw,90px);background:#221d27;color:#f5f2ef')}>
-        <div style={css('max-width:1100px;margin:0 auto;text-align:center')}>
-          <div data-reveal style={reveal()}>
-            <div style={css("font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:#e8b9c8")}>BẢO MẬT & TIN CẬY</div>
-            <h2 style={css(h2)}>An toàn là trên hết</h2>
+      <section id="safety" className="relative py-[clamp(70px,10vh,130px)] px-[clamp(18px,5vw,90px)] bg-surface-inverted text-text-inverted">
+        <div className="max-w-[1100px] mx-auto text-center">
+          <div data-reveal>
+            <div className="font-mono text-[12px] tracking-[3px] text-chizuru-600">BẢO MẬT &amp; TIN CẬY</div>
+            <h2 className="font-sans font-medium text-[clamp(34px,5.5vw,64px)] leading-[1.02] mt-[14px]">An toàn là trên hết</h2>
           </div>
-          <div style={css('display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;margin-top:56px;text-align:left')}>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-[30px] mt-[56px] text-left">
             {SAFETY.map((f) => (
-              <div key={f.t} data-reveal style={reveal()}>
-                <div style={css("width:46px;height:46px;border:1.5px dashed rgba(245,242,239,.4);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;color:rgba(245,242,239,.55)")}>ICON</div>
-                <h3 style={css("font-family:'Cormorant Garamond',serif;font-weight:600;font-size:23px;margin:18px 0 10px")}>{f.t}</h3>
-                <p style={css('font-size:14.5px;line-height:1.65;color:rgba(245,242,239,.7);margin:0')}>{f.d}</p>
+              <div key={f.t} data-reveal>
+                <div className="w-[46px] h-[46px] border-[1.5px] border-dashed border-white/40 rounded-xl flex items-center justify-center font-mono text-[10px] text-white/55">ICON</div>
+                <h3 className="font-sans font-semibold text-[23px] mt-[18px] mb-[10px]">{f.t}</h3>
+                <p className="text-[14.5px] leading-[1.65] text-white/70 m-0 font-sans">{f.d}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="faq" style={css('position:relative;padding:clamp(80px,12vh,140px) clamp(18px,5vw,90px);max-width:860px;margin:0 auto')}>
-        <div data-reveal style={reveal('text-align:center')}>
-          <div style={css(eyebrow)}>GIẢI ĐÁP</div>
-          <h2 style={css(h2)}>Câu hỏi thường gặp</h2>
+      <section id="faq" className="relative py-[clamp(80px,12vh,140px)] px-[clamp(18px,5vw,90px)] max-w-[860px] mx-auto">
+        <div data-reveal className="text-center">
+          <div className="font-mono text-[12px] tracking-[3px] text-chizuru-600">GIẢI ĐÁP</div>
+          <h2 className="font-sans font-medium text-[clamp(34px,5.5vw,64px)] leading-[1.02] mt-[14px] text-text">Câu hỏi thường gặp</h2>
         </div>
-        <div data-reveal style={reveal('margin-top:46px')}>
+        <div data-reveal className="mt-[46px]">
           {FAQS.map((f) => (
-            <div key={f.q} data-faq data-open="0" style={css('border-bottom:1.5px solid #ddd6d1')}>
-              <div onClick={toggleFaq} style={css('display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 4px;cursor:pointer')}>
-                <span style={css('font-size:17px;font-weight:500;color:#3a3338')}>{f.q}</span>
-                <span data-chev style={css('font-size:20px;color:#b08597;flex-shrink:0')}>+</span>
-              </div>
-              <div data-ans style={css('max-height:0;overflow:hidden;transition:max-height .35s ease')}>
-                <p style={css('font-size:14.5px;line-height:1.7;color:#6d6369;margin:0 4px 22px')}>{f.a}</p>
-              </div>
-            </div>
+            <details key={f.q} className="group border-b-[1.5px] border-border">
+              <summary className="flex items-center justify-between gap-4 py-[22px] px-1 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <span className="text-[17px] font-medium text-text font-sans">{f.q}</span>
+                <span className="text-[20px] text-chizuru-600 shrink-0 transition-transform duration-200 group-open:rotate-45">+</span>
+              </summary>
+              <p className="text-[14.5px] leading-[1.7] text-text-muted mt-0 mb-[22px] mx-1 font-sans">{f.a}</p>
+            </details>
           ))}
         </div>
       </section>
 
-      <section style={css('position:relative;padding:clamp(80px,12vh,150px) clamp(18px,5vw,90px);text-align:center;background:#efe9e4')}>
-        <div data-reveal style={reveal('max-width:680px;margin:0 auto')}>
-          <h2 style={css("font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(36px,6vw,76px);line-height:1.02;margin:0")}>Sẵn sàng tìm người đồng hành của bạn?</h2>
-          <Link href="/explore" style={css('display:inline-block;font-family:inherit;font-size:16px;font-weight:600;padding:16px 40px;border-radius:999px;background:#3a3338;color:#f5f2ef;margin-top:34px;text-decoration:none')}>Bắt đầu ngay</Link>
+      <section className="relative py-[clamp(80px,12vh,150px)] px-[clamp(18px,5vw,90px)] text-center bg-surface-muted">
+        <div data-reveal className="max-w-[680px] mx-auto">
+          <h2 className="font-sans font-medium text-[clamp(36px,6vw,76px)] leading-[1.02] m-0 text-text">
+            Sẵn sàng tìm người đồng hành của bạn?
+          </h2>
+          <Link
+            href="/explore"
+            className="inline-block font-sans text-[16px] font-semibold py-4 px-10 rounded-full bg-surface-inverted text-text-inverted mt-[34px] no-underline"
+          >
+            Bắt đầu ngay
+          </Link>
         </div>
       </section>
 
-      <footer style={css('position:relative;padding:clamp(50px,7vh,80px) clamp(18px,5vw,90px) 40px;background:#221d27;color:rgba(245,242,239,.7)')}>
-        <div style={css('max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:36px')}>
-          <div style={css('max-width:260px')}>
-            <div style={css('display:flex;align-items:center;gap:10px;color:#f5f2ef')}>
-              <div style={css('width:28px;height:28px;border:1.5px solid #f5f2ef;border-radius:50% 50% 50% 4px;display:flex;align-items:center;justify-content:center;font-size:12px')}>♥</div>
-              <span style={css("font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600")}>Rent-a-Girlfriend</span>
+      <footer className="relative py-[clamp(50px,7vh,80px)] px-[clamp(18px,5vw,90px)] pb-10 bg-surface-inverted text-white/70">
+        <div className="max-w-[1280px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-9">
+          <div className="max-w-[260px]">
+            <div className="flex items-center gap-[10px] text-text-inverted">
+              <div className="w-7 h-7 border-[1.5px] border-white rounded-[50%_50%_50%_4px] flex items-center justify-center text-[12px]">♥</div>
+              <span className="font-display text-[20px] font-semibold">Rent-a-Girlfriend</span>
             </div>
-            <p style={css('font-size:13.5px;line-height:1.6;margin:16px 0 0')}>Người đồng hành dịu dàng, an toàn và minh bạch cho mọi khoảnh khắc.</p>
+            <p className="text-[13.5px] leading-[1.6] mt-4 font-sans">Người đồng hành dịu dàng, an toàn và minh bạch cho mọi khoảnh khắc.</p>
           </div>
           {FOOTCOLS.map((c) => (
             <div key={c.h}>
-              <div style={css("font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;color:#e8b9c8;margin-bottom:16px")}>{c.h}</div>
+              <div className="font-mono text-[11px] tracking-[2px] text-chizuru-600 mb-4">{c.h}</div>
               {c.items.map((it) => (
-                <div key={it} style={css('font-size:14px;margin-bottom:12px')}>{it}</div>
+                <div key={it} className="text-[14px] mb-3 font-sans">{it}</div>
               ))}
             </div>
           ))}
         </div>
-        <div style={css("max-width:1280px;margin:48px auto 0;padding-top:24px;border-top:1px solid rgba(245,242,239,.15);font-family:'Space Mono',monospace;font-size:11px;color:rgba(245,242,239,.4)")}>© 2026 Rent-a-Girlfriend</div>
+        <div className="max-w-[1280px] mx-auto mt-12 pt-6 border-t border-white/15 font-mono text-[11px] text-white/40">
+          © 2026 Rent-a-Girlfriend
+        </div>
       </footer>
     </div>
   );
