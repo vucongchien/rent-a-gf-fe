@@ -21,7 +21,7 @@ export async function createProxyNotificationStream(
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const backendRes = await fetch(`${apiUrl.replace(/\/$/, '')}/notifications/stream`, {
+    const backendRes = await fetch(`${apiUrl.replace(/\/$/, '')}/v1/notifications/stream`, {
       headers,
       signal: reqSignal,
     });

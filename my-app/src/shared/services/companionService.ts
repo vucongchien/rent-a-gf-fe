@@ -3,8 +3,6 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { serverFetch } from '@/shared/lib/apiClient';
 import { CACHE_TAGS } from '@/shared/lib/cacheTags';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
-import { isMockMode } from '@/shared/lib/env';
-import { companions as mockCompanions } from '@/mocks/fixtures/data';
 import type {
   Companion,
   CompanionDetail,
@@ -23,19 +21,6 @@ function listScopeKey(params?: { page?: number; city?: string }): string {
 }
 
 async function getMyProfileImpl(): Promise<CompanionProfileMe> {
-  if (isMockMode()) {
-    const found = mockCompanions[0];
-    return {
-      companionId: found.companionId,
-      displayName: found.displayName,
-      biography: found.biography,
-      avatarUrl: found.avatarUrl,
-      albumUrls: found.albumUrls,
-      voiceIntroUrl: found.voiceIntroUrl,
-      availableCities: found.availableCities,
-      status: 'APPROVED',
-    };
-  }
   const req = await getRequestCookieHeader();
   return serverFetch<CompanionProfileMe>('/profile/me', { method: 'GET', req });
 }
@@ -57,20 +42,6 @@ export const companionService = {
     cacheLife('minutes');
     cacheTag(CACHE_TAGS.COMPANIONS_LIST);
     cacheTag(CACHE_TAGS.companionsList(listScopeKey(params)));
-
-    if (isMockMode()) {
-      let items = [...mockCompanions];
-      if (params?.city && params.city !== 'all') {
-        items = items.filter(c => c.availableCities.includes(params.city!));
-      }
-
-      const total = items.length;
-      const page = params?.page || 1;
-      const pageSize = params?.pageSize || 9;
-      const slicedItems = items.slice((page - 1) * pageSize, page * pageSize);
-
-      return { companions: slicedItems, total, page, pageSize };
-    }
 
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', String(params.page));
@@ -103,12 +74,6 @@ export const companionService = {
     cacheLife('minutes');
     cacheTag('companions-featured');
 
-    if (isMockMode()) {
-      const items = mockCompanions;
-      const featured = items.length > 0 ? items[0] : null;
-      return { featuredCompanion: featured, totalCount: items.length };
-    }
-
     const searchParams = new URLSearchParams();
     searchParams.set('pageSize', '1');
 
@@ -133,24 +98,6 @@ export const companionService = {
     cacheLife('minutes');
     cacheTag(CACHE_TAGS.companion(companionId));
 
-    if (isMockMode()) {
-      const found = mockCompanions.find(c => c.companionId === companionId);
-      if (!found) return null;
-      return {
-        companionId: found.companionId,
-        displayName: found.displayName,
-        biography: found.biography || 'Đây là bio mặc định cho mock.',
-        avatarUrl: found.avatarUrl,
-        albumUrls: found.albumUrls || [],
-        voiceIntroUrl: found.voiceIntroUrl,
-        availableCities: found.availableCities || [],
-        averageRating: found.averageRating,
-        totalReviews: found.totalReviews,
-        scenarios: found.scenarios || [],
-        recentReviews: found.recentReviews ?? [],
-      };
-    }
-
     return serverFetch<CompanionDetail>(`/companions/${companionId}`);
   },
 
@@ -163,11 +110,6 @@ export const companionService = {
     cacheLife('minutes');
     cacheTag(CACHE_TAGS.companion(companionId));
 
-    if (isMockMode()) {
-      const found = mockCompanions.find(c => c.companionId === companionId);
-      return found?.recentReviews ?? [];
-    }
-
     const raw = await serverFetch<CompanionReview[]>(
       `/interaction/reviews/companion/${companionId}`,
     );
@@ -176,7 +118,6 @@ export const companionService = {
 
   /** Companion Management API — POST /upgrade-requests { reason } (SSOT). */
   async applyCompanion(body: { reason: string }, options?: ServiceRequestOptions) {
-    if (isMockMode()) return { status: 'PENDING' };
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch('/upgrade-requests', { method: 'POST', body, req });
   },
@@ -194,13 +135,11 @@ export const companionService = {
   },
 
   async updateMyProfile(body: Partial<CompanionProfileMe>, options?: ServiceRequestOptions) {
-    if (isMockMode()) return body;
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch('/profile/me', { method: 'PUT', body, req });
   },
 
   async createMyScenario(body: CreateScenarioBody, options?: ServiceRequestOptions) {
-    if (isMockMode()) return { scenarioId: `sc-new-${Date.now()}`, ...body };
     const req = await getRequestCookieHeader(options?.req);
     // SSOT chỉ nhận { title, description, price, durationMinutes }.
     const { title, description, price, durationMinutes } = body;
@@ -212,13 +151,11 @@ export const companionService = {
   },
 
   async updateMyScenario(scenarioId: string, body: UpdateScenarioBody, options?: ServiceRequestOptions) {
-    if (isMockMode()) return body;
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch(`/profile/me/scenarios/${scenarioId}`, { method: 'PUT', body, req });
   },
 
   async deleteMyScenario(scenarioId: string, options?: ServiceRequestOptions) {
-    if (isMockMode()) return { success: true };
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch(`/profile/me/scenarios/${scenarioId}`, { method: 'DELETE', req });
   },
@@ -227,12 +164,6 @@ export const companionService = {
     body: { assetType: 'IMAGE' | 'VOICE'; sizeBytes: number; durationSeconds?: number; contentType?: string },
     options?: ServiceRequestOptions,
   ): Promise<{ uploadUrl: string; fileUrl: string }> {
-    if (isMockMode()) {
-      const ext = body.assetType === 'IMAGE' ? 'png' : 'mp3';
-      const id = `mock-${Date.now()}`;
-      const fileUrl = `https://storage.rent-a-gf.com/mock/${body.assetType.toLowerCase()}/${id}.${ext}`;
-      return { uploadUrl: `${fileUrl}?X-Amz-Signature=mock-${id}`, fileUrl };
-    }
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch('/profile/me/media/presigned-urls', { method: 'POST', body, req });
   },

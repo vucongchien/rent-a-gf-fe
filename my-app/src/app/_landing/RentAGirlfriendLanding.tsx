@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { CompanionCard, type CompanionCardProps } from '@/shared/components/molecules/CompanionCard';
 
 // TODO: swap bằng video Furina thật khi có asset chính thức.
-const HERO_VIDEO_URL = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+const HERO_VIDEO_URL = '/0624.mp4';
 
 interface Props {
   companions: CompanionCardProps[];
@@ -57,6 +57,40 @@ interface Engine {
 export default function RentAGirlfriendLanding({ companions }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const eng = useRef<Engine>({ tweens: [], revealed: new Set() });
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = false;
+
+    const handleInteraction = () => {
+      if (video.muted) {
+        video.muted = false;
+        video.play().catch(() => {});
+      }
+      cleanup();
+    };
+
+    const cleanup = () => {
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+    };
+
+    video.play().catch((err) => {
+      console.log('Autoplay with sound blocked, fallback to muted:', err);
+      video.muted = true;
+      video.play().catch(() => {});
+
+      document.addEventListener('click', handleInteraction);
+      document.addEventListener('touchstart', handleInteraction);
+      document.addEventListener('keydown', handleInteraction);
+    });
+
+    return cleanup;
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -160,8 +194,8 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
         <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
           <div id="heroScreen" className="absolute inset-0 w-full h-full bg-surface-inverted overflow-hidden">
             <video
+              ref={videoRef}
               autoPlay
-              muted
               loop
               playsInline
               preload="auto"

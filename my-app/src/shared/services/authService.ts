@@ -2,8 +2,7 @@ import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
-import { isMockMode } from '@/shared/lib/env';
-import { currentMockUser, mockUsers, setMockUser } from '@/mocks/fixtures/data';
+import { decodeJwtPayload } from '@/shared/lib/tokenRefresh';
 import type { LogoutResponse, ServiceRequestOptions, User } from '@/shared/types';
 
 export interface RefreshTokenResponse {
@@ -19,24 +18,37 @@ function parseCookie(cookieString: string | null, name: string): string | null {
 }
 
 async function getMeImpl(): Promise<User | null> {
-  if (isMockMode()) {
-    let role: string | null = null;
-    try {
-      const cookieStore = await cookies();
-      role = cookieStore.get('msw_mock_role')?.value ?? null;
-    } catch {
-      // Ignore if called outside of request context
-    }
-    if (role && role in mockUsers) {
-      setMockUser(role as keyof typeof mockUsers);
-    }
-    return currentMockUser as User;
-  }
-  const req = await getRequestCookieHeader();
   try {
-    return await serverFetch<User>('/auth/me', { req });
+    const cookieStore = await cookies();
+    const token = cookieStore.get('access_token')?.value;
+    if (!token) return null;
+
+    const payload = decodeJwtPayload(token);
+    if (!payload) return null;
+
+    const userId = (payload.userId || payload.sub || payload.user_id) as string;
+    const email = (payload.email || '') as string;
+    const role = (payload.role || 'CLIENT') as any;
+
+    if (!userId) return null;
+
+    return {
+      userId,
+      email,
+      displayName: email.split('@')[0] || 'User',
+      avatarUrl: '',
+      role,
+    };
   } catch (err: unknown) {
-    console.error('[authService] Lỗi fetch user me:', err);
+    if (
+      err instanceof Error &&
+      (err.message.includes('prerender') ||
+        err.message.includes('cookies()') ||
+        (err as any).digest === 'NEXT_PRERENDER_INTERRUPTED')
+    ) {
+      throw err;
+    }
+    console.error('[authService] Lỗi giải mã JWT user me:', err);
     return null;
   }
 }
@@ -57,18 +69,37 @@ export const authService = {
    */
   async getMe(options?: ServiceRequestOptions): Promise<User | null> {
     if (options?.req) {
-      if (isMockMode()) {
-        const cookieHeader = options.req.headers.get('cookie') ?? '';
-        const role = parseCookie(cookieHeader, 'msw_mock_role');
-        if (role && role in mockUsers) {
-          setMockUser(role as keyof typeof mockUsers);
-        }
-        return currentMockUser as User;
-      }
       try {
-        return await serverFetch<User>('/auth/me', { req: options.req });
+        const cookieHeader = options.req.headers.get('cookie') ?? '';
+        const token = parseCookie(cookieHeader, 'access_token');
+        if (!token) return null;
+
+        const payload = decodeJwtPayload(token);
+        if (!payload) return null;
+
+        const userId = (payload.userId || payload.sub || payload.user_id) as string;
+        const email = (payload.email || '') as string;
+        const role = (payload.role || 'CLIENT') as any;
+
+        if (!userId) return null;
+
+        return {
+          userId,
+          email,
+          displayName: email.split('@')[0] || 'User',
+          avatarUrl: '',
+          role,
+        };
       } catch (err: unknown) {
-        console.error('[authService] Lỗi fetch user me:', err);
+        if (
+          err instanceof Error &&
+          (err.message.includes('prerender') ||
+            err.message.includes('headers') ||
+            (err as any).digest === 'NEXT_PRERENDER_INTERRUPTED')
+        ) {
+          throw err;
+        }
+        console.error('[authService] Lỗi giải mã JWT user me từ request:', err);
         return null;
       }
     }
@@ -82,9 +113,6 @@ export const authService = {
    * `refresh_token`. Nếu không có thì gửi chuỗi rỗng — vẫn include field theo SSOT.
    */
   async logout(options?: ServiceRequestOptions): Promise<LogoutResponse> {
-    if (isMockMode()) {
-      return { message: 'Logout successful' };
-    }
     const req = await getRequestCookieHeader(options?.req);
     const cookieHeader = req?.headers.get('cookie') ?? '';
     const refreshToken = parseCookie(cookieHeader, 'refresh_token') ?? '';
@@ -102,13 +130,6 @@ export const authService = {
    * Refresh token đọc từ cookie HttpOnly `refresh_token`. Service KHÔNG nuốt lỗi.
    */
   async refresh(options?: ServiceRequestOptions): Promise<RefreshTokenResponse> {
-    if (isMockMode()) {
-      return {
-        accessToken: `mock_access_${Date.now()}`,
-        refreshToken: `mock_refresh_${Date.now()}`,
-        expiresIn: 3600,
-      };
-    }
     const req = await getRequestCookieHeader(options?.req);
     const cookieHeader = req?.headers.get('cookie') ?? '';
     const refreshToken = parseCookie(cookieHeader, 'refresh_token') ?? '';

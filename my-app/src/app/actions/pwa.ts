@@ -11,31 +11,15 @@ interface PushSub {
   };
 }
 
-// 1. Quản lý VAPID Keys thông minh (Dynamic local dev & Production env)
-let keys = {
+// 1. Quản lý VAPID Keys (Production env)
+const keys = {
   publicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
   privateKey: process.env.VAPID_PRIVATE_KEY || '',
 };
 
-// Nếu thiếu key và đang chạy local/mock -> Tự động sinh key hợp lệ để dev không bị crash
+// Yêu cầu bắt buộc cấu hình VAPID Keys
 if (!keys.publicKey || !keys.privateKey) {
-  const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-  if (process.env.NODE_ENV === 'development' || isMock) {
-    try {
-      const generated = webpush.generateVAPIDKeys();
-      keys = {
-        publicKey: generated.publicKey,
-        privateKey: generated.privateKey,
-      };
-      console.log('==================================================');
-      console.log('   [PWA Info] Đã tự động sinh VAPID Keys chạy local:');
-      console.log('   NEXT_PUBLIC_VAPID_PUBLIC_KEY =', generated.publicKey);
-      console.log('   VAPID_PRIVATE_KEY =', generated.privateKey);
-      console.log('==================================================');
-    } catch (err) {
-      console.error('[PWA Error] Không thể tự sinh VAPID keys:', err);
-    }
-  }
+  throw new Error('VAPID keys (NEXT_PUBLIC_VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY) are required.');
 }
 
 // Thiết lập cấu hình web-push

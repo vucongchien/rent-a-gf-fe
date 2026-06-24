@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
 
     return [
       {
-        // CSP cho Service Worker - cần cho phép external domains để MSW passthrough hoạt động
+        // CSP cho Service Worker - chỉ cho phép kết nối self và các CDN ảnh an toàn
         source: "/sw.js",
         headers: [
           {
@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; script-src 'self'; connect-src 'self' https: http: data: blob:; img-src 'self' data: blob: https: http:`,
+            value: `default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data: blob: ${imageDomains}`,
           },
         ],
       },

@@ -7,7 +7,6 @@ import { useWallet } from '@/shared/contexts/WalletContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import type { BookingActionState } from '@/app/(marketing)/explore/[companionId]/types'
 
-const IS_MOCK = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true'
 
 export interface UseBookingFormProps {
   companionId: string
@@ -35,27 +34,18 @@ export function useBookingForm(props: UseBookingFormProps) {
   const { companionId, scenarioId } = props
   const router = useRouter()
   const { balance, open: openWallet, fetchWallet } = useWallet()
-  const { user, login } = useAuth()
+  const { user } = useAuth()
 
   const [step, setStep] = useState<1 | 2>(1)
   const [scheduledAt, setScheduledAt] = useState('')
   const [note, setNote] = useState('')
   const [validationError, setValidationError] = useState('')
 
-  // --- Production path: Server Action ---
   // useActionState trả về: [state, action, isPending] trong React 19
-  const [actionState, formAction, actionIsPending] = useActionState(
+  const [state, formAction, isPending] = useActionState(
     createBookingAction,
     { status: 'idle' } as BookingActionState
   )
-
-  // --- Mock path: Browser fetch → MSW intercepts → mockWallet updated browser-side ---
-  const [mockState, setMockState] = useState<BookingActionState>({ status: 'idle' })
-  const [mockIsPending, setMockIsPending] = useState(false)
-
-  // Unified state dựa trên môi trường
-  const state = IS_MOCK ? mockState : actionState
-  const isPending = IS_MOCK ? mockIsPending : actionIsPending
 
   const errorMessage = validationError || (state.status === 'error' ? state.message : '')
 
@@ -96,45 +86,6 @@ export function useBookingForm(props: UseBookingFormProps) {
     setStep(2)
   }
 
-  /**
-   * Mock submit handler — dùng browser fetch để MSW Service Worker có thể
-   * intercept và update mockWallet (browser-side).
-   * Server Action bypass MSW hoàn toàn vì chạy trong Node.js (khác process).
-   */
-  const handleMockSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (mockIsPending) return
-
-    setMockIsPending(true)
-    setMockState({ status: 'idle' })
-
-    try {
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          companionId,
-          scenarioId,
-          startTime: new Date(scheduledAt).toISOString(),
-        }),
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        setMockState({ status: 'success', bookingId: data.bookingId })
-      } else {
-        const err = await res.json().catch(() => ({}))
-        setMockState({
-          status: 'error',
-          message: err?.message ?? 'Đặt lịch thất bại. Vui lòng thử lại.',
-        })
-      }
-    } catch {
-      setMockState({ status: 'error', message: 'Mất kết nối mạng. Vui lòng thử lại.' })
-    } finally {
-      setMockIsPending(false)
-    }
-  }, [companionId, scenarioId, scheduledAt, mockIsPending])
 
   return {
     step,
@@ -146,17 +97,13 @@ export function useBookingForm(props: UseBookingFormProps) {
     validationError,
     setValidationError,
     state,
-    // Production: truyền vào <form action={formAction}>
-    formAction: IS_MOCK ? undefined : formAction,
-    // Mock: truyền vào <form onSubmit={mockFormSubmit}>
-    mockFormSubmit: IS_MOCK ? handleMockSubmit : undefined,
+    formAction,
     isPending,
     errorMessage,
     handleNextStep,
     balance,
     openWallet,
     user,
-    login,
     minDatetimeLocal,
     router,
   }

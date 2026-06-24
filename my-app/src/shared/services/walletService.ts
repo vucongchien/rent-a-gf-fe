@@ -1,13 +1,18 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
 import { getCurrentUserId } from '@/shared/lib/userContext';
-import { isMockMode } from '@/shared/lib/env';
-import { mockWallet, mockPendingTopups, currentMockUser } from '@/mocks/fixtures/data';
+import { decodeJwtPayload } from '@/shared/lib/tokenRefresh';
 import type { Wallet, TopupResponse, WalletTransaction, ServiceRequestOptions } from '@/shared/types';
 
 export interface InitiateTopupOptions extends ServiceRequestOptions {
   /** Idempotency key forward từ client để chống double-charge ở BE. */
   idempotencyKey?: string;
+}
+
+function parseCookie(cookieString: string | null, name: string): string | null {
+  if (!cookieString) return null;
+  const match = cookieString.match(new RegExp(`(^|;)\\s*${name}\\s*=\\s*([^;]+)`));
+  return match ? decodeURIComponent(match[2]) : null;
 }
 
 export const walletService = {
@@ -16,17 +21,34 @@ export const walletService = {
    * KHÔNG cache (user-specific + tài chính cần fresh).
    */
   async getWallet(options?: ServiceRequestOptions): Promise<Wallet> {
-    if (isMockMode()) {
-      return {
-        walletId: mockWallet.walletId,
-        userId: mockWallet.userId,
-        availableBalance: mockWallet.availableBalance,
-        frozenBalance: mockWallet.frozenBalance,
-      };
+    const req = await getRequestCookieHeader(options?.req);
+    
+    // Tự động lấy userId từ token trong cookie để truyền vào query params của Backend
+    let userId = '';
+    let cookieHeader = '';
+    if (req) {
+      if (req.headers && typeof req.headers.get === 'function') {
+        cookieHeader = req.headers.get('cookie') ?? '';
+      } else if ('Cookie' in req) {
+        cookieHeader = (req as any).Cookie ?? '';
+      } else if ('cookie' in req) {
+        cookieHeader = (req as any).cookie ?? '';
+      }
+    }
+    const token = parseCookie(cookieHeader, 'access_token');
+    if (token) {
+      const payload = decodeJwtPayload(token);
+      if (payload) {
+        userId = (payload.userId || payload.sub || payload.user_id) as string;
+      }
     }
 
-    const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<Wallet>('/finance/wallet', { req });
+    const searchParams = new URLSearchParams();
+    if (userId) {
+      searchParams.set('userId', userId);
+    }
+
+    return serverFetch<Wallet>('/finance/wallet', { req, searchParams });
   },
 
   /**
@@ -38,22 +60,6 @@ export const walletService = {
    * Handler / Server Action để BE chống double-charge khi client retry.
    */
   async initiateTopup(body: { amount: number }, options?: InitiateTopupOptions): Promise<TopupResponse> {
-    if (isMockMode()) {
-      // Phase 1.A — generate orderId, lưu pending, trỏ paymentUrl về trang
-      // mock checkout. Chỉ credit wallet khi user xác nhận thành công ở return URL.
-      const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-      mockPendingTopups.set(orderId, {
-        orderId,
-        userId: currentMockUser?.userId ?? 'u-client-1',
-        amount: body.amount,
-        createdAt: new Date().toISOString(),
-      });
-      const qs = new URLSearchParams({ orderId, amount: String(body.amount) });
-      return {
-        paymentUrl: `/mock/vnpay/checkout?${qs.toString()}`,
-      };
-    }
-
     const req = await getRequestCookieHeader(options?.req);
     const userId = (await getCurrentUserId()) ?? '';
     return serverFetch<TopupResponse>('/finance/topup', {
@@ -70,10 +76,6 @@ export const walletService = {
    * Lấy lịch sử giao dịch của user hiện tại. KHÔNG cache.
    */
   async getTransactions(options?: ServiceRequestOptions): Promise<WalletTransaction[]> {
-    if (isMockMode()) {
-      return mockWallet.transactions;
-    }
-
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch<WalletTransaction[]>('/finance/transactions', { req });
   }

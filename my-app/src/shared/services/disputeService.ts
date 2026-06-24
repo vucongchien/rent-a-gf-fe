@@ -10,7 +10,6 @@
 
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
-import { isMockMode } from '@/shared/lib/env';
 import type {
   CreateDisputeBody,
   CreateDisputeResponse,
@@ -28,9 +27,6 @@ export const disputeService = {
     body: CreateDisputeBody,
     options?: ServiceRequestOptions,
   ): Promise<CreateDisputeResponse> {
-    if (isMockMode()) {
-      return { disputeId: `dis_${Date.now()}` };
-    }
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch<CreateDisputeResponse>('/disputes', {
       req,
@@ -47,22 +43,6 @@ export const disputeService = {
     disputeId: string,
     options?: ServiceRequestOptions,
   ): Promise<Dispute | null> {
-    if (isMockMode()) {
-      // Mock fixture chưa có dispute store — trả stub có id khớp.
-      return {
-        disputeId,
-        bookingId: 'bk-mock',
-        reporterId: 'u-client-1',
-        accusedId: 'comp-1',
-        reason: 'NO_SHOW',
-        status: 'OPEN',
-        adminId: null,
-        resolution: null,
-        notes: null,
-        version: 1,
-        evidences: [],
-      };
-    }
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch<Dispute>(`/disputes/${disputeId}`, { req });
   },
@@ -76,9 +56,6 @@ export const disputeService = {
     disputeId: string,
     options?: ServiceRequestOptions,
   ): Promise<DisputeSaga | null> {
-    if (isMockMode()) {
-      return null;
-    }
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch<DisputeSaga | null>(`/disputes/${disputeId}/saga`, { req });
   },

@@ -5,7 +5,6 @@ Tài liệu này đóng vai trò như một mục lục để giúp các develop
 ## 1. Mục tiêu kiểm thử
 
 -   Đảm bảo chất lượng các Components độc lập (Atomic Design).
--   Cô lập dữ liệu mock thông qua MSW, đảm bảo hệ thống render chuẩn.
 -   Đảm bảo luồng đi và logic không bị sai sót khi tích hợp vào Page.
 
 ## 2. Cách chạy test
@@ -22,8 +21,7 @@ Dự án sử dụng `vitest` kết hợp với `@testing-library/react`.
 ### Phase 1: Mock Context & Providers
 | Tên Module | File Test | Ý nghĩa kiểm thử |
 |---|---|---|
-| **AuthContext** | `src/shared/contexts/AuthContext.test.tsx` | Kiểm tra luồng trạng thái xác thực bằng mock MSW. Đảm bảo UI nhận và chuyển đổi role (guest/client/companion) chính xác. |
-| **Companions MSW** | `src/mocks/handlers/companions.test.tsx` | Fake fetch request gọi vào server MSW, xác thực response trả về đúng schema và pagination cho logic companion grid. |
+| **AuthContext** | `src/shared/contexts/AuthContext.test.tsx` | Kiểm tra luồng trạng thái xác thực bằng API mock. Đảm bảo UI nhận và hiển thị vai trò chính xác. |
 
 ### Phase 2: Components
 | Tên Component | File Test | Ý nghĩa kiểm thử |
@@ -36,7 +34,7 @@ Dự án sử dụng `vitest` kết hợp với `@testing-library/react`.
 ### Phase 3: Integration
 | Tên Page | File Test | Ý nghĩa kiểm thử |
 |---|---|---|
-| **ExplorePage** | `src/app/(marketing)/explore/page.test.tsx` | Integration testing mô phỏng thao tác fetch companions lúc mounted, click trên FilterChip có cập nhật URL params và làm mới grid chính xác theo cơ chế MSW. |
+| **ExplorePage** | `src/app/(marketing)/explore/page.test.tsx` | Integration testing mô phỏng thao tác fetch companions lúc mounted, click trên FilterChip có cập nhật URL params và làm mới grid chính xác theo cơ chế BFF. |
 
 ### Companion Detail Page Components (Phases 5, 6, 7, 8)
 | Tên Component | File Test | Ý nghĩa kiểm thử |

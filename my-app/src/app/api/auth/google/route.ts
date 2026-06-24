@@ -1,11 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isMockMode } from '@/shared/lib/env'
-
-function generateMockJwt(userId: string, role: string): string {
-  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-  const payload = btoa(JSON.stringify({ userId, sub: userId, role }))
-  return `${header}.${payload}.mock_signature`
-}
 
 /**
  * GET /api/auth/google — Init endpoint cho popup OAuth flow.
@@ -13,17 +6,8 @@ function generateMockJwt(userId: string, role: string): string {
  * SSOT §2.1: BE `GET /auth/google/init` trả JSON `{ authUrl }`. BFF gọi
  * server-to-server lấy authUrl rồi 302 popup sang IdP. FE không sinh
  * state / PKCE / lưu gì.
- *
- * Mock mode: nhảy thẳng sang /api/auth/callback giả lập IdP đã trả code+state.
  */
 export async function GET(req: NextRequest) {
-  if (isMockMode()) {
-    const mockToken = generateMockJwt('usr-client', 'CLIENT')
-    const callbackUrl = new URL('/api/auth/callback', req.url)
-    callbackUrl.searchParams.set('code', `mock_code_${mockToken}`)
-    callbackUrl.searchParams.set('state', 'mock_state')
-    return NextResponse.redirect(callbackUrl)
-  }
 
   const apiUrl = process.env.API_URL
   if (!apiUrl) {
@@ -55,7 +39,18 @@ export async function GET(req: NextRequest) {
         { status: 502 },
       )
     }
-    return NextResponse.redirect(data.authUrl)
+
+    // Ghi đè redirect_uri trỏ về BFF Frontend thay vì Backend thật
+    try {
+      const targetOrigin = req.nextUrl.origin
+      const frontendRedirectUri = `${targetOrigin}/api/auth/callback`
+      const url = new URL(data.authUrl)
+      url.searchParams.set('redirect_uri', frontendRedirectUri)
+      return NextResponse.redirect(url.toString())
+    } catch (parseErr) {
+      console.error('[BFF init] Lỗi parse authUrl từ BE:', parseErr)
+      return NextResponse.redirect(data.authUrl)
+    }
   } catch (err) {
     console.error('[BFF init] Lỗi gọi BE init:', err)
     return NextResponse.json(

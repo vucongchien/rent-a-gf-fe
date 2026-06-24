@@ -20,11 +20,8 @@ export default async function MePage({ searchParams }: PageProps) {
   const filterType = resolvedSearchParams.type || 'ALL';
   const filterStatus = resolvedSearchParams.status || 'ALL';
 
-  // Gom các request quan trọng của trang để fetch song song tránh fetch waterfall
-  const [user, wallet] = await Promise.all([
-    authService.getMe(),
-    walletService.getWallet(),
-  ]);
+  // Lấy thông tin user trước. Nếu chưa đăng nhập, hiển thị màn hình đăng nhập luôn
+  const user = await authService.getMe();
 
   if (!user) {
     return (
@@ -35,6 +32,12 @@ export default async function MePage({ searchParams }: PageProps) {
       />
     );
   }
+
+  // Sau khi chắc chắn đã đăng nhập mới gọi API lấy ví
+  const wallet = await walletService.getWallet().catch((err) => {
+    console.error('[MePage] Lỗi lấy thông tin ví:', err);
+    return null;
+  });
 
   return (
     <div className="w-full pt-6 md:pt-4 pb-12">

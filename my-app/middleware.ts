@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { refreshTokensFromCookie, shouldRefreshAccessToken } from './src/shared/lib/tokenRefresh'
+import { refreshTokensFromCookie, shouldRefreshAccessToken, decodeJwtPayload } from './src/shared/lib/tokenRefresh'
 
 /**
  * Middleware — decode JWT từ cookie HttpOnly, inject header `user-id`
@@ -26,20 +26,7 @@ const REFRESH_COOKIE_NAME = 'refresh_token'
 const USER_ID_HEADER = 'user-id'
 const REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 // 30 ngày — đồng bộ /api/auth/callback
 
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-  const parts = token.split('.')
-  if (parts.length !== 3) return null
-  try {
-    const payload = parts[1]
-      .replace(/-/g, '+')
-      .replace(/_/g, '/')
-      .padEnd(parts[1].length + ((4 - (parts[1].length % 4)) % 4), '=')
-    const json = atob(payload)
-    return JSON.parse(json) as Record<string, unknown>
-  } catch {
-    return null
-  }
-}
+
 
 function extractUserId(payload: Record<string, unknown> | null): string | null {
   if (!payload) return null

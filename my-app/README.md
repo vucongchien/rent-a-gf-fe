@@ -27,15 +27,16 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new).
 
-### Hướng dẫn cấu hình đăng nhập trên Vercel (Demo Mode)
+### Hướng dẫn cấu hình API Backend thật trên Vercel / Production
 
-Dự án sử dụng **Mock Service Worker (MSW)** ở client-side để giả lập API backend (bao gồm đăng nhập, đăng xuất, nạp tiền ví coin, đặt lịch...). Để ứng dụng chạy demo đầy đủ chức năng sau khi deploy lên Vercel:
+Dự án sử dụng API Gateway backend thật. Để ứng dụng hoạt động chính xác:
 
 1. **Thêm Biến Môi Trường (Environment Variable)**:
    Trên Vercel Dashboard của dự án, truy cập vào mục **Settings** -> **Environment Variables** và thêm biến sau:
-   - **Key**: `NEXT_PUBLIC_MOCK_ENABLED`
-   - **Value**: `true`
-2. **Deploy**: Tiến hành deploy. Vì file `/public/mockServiceWorker.js` đã có sẵn trong source code, khi người dùng truy cập trang web trên Vercel, service worker sẽ tự động khởi chạy, cho phép bạn bấm nút **Đăng nhập**, nạp coin vào ví và trải nghiệm toàn bộ luồng nghiệp vụ.
+   - **Key**: `API_URL`
+   - **Value**: `https://api.moibuocmotduyen.site` (hoặc URL backend tương ứng)
+2. **Cấu hình AUTH_COOKIE_NAME (Tùy chọn)**:
+   Mặc định, cookie xác thực trên BFF là `access_token`. Bạn có thể thay đổi bằng biến `AUTH_COOKIE_NAME`.
 
 ---
 
@@ -46,13 +47,11 @@ Chi tiết về các quy tắc quét giao diện tự động (SVG, Button, Colo
 
 ---
 
-## Cơ chế Đóng Vai (Mock Role Switcher) và Đồng bộ Client - Server
+## Cơ chế Xác thực Client - Server (BFF Pattern)
 
-Trong môi trường phát triển (Mock Mode `NEXT_PUBLIC_MOCK_ENABLED=true`), ứng dụng sử dụng MSW (Mock Service Worker) ở client-side để chuyển đổi vai trò (Client, Companion, Admin, Guest).
-
-Do Next.js 16 sử dụng kiến trúc Server Components chạy trực tiếp trên Server (NodeJS) không qua Service Worker của trình duyệt, trạng thái role mock cần được đồng bộ:
-- **Client-side**: Khi người dùng chọn vai trò mới, MSW Client lưu giá trị role mock vào `localStorage` và cập nhật cookie `msw_mock_role`.
-- **Server-side**: Khi render Server Components (như `AdminLayout`), hệ thống đọc cookie `msw_mock_role` để cập nhật trạng thái `currentMockUser` trên server tương ứng, đảm bảo kiểm tra quyền (`user.role === 'ADMIN'`) hoạt động nhất quán, tránh các lỗi redirect không mong muốn.
+Ứng dụng sử dụng mô hình BFF (Backend for Frontend):
+- **Client-side**: Giao tiếp với BFF thông qua các Route Handlers Next.js (`/api/*`) hoặc Server Actions, sử dụng cookie HttpOnly để bảo vệ JWT session.
+- **Server-side (BFF)**: Route Handlers và Server Components chuyển tiếp token từ cookie trình duyệt sang Backend thực tế thông qua helper `serverFetch`, bảo đảm an toàn dữ liệu và tuân thủ nguyên tắc Server First.
  
 ---
 

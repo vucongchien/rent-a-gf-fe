@@ -1,7 +1,5 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
-import { isMockMode } from '@/shared/lib/env';
-import { mockNotifications } from '@/mocks/fixtures/data';
 import type {
   Notification,
   NotificationType,
@@ -25,24 +23,6 @@ export const notificationService = {
   async getNotifications(options?: ServiceRequestOptions & {
     searchParams?: URLSearchParams;
   }): Promise<NotificationsResponse> {
-    if (isMockMode()) {
-      const items: Notification[] = mockNotifications.map(n => ({
-        id: n.id,
-        title: n.title,
-        body: n.body,
-        type: n.type as NotificationType,
-        category: n.category as NotificationCategory,
-        isRead: n.isRead,
-        createdAt: n.createdAt,
-        bookingId: n.bookingId,
-        actionUrl: n.actionUrl,
-        senderName: n.senderName,
-        senderAvatar: n.senderAvatar,
-      }));
-      // Mock dataset nhỏ → trả luôn hết, hasMore=false.
-      return { items, nextCursor: null, hasMore: false };
-    }
-
     const req = await getRequestCookieHeader(options?.req);
 
     // SSOT: `{ data: [{ id, payload:{title,body,bookingId}, status, ... }], paging:{nextCursor, hasMore} }`.
@@ -97,12 +77,6 @@ export const notificationService = {
    * trả `{ success: true }` cho UI.
    */
   async markAsRead(notifId: string, options?: ServiceRequestOptions): Promise<{ success: boolean }> {
-    if (isMockMode()) {
-      const found = mockNotifications.find(n => n.id === notifId);
-      if (found) found.isRead = true;
-      return { success: true };
-    }
-
     const req = await getRequestCookieHeader(options?.req);
 
     try {
@@ -127,12 +101,6 @@ export const notificationService = {
   async markAllAsRead(
     options?: ServiceRequestOptions,
   ): Promise<{ success: boolean; affectedRows: number }> {
-    if (isMockMode()) {
-      const affected = mockNotifications.filter(n => !n.isRead).length;
-      mockNotifications.forEach(n => { n.isRead = true; });
-      return { success: true, affectedRows: affected };
-    }
-
     const req = await getRequestCookieHeader(options?.req);
 
     const raw = await serverFetch<{ affectedRows?: number }>('/notifications/read-all', {

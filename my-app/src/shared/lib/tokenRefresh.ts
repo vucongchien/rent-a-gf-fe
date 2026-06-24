@@ -37,6 +37,24 @@ export function decodeJwtExp(token: string): number | null {
 }
 
 /**
+ * Decode payload từ JWT token dưới dạng Object. KHÔNG verify signature.
+ */
+export function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split('.')
+  if (parts.length !== 3) return null
+  try {
+    const seg = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const pad = seg.padEnd(seg.length + ((4 - (seg.length % 4)) % 4), '=')
+    const json = typeof atob === 'function'
+      ? atob(pad)
+      : Buffer.from(pad, 'base64').toString('utf8')
+    return JSON.parse(json) as Record<string, unknown>
+  } catch {
+    return null
+  }
+}
+
+/**
  * Trả true nếu access_token sắp hết hạn (within leadSeconds) hoặc đã hết hạn,
  * hoặc decode fail (an toàn: prefer refresh hơn là để request fail).
  */
@@ -64,7 +82,7 @@ export async function refreshTokensFromCookie(
   if (!apiUrl) return null
 
   try {
-    const url = `${apiUrl.replace(/\/$/, '')}/auth/refresh`
+    const url = `${apiUrl.replace(/\/$/, '')}/api/v1/auth/refresh`
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 10_000)
     try {

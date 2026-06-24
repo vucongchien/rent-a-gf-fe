@@ -85,7 +85,6 @@ describe('NotificationContext', () => {
     vi.mocked(useAuth).mockReturnValue({
       user: mockUser,
       isLoading: false,
-      login: vi.fn(),
       logout: vi.fn(),
       refreshUser: vi.fn(),
     });

@@ -21,7 +21,7 @@ function DesignSystemContent() {
   const [replayKey, setReplayKey] = React.useState(0);
   
   const { balance, topup } = useWallet();
-  const { user, login, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleShowToast = () => {
     toast({
@@ -395,7 +395,7 @@ function DesignSystemContent() {
                   ) : (
                     <div className="space-y-2">
                       <div className="text-neutral-400 italic text-xs">Chưa đăng nhập tài khoản</div>
-                      <Button variant="primary" size="sm" className="w-full text-xs" onClick={() => login('client')}>
+                      <Button variant="primary" size="sm" className="w-full text-xs" onClick={() => window.location.href = '/login'}>
                         Đăng nhập (Google OAuth)
                       </Button>
                     </div>
