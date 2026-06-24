@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useToast } from '@/shared/components/atoms/ToastNotification';
 import type { Notification } from '@/shared/types';
@@ -10,9 +10,16 @@ interface NotificationContextProps {
   decrementUnreadCount: () => void;
   resetUnreadCount: () => void;
   fetchUnreadCount: () => Promise<void>;
+  /** Trạng thái nguồn realtime: 'sse' khi EventSource active, 'polling' khi fallback. */
+  realtimeSource: 'sse' | 'polling' | 'idle';
 }
 
 const NotificationContext = createContext<NotificationContextProps | undefined>(undefined);
+
+/** Số lần SSE error liên tiếp trước khi fallback sang polling. */
+const SSE_ERROR_THRESHOLD = 3;
+/** Polling interval (ms) khi SSE fail. */
+const POLLING_INTERVAL_MS = 30_000;
 
 export const useNotifications = () => {
   const context = useContext(NotificationContext);
@@ -26,8 +33,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const { user } = useAuth();
   const { toast } = useToast();
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [realtimeSource, setRealtimeSource] = useState<'sse' | 'polling' | 'idle'>('idle');
 
-  // 1. Fetch unread count ban đầu từ server
+  // 1. Fetch unread count ban đầu từ server (history)
   const fetchUnreadCount = useCallback(async () => {
     if (!user) {
       setUnreadCount(0);
@@ -45,7 +53,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [user]);
 
-  // Tự động fetch lại khi user thay đổi
+  // Initial load khi user đổi
   useEffect(() => {
     let active = true;
     const load = async () => {
@@ -70,59 +78,145 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
   }, [user]);
 
-  // 2. Lắng nghe SSE từ backend
+  /** Handler khi nhận notification mới (từ SSE hoặc polling diff). */
+  const handleNewNotification = useCallback(
+    (data: Notification) => {
+      setUnreadCount((prev) => prev + 1);
+      window.dispatchEvent(new CustomEvent('new-notification', { detail: data }));
+
+      if (typeof window !== 'undefined' && window.location.pathname !== '/notifications') {
+        toast({
+          title: data.title,
+          message: data.body,
+          variant: 'info',
+          duration: 3500,
+        });
+      }
+    },
+    [toast],
+  );
+
+  // 2. SSE realtime với fallback polling
+  const fallbackToPollingRef = useRef(false);
+  const lastSeenIdsRef = useRef<Set<string>>(new Set());
+
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      // Đảm bảo reset source khi logout, nhưng tránh setState đồng bộ ở effect body
+      // — schedule sang microtask để pass linter rule.
+      queueMicrotask(() => setRealtimeSource('idle'));
+      return;
+    }
 
-    let eventSource: EventSource;
+    let eventSource: EventSource | null = null;
+    let pollingTimer: ReturnType<typeof setInterval> | null = null;
+    let errorCount = 0;
+    let cancelled = false;
 
-    try {
-      eventSource = new EventSource('/api/notifications/stream');
+    const startPolling = () => {
+      if (pollingTimer || cancelled) return;
+      fallbackToPollingRef.current = true;
+      setRealtimeSource('polling');
+      console.warn('[NotificationContext] SSE thất bại — fallback sang polling 30s.');
 
-      eventSource.addEventListener('notification', (event) => {
+      // Khởi tạo snapshot id hiện tại để diff
+      const seedSeen = async () => {
         try {
-          const data = JSON.parse(event.data) as Notification;
-          
-          // Cập nhật số lượng chưa đọc
-          setUnreadCount((prev) => prev + 1);
+          const res = await fetch('/api/notifications');
+          if (!res.ok) return;
+          const data = await res.json();
+          lastSeenIdsRef.current = new Set(
+            (data.items as Notification[]).map((n) => n.id),
+          );
+        } catch {
+          // ignore
+        }
+      };
+      void seedSeen();
 
-          // Phát ra custom event để UI list nhận biết
-          window.dispatchEvent(new CustomEvent('new-notification', { detail: data }));
-
-          // Hiển thị Toast thông báo realtime nếu người dùng không ở trang notifications
-          if (window.location.pathname !== '/notifications') {
-            toast({
-              message: (
-                <div className="flex flex-col gap-0.5 text-left font-sans">
-                  <span className="font-bold text-chizuru-400 text-xs uppercase tracking-wider">
-                    {data.title}
-                  </span>
-                  <span className="text-white text-sm font-normal">
-                    {data.body}
-                  </span>
-                </div>
-              ),
-              duration: 3500,
-            });
+      pollingTimer = setInterval(async () => {
+        if (cancelled) return;
+        try {
+          const res = await fetch('/api/notifications');
+          if (!res.ok) return;
+          const data = await res.json();
+          const items = data.items as Notification[];
+          const seen = lastSeenIdsRef.current;
+          for (const n of items) {
+            if (!seen.has(n.id)) {
+              seen.add(n.id);
+              if (!n.isRead) handleNewNotification(n);
+            }
           }
         } catch (err) {
-          console.error('[NotificationContext] Lỗi parse dữ liệu event:', err);
+          console.error('[NotificationContext] Polling lỗi:', err);
         }
-      });
+      }, POLLING_INTERVAL_MS);
+    };
 
-      eventSource.onerror = (err) => {
-        console.error('[NotificationContext] Lỗi kết nối SSE, đang thử kết nối lại...', err);
-      };
-    } catch (err) {
-      console.error('[NotificationContext] Không thể tạo kết nối SSE:', err);
+    const tryConnectSSE = () => {
+      if (cancelled) return;
+      try {
+        eventSource = new EventSource('/api/notifications/stream');
+
+        eventSource.addEventListener('open', () => {
+          errorCount = 0;
+          setRealtimeSource('sse');
+        });
+
+        const handleEvent = (event: MessageEvent) => {
+          try {
+            const data = JSON.parse(event.data) as Notification;
+            handleNewNotification(data);
+          } catch (err) {
+            console.error('[NotificationContext] Lỗi parse dữ liệu event:', err);
+          }
+        };
+
+        eventSource.addEventListener('notification', handleEvent as EventListener);
+        // Fallback nếu BE dùng default `message` event.
+        eventSource.addEventListener('message', handleEvent);
+
+        eventSource.onerror = (err) => {
+          errorCount += 1;
+          console.error(
+            `[NotificationContext] SSE lỗi (${errorCount}/${SSE_ERROR_THRESHOLD})`,
+            err,
+          );
+          if (errorCount >= SSE_ERROR_THRESHOLD && !fallbackToPollingRef.current) {
+            // Đóng SSE và chuyển sang polling.
+            eventSource?.close();
+            eventSource = null;
+            startPolling();
+          }
+        };
+      } catch (err) {
+        console.error('[NotificationContext] Không thể tạo SSE:', err);
+        startPolling();
+      }
+    };
+
+    if (typeof window !== 'undefined' && typeof EventSource !== 'undefined') {
+      tryConnectSSE();
+    } else {
+      // SSR / không hỗ trợ EventSource → polling luôn.
+      startPolling();
     }
 
     return () => {
+      cancelled = true;
       if (eventSource) {
         eventSource.close();
+        eventSource = null;
       }
+      if (pollingTimer) {
+        clearInterval(pollingTimer);
+        pollingTimer = null;
+      }
+      fallbackToPollingRef.current = false;
+      setRealtimeSource('idle');
     };
-  }, [user, toast]);
+  }, [user, handleNewNotification]);
 
   const decrementUnreadCount = useCallback(() => {
     setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -139,6 +233,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         decrementUnreadCount,
         resetUnreadCount,
         fetchUnreadCount,
+        realtimeSource,
       }}
     >
       {children}

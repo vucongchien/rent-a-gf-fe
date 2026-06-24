@@ -225,6 +225,34 @@ export interface AdminDisputeResolveResult {
   auditEntry: AdminAuditLogEntry;
 }
 
+// ─── UPGRADE REQUESTS (Client → Companion) ────────────────────────────────
+
+export type AdminUpgradeRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface AdminUpgradeRequest {
+  id: string;
+  userId: string;
+  status: AdminUpgradeRequestStatus;
+  reason: string;
+  rejectReason: string;
+  reviewedBy: string;
+  reviewedAt: string | null;
+  createdAt: string;
+}
+
+export interface AdminUpgradeRequestListParams {
+  page?: number;
+  pageSize?: number;
+}
+
+export interface AdminUpgradeRequestListResponse extends PaginatedMeta {
+  data: AdminUpgradeRequest[];
+}
+
+export interface AdminUpgradeRequestActionResult {
+  message: string;
+}
+
 // ─── FEATURE FLAGS ─────────────────────────────────────────────────────────
 
 export interface AdminFeatureFlag {

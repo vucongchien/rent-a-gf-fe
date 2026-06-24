@@ -7,7 +7,7 @@ Tài liệu này mô tả chi tiết cấu trúc, mục tiêu và cách chạy c
 ## 1. Mục tiêu kiểm thử
 
 -   **ExplorePage Integration**: Đảm bảo sự gắn kết đúng đắn giữa các component Organisms (`SiteHeader`, `HeroSection`), Molecules (`FilterBar`), và Atoms (`CompanionCard`) khi tích hợp trên trang `/explore`.
--   **MSW Mocking Integration**: Đảm bảo trang sử dụng dữ liệu giả lập từ Mock Service Worker (MSW) dùng chung một cách chính xác thay vì hardcode cục bộ.
+-   **API Integration**: Đảm bảo trang gọi API backend thật thông qua Route Handler / BFF và xử lý dữ liệu trả về một cách chính xác.
 -   **Địa bàn hoạt động & Lọc dữ liệu**: Xác minh khi chuyển đổi bộ lọc thành phố, danh sách hiển thị cập nhật chính xác theo query parameter của URL mà không gây giật lag.
 -   **Cơ chế Phân trang bằng Cursor**: Kiểm thử nút "Tải thêm" (Load More) tương tác đúng với cursor pagination, tải trang tiếp theo lên UI một cách mượt mà.
 

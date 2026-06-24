@@ -11,16 +11,16 @@
  * apiClient tự đọc JWT từ cookie tên AUTH_COOKIE_NAME
  * (mặc định: "access_token") và inject vào Bearer header.
  *
- * Toggle mock/real:
- *   - API_URL không set → MSW intercept ở browser (dev offline)
- *   - API_URL có giá trị → Route Handler proxy sang backend thực
+ * Yêu cầu bắt buộc cấu hình API_URL trỏ tới Backend thực tế.
  */
 
 import { ApiError } from './apiError'
+import { refreshTokensFromCookie } from './tokenRefresh'
 import type { ApiErrorDetail } from '@/shared/types'
 
 const TIMEOUT_MS = 10_000
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? 'access_token'
+const REFRESH_COOKIE_NAME = 'refresh_token'
 
 export interface ServerFetchOptions {
   /** NextRequest để extract JWT từ Cookie header */
@@ -37,6 +37,8 @@ export interface ServerFetchOptions {
   cache?: RequestCache
   /** Next.js revalidate + tags */
   next?: NextFetchRequestConfig
+  /** @internal — guard chống retry loop khi 401 → refresh → retry */
+  _retried?: boolean
 }
 
 /**
@@ -68,15 +70,15 @@ export async function serverFetch<T = unknown>(
 
   if (!apiUrl) {
     throw ApiError.serviceUnavailable(
-      '[BFF] API_URL chưa được set. ' +
-      'Dev offline: không set API_URL để MSW tự intercept tại browser.',
+      '[BFF] API_URL is required.',
     )
   }
 
   const { req, searchParams, body, method = 'GET', extraHeaders, cache, next } = options
 
   // Build URL
-  const url = new URL(apiUrl.replace(/\/$/, '') + path)
+  const cleanPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`
+  const url = new URL(apiUrl.replace(/\/$/, '') + cleanPath)
   if (searchParams) {
     searchParams.forEach((value, key) => url.searchParams.set(key, value))
   }
@@ -99,6 +101,14 @@ export async function serverFetch<T = unknown>(
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
   const startAt = Date.now()
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[BFF Request] ${method} ${url.toString()}`)
+    console.log(`[BFF Request Headers]`, {
+      ...headers,
+      Authorization: headers['Authorization'] ? (headers['Authorization'].slice(0, 35) + '...') : 'none',
+    })
+  }
+
   try {
     const res = await fetch(url.toString(), {
       method,
@@ -111,10 +121,32 @@ export async function serverFetch<T = unknown>(
 
     const elapsed = Date.now() - startAt
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[BFF] ${method} ${path} → ${res.status} (${elapsed}ms)`)
+      console.log(`[BFF Response] ${method} ${path} → ${res.status} (${elapsed}ms)`)
     }
 
     if (!res.ok) {
+      // Reactive refresh: BE trả 401, có refresh_token, chưa retry → refresh + retry 1 lần.
+      // Race condition: nếu BE rotate refresh_token, request đồng thời thứ 2 fail → caller
+      // sẽ thấy ApiError.unauthorized() và điều hướng login. Document chấp nhận.
+      if (res.status === 401 && !options._retried) {
+        const refreshTokenValue = extractCookieValue(cookieHeader, REFRESH_COOKIE_NAME)
+        if (refreshTokenValue) {
+          const fresh = await refreshTokensFromCookie(refreshTokenValue)
+          if (fresh) {
+            // Cookie cập nhật KHÔNG làm được từ serverFetch (không ở context có cookies().set).
+            // Middleware sẽ refresh cookie ở request kế tiếp. Tạm thời retry với token mới.
+            const retryHeaders: Record<string, string> = { ...extraHeaders ?? {}, Authorization: `Bearer ${fresh.accessToken}` }
+            return serverFetch<T>(path, {
+              ...options,
+              extraHeaders: retryHeaders,
+              _retried: true,
+            })
+          }
+        }
+        // Refresh fail hoặc không có refresh_token → throw unauthorized.
+        throw ApiError.unauthorized(`Phiên đăng nhập đã hết hạn (${method} ${path})`)
+      }
+
       // Parse Naked JSON Error format ở root level: { code, message, details }
       let code: string | number = `HTTP_${res.status}`
       let message = `Backend trả về ${res.status} cho ${method} ${path}`

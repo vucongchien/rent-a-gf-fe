@@ -132,7 +132,7 @@ describe('BookingForm Integration', () => {
     expect(loginBtn).toBeInTheDocument()
 
     fireEvent.click(loginBtn)
-    expect(mockLogin).toHaveBeenCalledWith('client')
+    expect(mockPush).toHaveBeenCalledWith('/login')
   })
 
   it('shows Wallet recharge warning and button when balance is insufficient', () => {

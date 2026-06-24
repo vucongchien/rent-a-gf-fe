@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { bookingService } from '@/shared/services/bookingService';
 import { companionService } from '@/shared/services/companionService';
+import { authService } from '@/shared/services/authService';
 import type { BookingDetail, BookingStatus } from '@/shared/types';
 import {
   ChevronLeftIcon,
@@ -50,21 +51,27 @@ export default async function BookingDetailPage({ params, searchParams }: PagePr
 }
 
 async function BookingDetailLoader({ bookingId }: { bookingId: string }) {
-  const booking = await bookingService.getBookingDetail(bookingId);
+  const [booking, me] = await Promise.all([
+    bookingService.getBookingDetail(bookingId),
+    authService.getMe(),
+  ]);
   if (!booking) notFound();
 
   // Fetch companion song song để hiển thị avatar + tên (BookingDetail không có)
   const companion = await companionService.getCompanionDetail(booking.companionId);
 
-  return <BookingDetailView booking={booking} companion={companion} />;
+  const isClient = !!me && me.userId === booking.clientId;
+
+  return <BookingDetailView booking={booking} companion={companion} isClient={isClient} />;
 }
 
 interface BookingDetailViewProps {
   booking: BookingDetail;
   companion: Awaited<ReturnType<typeof companionService.getCompanionDetail>>;
+  isClient: boolean;
 }
 
-function BookingDetailView({ booking, companion }: BookingDetailViewProps) {
+function BookingDetailView({ booking, companion, isClient }: BookingDetailViewProps) {
   const partnerName = companion?.displayName ?? 'Bạn đồng hành';
   const partnerAvatar = companion?.avatarUrl;
   const status = getStatusConfig(booking.status);
@@ -140,6 +147,8 @@ function BookingDetailView({ booking, companion }: BookingDetailViewProps) {
           status={booking.status}
           chatRoomId={booking.chatRoomId}
           hasReviewed={booking.hasReviewed}
+          endTime={booking.endTime}
+          isClient={isClient}
         />
       </section>
 

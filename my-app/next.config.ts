@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
 
     return [
       {
-        // CSP cho Service Worker - cần cho phép external domains để MSW passthrough hoạt động
+        // CSP cho Service Worker - chỉ cho phép kết nối self và các CDN ảnh an toàn
         source: "/sw.js",
         headers: [
           {
@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; script-src 'self'; connect-src 'self' https: http: data: blob:; img-src 'self' data: blob: https: http:`,
+            value: `default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data: blob: ${imageDomains}`,
           },
         ],
       },
@@ -60,7 +60,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: ${imageDomains}; connect-src 'self' ${imageDomains}; worker-src 'self' blob:`,
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: ${imageDomains}; media-src 'self' https: blob:; connect-src 'self' ${imageDomains}; worker-src 'self' blob:`,
           },
         ],
       },

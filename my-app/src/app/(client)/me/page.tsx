@@ -6,6 +6,7 @@ import { WalletDashboard } from '@/shared/components/organisms/WalletDashboard';
 import { TransactionFilters } from './components/TransactionFilters';
 import { TransactionList } from './components/TransactionList';
 import { TransactionSkeleton } from './components/TransactionSkeleton';
+import { AuthRequiredPage } from '@/shared/components/organisms/AuthRequiredPage';
 
 interface PageProps {
   searchParams: Promise<{
@@ -19,28 +20,24 @@ export default async function MePage({ searchParams }: PageProps) {
   const filterType = resolvedSearchParams.type || 'ALL';
   const filterStatus = resolvedSearchParams.status || 'ALL';
 
-  // Gom các request quan trọng của trang để fetch song song tránh fetch waterfall
-  const [user, wallet] = await Promise.all([
-    authService.getMe(),
-    walletService.getWallet(),
-  ]);
+  // Lấy thông tin user trước. Nếu chưa đăng nhập, hiển thị màn hình đăng nhập luôn
+  const user = await authService.getMe();
 
   if (!user) {
     return (
-      <div className="w-full py-16 flex flex-col items-center justify-center text-center">
-        <div className="w-16 h-16 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mb-4 border border-rose-100">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
-            <line x1="12" y1="2" x2="12" y2="12" />
-          </svg>
-        </div>
-        <h2 className="font-sans font-bold text-lg text-neutral-800 mb-1">Yêu cầu đăng nhập</h2>
-        <p className="font-sans text-sm text-neutral-500 max-w-[320px]">
-          Bạn cần đăng nhập để xem thông tin tài khoản và lịch sử giao dịch.
-        </p>
-      </div>
+      <AuthRequiredPage
+        redirectPath="/me"
+        title="Đăng nhập để xem profile"
+        description="Bạn cần đăng nhập để xem thông tin tài khoản và lịch sử giao dịch của mình."
+      />
     );
   }
+
+  // Sau khi chắc chắn đã đăng nhập mới gọi API lấy ví
+  const wallet = await walletService.getWallet().catch((err) => {
+    console.error('[MePage] Lỗi lấy thông tin ví:', err);
+    return null;
+  });
 
   return (
     <div className="w-full pt-6 md:pt-4 pb-12">

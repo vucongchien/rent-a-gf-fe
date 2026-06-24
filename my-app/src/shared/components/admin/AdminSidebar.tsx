@@ -13,6 +13,7 @@ interface AdminNavItem {
 
 const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: 'companions', label: 'Companions', href: '/admin/companions', emoji: '👥' },
+  { id: 'upgrade-requests', label: 'Upgrade Requests', href: '/admin/upgrade-requests', emoji: '⬆️' },
   { id: 'users', label: 'Users', href: '/admin/users', emoji: '🧑' },
   { id: 'transactions', label: 'Transactions', href: '/admin/transactions', emoji: '💳' },
   { id: 'disputes', label: 'Disputes', href: '/admin/disputes', emoji: '⚖️' },

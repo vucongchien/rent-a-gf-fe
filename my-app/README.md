@@ -27,15 +27,16 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new).
 
-### Hướng dẫn cấu hình đăng nhập trên Vercel (Demo Mode)
+### Hướng dẫn cấu hình API Backend thật trên Vercel / Production
 
-Dự án sử dụng **Mock Service Worker (MSW)** ở client-side để giả lập API backend (bao gồm đăng nhập, đăng xuất, nạp tiền ví coin, đặt lịch...). Để ứng dụng chạy demo đầy đủ chức năng sau khi deploy lên Vercel:
+Dự án sử dụng API Gateway backend thật. Để ứng dụng hoạt động chính xác:
 
 1. **Thêm Biến Môi Trường (Environment Variable)**:
    Trên Vercel Dashboard của dự án, truy cập vào mục **Settings** -> **Environment Variables** và thêm biến sau:
-   - **Key**: `NEXT_PUBLIC_MOCK_ENABLED`
-   - **Value**: `true`
-2. **Deploy**: Tiến hành deploy. Vì file `/public/mockServiceWorker.js` đã có sẵn trong source code, khi người dùng truy cập trang web trên Vercel, service worker sẽ tự động khởi chạy, cho phép bạn bấm nút **Đăng nhập**, nạp coin vào ví và trải nghiệm toàn bộ luồng nghiệp vụ.
+   - **Key**: `API_URL`
+   - **Value**: `https://api.moibuocmotduyen.site` (hoặc URL backend tương ứng)
+2. **Cấu hình AUTH_COOKIE_NAME (Tùy chọn)**:
+   Mặc định, cookie xác thực trên BFF là `access_token`. Bạn có thể thay đổi bằng biến `AUTH_COOKIE_NAME`.
 
 ---
 
@@ -43,3 +44,22 @@ Dự án sử dụng **Mock Service Worker (MSW)** ở client-side để giả l
 
 Chi tiết về các quy tắc quét giao diện tự động (SVG, Button, Color, Font) và cách sửa lỗi khi gặp cảnh báo của linter, vui lòng xem tại tài liệu:
 👉 **[Quy tắc Kiểm tra Giao diện UI (UI Linting Rules)](./docs/ui-lint.md)**
+
+---
+
+## Cơ chế Xác thực Client - Server (BFF Pattern)
+
+Ứng dụng sử dụng mô hình BFF (Backend for Frontend):
+- **Client-side**: Giao tiếp với BFF thông qua các Route Handlers Next.js (`/api/*`) hoặc Server Actions, sử dụng cookie HttpOnly để bảo vệ JWT session.
+- **Server-side (BFF)**: Route Handlers và Server Components chuyển tiếp token từ cookie trình duyệt sang Backend thực tế thông qua helper `serverFetch`, bảo đảm an toàn dữ liệu và tuân thủ nguyên tắc Server First.
+ 
+---
+
+## Trang Đăng nhập Việt hóa & Thiết kế Thân thiện
+
+Trang đăng nhập (`/login`) đã được tinh chỉnh thiết kế và Việt hóa toàn bộ nội dung nhằm nâng cao trải nghiệm người dùng:
+- **Nhận diện thương hiệu**: Tích hợp Logo văn bản `RentGF 💖` với font chữ display `Cherry Bomb One` phong cách anime lãng mạn.
+- **Ngôn ngữ**: Việt hóa 100% nội dung cùng nút đăng nhập OAuth Google (`Tiếp tục với Google`), sử dụng các câu từ ấm áp, lịch thiệp.
+- **Lưu ý rõ ràng**: Loại bỏ các lưu ý mẫu của doanh nghiệp, thay vào đó là các cam kết bảo mật thông tin và hướng dẫn sử dụng chế độ Giả lập (Mock Mode) chi tiết để người dùng dễ dàng làm quen.
+
+

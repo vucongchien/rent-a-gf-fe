@@ -10,8 +10,9 @@ export type { User, UserRole };
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (role?: 'client' | 'companion' | 'admin') => Promise<void>;
   logout: () => Promise<void>;
+  /** Refetch /api/auth/me — gọi sau OAuth popup success */
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,20 +45,6 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
     }
   }, [initialUser]);
 
-  const login = async (role: 'client' | 'companion' | 'admin' = 'client') => {
-    try {
-      setIsLoading(true);
-      await fetch('/api/auth/mock-switch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role }),
-      });
-      await fetchUser();
-    } catch (err) {
-      console.error('Failed to login', err);
-      setIsLoading(false);
-    }
-  };
 
   const logout = async () => {
     try {
@@ -72,7 +59,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, logout, refreshUser: fetchUser }}>
       {children}
     </AuthContext.Provider>
   );

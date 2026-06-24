@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { Button } from './Button';
 
 export const LoginButton: React.FC = () => {
-  const { user, login, logout, isLoading } = useAuth();
+  const router = useRouter();
+  const { user, logout, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -35,7 +37,7 @@ export const LoginButton: React.FC = () => {
   return (
     <Button 
       variant="ghost"
-      onClick={() => login('client')}
+      onClick={() => router.push('/login')}
     >
       Sign in
     </Button>

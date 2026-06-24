@@ -8,8 +8,11 @@ interface WalletContextType {
   frozenBalance: number;
   isLoading: boolean;
   isOpen: boolean; // Trạng thái đóng/mở Wallet Modal
+  /** True khi user chưa đăng nhập và cố mở ví → mở AuthRequiredModal */
+  isAuthModalOpen: boolean;
   open: () => void;
   close: () => void;
+  closeAuthModal: () => void;
   fetchWallet: () => Promise<void>;
   topup: (amountInCoin: number) => Promise<boolean>;
 }
@@ -22,9 +25,18 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [frozenBalance, setFrozenBalance] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
 
-  const open = () => setIsOpen(true);
+  /** Mở Wallet Modal — nếu chưa đăng nhập thì mở AuthRequiredModal thay thế */
+  const open = () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+    } else {
+      setIsOpen(true);
+    }
+  };
   const close = () => setIsOpen(false);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
 
   const fetchWallet = useCallback(async () => {
     if (!user) {
@@ -53,6 +65,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     fetchWallet();
   }, [fetchWallet]);
 
+  /**
+   * Khởi tạo nạp tiền: gọi BFF/BE để lấy paymentUrl (VNPay sandbox/prod hoặc
+   * /mock/vnpay/checkout ở mock mode), rồi redirect browser sang đó.
+   * KHÔNG credit wallet ở đây — chỉ được credit sau khi user hoàn tất ở VNPay
+   * và quay về qua /api/finance/vnpay-return.
+   */
   const topup = async (amountInCoin: number): Promise<boolean> => {
     if (!user) return false;
     try {
@@ -61,13 +79,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: amountInCoin }),
       });
-      if (res.ok) {
-        // Mock server đã tự động cộng tiền và ghi nhận
-        // Chúng ta fetch lại ví mới nhất để đồng bộ số dư
-        await fetchWallet();
-        return true;
-      }
-      return false;
+      if (!res.ok) return false;
+      const data = (await res.json()) as { paymentUrl?: string };
+      if (!data.paymentUrl) return false;
+      window.location.href = data.paymentUrl;
+      return true;
     } catch (err) {
       console.error('Failed to topup', err);
       return false;
@@ -81,8 +97,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         frozenBalance,
         isLoading,
         isOpen,
+        isAuthModalOpen,
         open,
         close,
+        closeAuthModal,
         fetchWallet,
         topup,
       }}

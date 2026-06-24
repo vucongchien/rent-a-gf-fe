@@ -26,14 +26,12 @@ export function BookingForm(props: BookingFormProps) {
     setNote,
     state,
     formAction,
-    mockFormSubmit,
     isPending,
     errorMessage,
     handleNextStep,
     balance,
     openWallet,
     user,
-    login,
     minDatetimeLocal,
     router,
   } = useBookingForm({
@@ -57,11 +55,8 @@ export function BookingForm(props: BookingFormProps) {
   }
 
   return (
-    // Production: action={formAction} → Server Action
-    // Mock: onSubmit={mockFormSubmit} → browser fetch → MSW intercepts
     <form
       action={formAction}
-      onSubmit={mockFormSubmit}
       className="space-y-5"
     >
       {/* Các trường ẩn để submit qua Server Action (production) */}
@@ -92,7 +87,6 @@ export function BookingForm(props: BookingFormProps) {
           balance={balance}
           user={user}
           isPending={isPending}
-          login={login}
           openWallet={openWallet}
           onBackStep={() => setStep(1)}
         />

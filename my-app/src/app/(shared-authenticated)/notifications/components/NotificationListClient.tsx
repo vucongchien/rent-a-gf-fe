@@ -5,24 +5,26 @@ import { NotificationItem } from './NotificationItem';
 import { useNotifications } from '@/shared/contexts/NotificationContext';
 import { SakuraIcon, SpinnerIcon } from '@/shared/components/atoms/Icons';
 import { Button } from '@/shared/components/atoms/Button';
-import type { Notification, NotificationCategory } from '@/shared/types';
+import type { Notification, NotificationCategory, NotificationsResponse } from '@/shared/types';
 
 interface NotificationListClientProps {
   initialNotifications: Notification[];
-  total: number;
+  initialNextCursor: string | null;
+  initialHasMore: boolean;
 }
 
 type TabType = 'ALL' | NotificationCategory;
 
 export const NotificationListClient: React.FC<NotificationListClientProps> = ({
   initialNotifications,
-  total,
+  initialNextCursor,
+  initialHasMore,
 }) => {
   const { resetUnreadCount } = useNotifications();
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
   const [activeTab, setActiveTab] = useState<TabType>('ALL');
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(initialNotifications.length < total);
+  const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor);
+  const [hasMore, setHasMore] = useState<boolean>(initialHasMore);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
   // 1. Lắng nghe thông báo realtime phát ra từ SSE Connection thông qua Custom Event
@@ -30,7 +32,7 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
     const handleNewNotification = (event: Event) => {
       const customEvent = event as CustomEvent<Notification>;
       const newNotif = customEvent.detail;
-      
+
       // Chèn lên đầu danh sách, tránh trùng lặp id
       setNotifications((prev) => {
         if (prev.some((n) => n.id === newNotif.id)) return prev;
@@ -72,28 +74,26 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
     }
   };
 
-  // 5. Tải thêm thông báo (Manual Load More)
+  // 5. Tải thêm thông báo (cursor-based)
   const handleLoadMore = async () => {
-    if (isLoadingMore) return;
+    if (isLoadingMore || !hasMore || !nextCursor) return;
     setIsLoadingMore(true);
-    const nextPage = page + 1;
 
     try {
-      const res = await fetch(`/api/notifications?page=${nextPage}`);
+      const qs = new URLSearchParams({ cursor: nextCursor });
+      const res = await fetch(`/api/notifications?${qs.toString()}`);
       if (res.ok) {
-        const data = await res.json();
-        const newItems = data.items as Notification[];
-        
-        let addedCount = 0;
+        const data = (await res.json()) as NotificationsResponse;
+        const newItems = data.items ?? [];
+
         setNotifications((prev) => {
           const existingIds = new Set(prev.map((n) => n.id));
           const filteredNew = newItems.filter((n) => !existingIds.has(n.id));
-          addedCount = filteredNew.length;
           return [...prev, ...filteredNew];
         });
 
-        setPage(nextPage);
-        setHasMore(notifications.length + addedCount < data.total);
+        setNextCursor(data.nextCursor ?? null);
+        setHasMore(Boolean(data.hasMore));
       }
     } catch (err) {
       console.error('[NotificationListClient] Lỗi fetch load more:', err);

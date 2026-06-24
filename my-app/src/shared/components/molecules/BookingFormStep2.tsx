@@ -4,6 +4,7 @@ import { useFormStatus } from 'react-dom'
 import { CoinIcon, SpinnerIcon } from '@/shared/components/atoms/Icons'
 import { Button } from '@/shared/components/atoms/Button'
 import type { User } from '@/shared/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 
 export interface BookingFormStep2Props {
   companionName: string
@@ -13,7 +14,6 @@ export interface BookingFormStep2Props {
   balance: number
   user: User | null // Kiểu từ AuthContext
   isPending: boolean
-  login: (provider: 'client') => void
   openWallet: () => void
   onBackStep: () => void
 }
@@ -36,6 +36,7 @@ function SubmitButton({ isPending }: { isPending: boolean }) {
 }
 
 export function BookingFormStep2(props: BookingFormStep2Props) {
+  const router = useRouter()
   const {
     companionName,
     scenarioName,
@@ -44,7 +45,6 @@ export function BookingFormStep2(props: BookingFormStep2Props) {
     balance,
     user,
     isPending,
-    login,
     openWallet,
     onBackStep,
   } = props
@@ -97,7 +97,7 @@ export function BookingFormStep2(props: BookingFormStep2Props) {
             variant="accent" 
             size="md"
             className="rounded-full w-full justify-center"
-            onClick={() => login('client')}
+            onClick={() => router.push('/login')}
             disabled={isPending}
           >
             Đăng nhập bằng Google 🔑
