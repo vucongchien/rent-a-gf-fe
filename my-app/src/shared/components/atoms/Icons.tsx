@@ -158,6 +158,18 @@ export const StarIcon: React.FC<IconProps & { fill?: string }> = ({ size = 20, c
   );
 };
 
+export const StarSolidIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" className={className} {...props}>
+    <path
+      d="M12 2.5 C12.8 5.5 15.5 6.5 19 7 C16 9 15.5 12.5 17 16 C14 14.5 10 14.5 7 16 C8.5 12.5 8 9 5 7 C8.5 6.5 11.2 5.5 12 2.5 Z"
+      fill="currentColor"
+      stroke="currentColor"
+      strokeWidth="0.5"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const MapPinIcon: React.FC<IconProps> = ({ size = 20, className = '', ...props }) => {
   const gradId = React.useId().replace(/:/g, "-");
   return (
