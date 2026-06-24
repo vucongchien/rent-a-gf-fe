@@ -24,6 +24,8 @@ vi.mock('@/mocks/fixtures/data', () => ({
       { transactionId: 'tx-2', walletId: 'wall_mock_001', description: 'Thanh toán', amount: -1000, type: 'DEBIT', status: 'SUCCESS', createdAt: '2026-06-23T13:00:00Z' },
     ],
   },
+  mockPendingTopups: new Map(),
+  currentMockUser: { userId: 'u-client-1', role: 'CLIENT', displayName: 'Mock User', email: 'mock@example.com', avatarUrl: '' },
 }));
 
 // Import walletService và các mocks để mockResolvedValue
@@ -93,14 +95,15 @@ describe('walletService', () => {
   });
 
   describe('initiateTopup', () => {
-    it('nên tạo link VNPay giả lập khi ở mock mode', async () => {
+    it('nên tạo link mock VNPay checkout khi ở mock mode', async () => {
       vi.mocked(isMockMode).mockReturnValue(true);
 
       const response = await walletService.initiateTopup({ amount: 500 });
 
       expect(isMockMode).toHaveBeenCalled();
-      expect(response.paymentUrl).toContain('sandbox.vnpayment.vn');
-      expect(response.paymentUrl).toContain('vnp_Amount=');
+      expect(response.paymentUrl).toContain('/mock/vnpay/checkout');
+      expect(response.paymentUrl).toContain('orderId=');
+      expect(response.paymentUrl).toContain('amount=500');
       expect(serverFetch).not.toHaveBeenCalled();
     });
 
@@ -114,7 +117,7 @@ describe('walletService', () => {
       expect(isMockMode).toHaveBeenCalled();
       expect(serverFetch).toHaveBeenCalledWith('/finance/topup', expect.objectContaining({
         method: 'POST',
-        body: { amount: 500 }
+        body: expect.objectContaining({ amount: 500 }),
       }));
       expect(response).toEqual(apiTopupResponse);
     });

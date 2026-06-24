@@ -1,7 +1,8 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
+import { getCurrentUserId } from '@/shared/lib/userContext';
 import { isMockMode } from '@/shared/lib/env';
-import { mockWallet } from '@/mocks/fixtures/data';
+import { mockWallet, mockPendingTopups, currentMockUser } from '@/mocks/fixtures/data';
 import type { Wallet, TopupResponse, WalletTransaction, ServiceRequestOptions } from '@/shared/types';
 
 export interface InitiateTopupOptions extends ServiceRequestOptions {
@@ -31,22 +32,34 @@ export const walletService = {
   /**
    * Khởi tạo nạp tiền qua VNPay.
    *
-   * BE đọc userId từ JWT (Bearer). FE KHÔNG đặt userId trong body — gửi BE giải
-   * sẽ tránh giả mạo. `idempotencyKey` forward từ Route Handler / Server Action
-   * để BE chống double-charge khi client retry.
+   * SSOT yêu cầu body `{ userId, amount }`. userId lấy từ header `user-id`
+   * (do middleware decode JWT) qua `getCurrentUserId()`. BE vẫn có thể tự
+   * verify khớp với JWT để chống giả mạo. `idempotencyKey` forward từ Route
+   * Handler / Server Action để BE chống double-charge khi client retry.
    */
   async initiateTopup(body: { amount: number }, options?: InitiateTopupOptions): Promise<TopupResponse> {
     if (isMockMode()) {
+      // Phase 1.A — generate orderId, lưu pending, trỏ paymentUrl về trang
+      // mock checkout. Chỉ credit wallet khi user xác nhận thành công ở return URL.
+      const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+      mockPendingTopups.set(orderId, {
+        orderId,
+        userId: currentMockUser?.userId ?? 'u-client-1',
+        amount: body.amount,
+        createdAt: new Date().toISOString(),
+      });
+      const qs = new URLSearchParams({ orderId, amount: String(body.amount) });
       return {
-        paymentUrl: `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=${body.amount * 1000 * 100}&vnp_TxnRef=mock_tx_${Date.now()}`
+        paymentUrl: `/mock/vnpay/checkout?${qs.toString()}`,
       };
     }
 
     const req = await getRequestCookieHeader(options?.req);
+    const userId = (await getCurrentUserId()) ?? '';
     return serverFetch<TopupResponse>('/finance/topup', {
       req,
       method: 'POST',
-      body: { amount: body.amount },
+      body: { userId, amount: body.amount },
       extraHeaders: options?.idempotencyKey
         ? { 'x-idempotency-key': options.idempotencyKey }
         : undefined,

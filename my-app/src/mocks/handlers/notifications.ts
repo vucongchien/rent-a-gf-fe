@@ -4,19 +4,14 @@ import { mockNotifications } from '../fixtures/data'
 let notifications = [...mockNotifications]
 
 export const notificationHandlers = [
-  // GET /api/notifications
-  http.get('/api/notifications', async ({ request }) => {
+  // GET /api/notifications — cursor-based (SSOT §2.7).
+  // Mock dataset nhỏ: trả tất cả 1 lần, nextCursor=null/hasMore=false.
+  http.get('/api/notifications', async () => {
     await delay(400)
-    const url = new URL(request.url)
-    const page = Number(url.searchParams.get('page') ?? 1)
-    const limit = 20
-    const start = (page - 1) * limit
-    
     return HttpResponse.json({
-      items: notifications.slice(start, start + limit),
-      total: notifications.length,
-      page,
-      pageSize: limit
+      items: notifications,
+      nextCursor: null,
+      hasMore: false,
     })
   }),
 
@@ -36,4 +31,3 @@ export const notificationHandlers = [
     return HttpResponse.json({ success: true })
   }),
 ]
-

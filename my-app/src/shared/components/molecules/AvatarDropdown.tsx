@@ -1,14 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/shared/contexts/AuthContext';
+import { useOAuthPopup } from '@/shared/hooks/useOAuthPopup';
 import { Button } from '../atoms/Button';
 import { Avatar } from '../atoms/Avatar';
 import { LogOutIcon } from '../atoms/Icons';
 
 
 export const AvatarDropdown: React.FC = () => {
-  const { user, logout, login, isLoading } = useAuth();
+  const { user, logout, login, isLoading, refreshUser } = useAuth();
   const router = useRouter();
+  const { login: openOAuthPopup } = useOAuthPopup({
+    onSuccess: async () => { await refreshUser(); },
+  });
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -31,10 +35,11 @@ export const AvatarDropdown: React.FC = () => {
   if (!user) {
     return (
       <Button
-        onClick={() => login('client')}
-        className="h-9 px-3.5 rounded-md bg-neutral-900 text-white font-sans font-semibold text-[13.5px] border-none shadow-none hover:bg-neutral-900/90 active:scale-95"
+        id="avatar-dropdown-signin-btn"
+        onClick={() => openOAuthPopup()}
+        className="h-9 px-3.5 rounded-md bg-neutral-900 text-white font-sans font-semibold text-[13.5px] border-none shadow-none hover:bg-neutral-900/90 active:scale-95 transition-all"
       >
-        Sign in
+        Đăng nhập
       </Button>
     );
   }
@@ -114,7 +119,11 @@ export const AvatarDropdown: React.FC = () => {
           {/* Actions */}
           <Button
             variant="ghost"
-            onClick={() => { logout(); setOpen(false); }}
+            onClick={async () => {
+              setOpen(false);
+              await logout();
+              router.push('/explore');
+            }}
             className="w-full justify-start gap-2.5 px-3.5 py-2 text-left text-[13.5px] font-sans text-rose-500 hover:bg-rose-50 border-none shadow-none font-medium"
           >
             <LogOutIcon size={15} className="flex-none" />

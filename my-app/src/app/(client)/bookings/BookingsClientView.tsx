@@ -1,15 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import type { BookingListItem } from '@/shared/types';
 import { BookingCard } from '@/shared/components/molecules/BookingCard';
 import { CalendarXIcon } from '@/shared/components/atoms/Icons';
+import { Button } from '@/shared/components/atoms/Button';
 import { BookingCardMenu } from './BookingCardMenu';
+import { loadMoreBookingsAction } from './actions';
 
 interface BookingsClientViewProps {
   initialBookings: BookingListItem[];
+  initialNextPageToken: string | null;
 }
 
 const tabItems = [
@@ -19,12 +22,40 @@ const tabItems = [
   { id: 'cancelled', label: 'Đã hủy' },
 ];
 
-export const BookingsClientView: React.FC<BookingsClientViewProps> = ({ initialBookings }) => {
+export const BookingsClientView: React.FC<BookingsClientViewProps> = ({
+  initialBookings,
+  initialNextPageToken,
+}) => {
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab') || 'all';
 
+  // initialBookings là source of truth (đến từ RSC). router.refresh() sau
+  // action → RSC refetch → prop mới → component re-render. KHÔNG snapshot
+  // vào useState (sẽ kẹt giá trị cũ).
+  const [extraPages, setExtraPages] = useState<BookingListItem[]>([]);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(initialNextPageToken);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const bookings = [...initialBookings, ...extraPages];
+
+  const handleLoadMore = useCallback(async () => {
+    if (isLoadingMore || !nextPageToken) return;
+    setIsLoadingMore(true);
+    try {
+      const data = await loadMoreBookingsAction(nextPageToken);
+      setExtraPages((prev) => {
+        const seen = new Set([...initialBookings, ...prev].map((b) => b.bookingId));
+        return [...prev, ...(data.bookings ?? []).filter((b) => !seen.has(b.bookingId))];
+      });
+      setNextPageToken(data.nextPageToken ?? null);
+    } catch (err) {
+      console.error('[BookingsClientView] Lỗi load more:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, nextPageToken, initialBookings]);
+
   // Lọc danh sách bookings ngay tại client-side
-  const filteredBookings = initialBookings.filter((booking) => {
+  const filteredBookings = bookings.filter((booking) => {
     if (currentTab === 'pending') {
       return (
         booking.status === 'PENDING' ||
@@ -106,10 +137,25 @@ export const BookingsClientView: React.FC<BookingsClientViewProps> = ({ initialB
                   bookingId={booking.bookingId}
                   status={booking.status}
                   chatRoomId={booking.chatRoomId}
+                  endTime={booking.endTime}
+                  hasReviewed={booking.hasReviewed}
                 />
               }
             />
           ))}
+
+          {nextPageToken && (
+            <div className="flex justify-center mt-4">
+              <Button
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
+                variant="unstyled"
+                className="px-6 py-2.5 rounded-xl border border-neutral-200 text-sm font-medium text-neutral-600 hover:bg-neutral-50 active:bg-neutral-100 disabled:opacity-50 transition-all shadow-sm cursor-pointer"
+              >
+                {isLoadingMore ? 'Đang tải...' : 'Xem thêm'}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

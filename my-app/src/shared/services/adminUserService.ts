@@ -66,7 +66,7 @@ export const adminUserService = {
     if (params.q) sp.set('q', params.q);
     if (params.page) sp.set('page', String(params.page));
     if (params.pageSize) sp.set('pageSize', String(params.pageSize));
-    return serverFetch<AdminUserListResponse>('/admin/users', {
+    return serverFetch<AdminUserListResponse>('/admin/accounts', {
       searchParams: sp,
       req: options?.req,
     });
@@ -86,7 +86,7 @@ export const adminUserService = {
       };
     }
     try {
-      return await serverFetch<AdminUserDetail>(`/admin/users/${userId}`, {
+      return await serverFetch<AdminUserDetail>(`/admin/accounts/${userId}`, {
         req: options?.req,
       });
     } catch (err) {
@@ -142,7 +142,7 @@ async function mutateUser(
     });
     return { success: true, status: ov.status, auditEntry };
   }
-  const path = `/admin/users/${userId}/${action.toLowerCase()}`;
+  const path = `/admin/accounts/${userId}/${action.toLowerCase()}`;
   return serverFetch<AdminUserActionResult>(path, {
     method: 'POST',
     body: reason ? { reason } : undefined,

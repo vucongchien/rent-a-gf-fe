@@ -6,7 +6,9 @@ import type {
   AcceptBookingResponse,
   BookingListItem,
   BookingDetail,
+  CancellationReason,
   CancelBookingResponse,
+  CompleteBookingResponse,
   CreateBookingBody,
   CreateBookingResponse,
   BookingsResponse,
@@ -26,7 +28,7 @@ export const bookingService = {
   }): Promise<BookingsResponse> {
     if (isMockMode()) {
       if (!currentMockUser) {
-        return { bookings: [], total: 0, page: 1, pageSize: 10 };
+        return { bookings: [], nextPageToken: null };
       }
       const mappedBookings: BookingListItem[] = mockBookings.map(b => ({
         bookingId: b.bookingId,
@@ -35,14 +37,17 @@ export const bookingService = {
         scenarioTitle: b.scenarioTitle,
         price: b.price,
         startTime: b.startTime,
+        endTime: b.endTime,
         chatRoomId: b.chatRoomId,
         hasReviewed: b.hasReviewed,
         status: b.status,
       }));
-      return { bookings: mappedBookings, total: mappedBookings.length, page: 1, pageSize: 10 };
+      // Mock dataset nhỏ → trả hết, nextPageToken=null.
+      return { bookings: mappedBookings, nextPageToken: null };
     }
 
     const req = await getRequestCookieHeader(options?.req);
+    // Pass-through SSOT response (`{ bookings, nextPageToken }`).
     return serverFetch<BookingsResponse>('/bookings', {
       req,
       searchParams: options?.searchParams,
@@ -102,12 +107,20 @@ export const bookingService = {
   },
 
   /** Hủy đặt lịch */
-  async cancelBooking(bookingId: string, options?: ServiceRequestOptions): Promise<CancelBookingResponse> {
+  async cancelBooking(
+    bookingId: string,
+    reason: CancellationReason,
+    options?: ServiceRequestOptions,
+  ): Promise<CancelBookingResponse> {
     if (isMockMode()) {
       return { bookingId, status: 'CANCELLED', refundAmount: 150, compensationAmount: 0 };
     }
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<CancelBookingResponse>(`/bookings/${bookingId}/cancel`, { req, method: 'PUT' });
+    return serverFetch<CancelBookingResponse>(`/bookings/${bookingId}/cancel`, {
+      req,
+      method: 'POST',
+      body: { reason },
+    });
   },
 
   /** Chấp nhận đặt lịch (Companion) */
@@ -116,21 +129,20 @@ export const bookingService = {
       return { bookingId, status: 'ACCEPTED', chatRoomId: `room-${bookingId}` };
     }
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<AcceptBookingResponse>(`/bookings/${bookingId}/accept`, { req, method: 'PUT' });
+    return serverFetch<AcceptBookingResponse>(`/bookings/${bookingId}/accept`, { req, method: 'POST' });
   },
 
   /**
    * Submit review cho booking đã COMPLETED (Client).
-   * BE contract giả định: POST /bookings/:id/review { rating, comment } → CompanionReview.
+   * SSOT: POST /interaction/reviews { bookingId, clientId, companionId, rating, comment }.
    * Mock mode: tự sinh review id + flip hasReviewed=true trong fixture để flow test được.
    */
   async submitReview(
-    bookingId: string,
     body: CreateReviewBody,
     options?: ServiceRequestOptions,
   ): Promise<CreateReviewResponse> {
     if (isMockMode()) {
-      const found = mockBookings.find(b => b.bookingId === bookingId);
+      const found = mockBookings.find(b => b.bookingId === body.bookingId);
       if (!found) throw new Error('Booking không tồn tại');
       if (found.status !== 'COMPLETED') throw new Error('Chỉ review được booking đã hoàn thành');
       if (found.hasReviewed) throw new Error('Bạn đã đánh giá booking này');
@@ -138,9 +150,9 @@ export const bookingService = {
       const now = new Date().toISOString();
       return {
         reviewId: `rv-${Date.now()}`,
-        bookingId,
-        clientId: found.clientId,
-        companionId: found.companionId,
+        bookingId: body.bookingId,
+        clientId: body.clientId || found.clientId,
+        companionId: body.companionId || found.companionId,
         rating: body.rating,
         comment: body.comment,
         createdAt: now,
@@ -149,19 +161,54 @@ export const bookingService = {
     }
 
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<CreateReviewResponse>(`/bookings/${bookingId}/review`, {
+    return serverFetch<CreateReviewResponse>('/interaction/reviews', {
       req,
       method: 'POST',
       body,
     });
   },
 
-  /** Từ chối đặt lịch (Companion) */
-  async rejectBooking(bookingId: string, options?: ServiceRequestOptions): Promise<RejectBookingResponse> {
+  /**
+   * Đánh dấu booking hoàn thành.
+   * SSOT: POST /bookings/{id}/complete (body rỗng) → `{ bookingId, status, message }`.
+   */
+  async completeBooking(
+    bookingId: string,
+    options?: ServiceRequestOptions,
+  ): Promise<CompleteBookingResponse> {
     if (isMockMode()) {
-      return { bookingId, status: 'REJECTED' };
+      const found = mockBookings.find(b => b.bookingId === bookingId);
+      if (found) {
+        found.status = 'COMPLETED';
+      }
+      return {
+        bookingId,
+        status: 'COMPLETED',
+        message: 'Booking completed successfully',
+      };
     }
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<RejectBookingResponse>(`/bookings/${bookingId}/reject`, { req, method: 'PUT' });
+    return serverFetch<CompleteBookingResponse>(`/bookings/${bookingId}/complete`, {
+      req,
+      method: 'POST',
+    });
+  },
+
+  /** Từ chối đặt lịch (Companion) */
+  async rejectBooking(
+    bookingId: string,
+    reason: string,
+    options?: ServiceRequestOptions,
+  ): Promise<RejectBookingResponse> {
+    if (isMockMode()) {
+      // SSOT: reject trả status CANCELLED (cọc unfreeze về Client).
+      return { bookingId, status: 'CANCELLED' };
+    }
+    const req = await getRequestCookieHeader(options?.req);
+    return serverFetch<RejectBookingResponse>(`/bookings/${bookingId}/reject`, {
+      req,
+      method: 'POST',
+      body: { reason },
+    });
   },
 };

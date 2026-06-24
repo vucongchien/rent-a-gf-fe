@@ -68,6 +68,7 @@ if (typeof window !== 'undefined') {
   const savedRole = localStorage.getItem('msw_mock_role') as keyof typeof mockUsers | null
   if (savedRole && savedRole in mockUsers) {
     currentMockUser = mockUsers[savedRole]
+    document.cookie = `msw_mock_role=${savedRole}; path=/; max-age=31536000`
   }
 }
 
@@ -76,12 +77,15 @@ export function setMockUser(role: keyof typeof mockUsers) {
   if (typeof window !== 'undefined') {
     if (role === 'guest') {
       localStorage.removeItem('msw_mock_role')
+      document.cookie = 'msw_mock_role=; path=/; max-age=0; SameSite=Lax'
     } else {
       localStorage.setItem('msw_mock_role', role)
+      document.cookie = `msw_mock_role=${role}; path=/; max-age=31536000; SameSite=Lax`
     }
   }
   console.log('[MSW] Switched user role to:', role)
 }
+
 
 // --- COMPANIONS ---
 const rawCompanions = [
@@ -544,8 +548,9 @@ const rawBookings = [
     companionName: 'Nguyễn Thị Linh',
     companionAvatarUrl: 'https://i.pravatar.cc/100?u=comp-1',
     scenarioTitle: 'Cà phê & trò chuyện',
-    startTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-    endTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(),
+    // endTime đã qua (3h trước) nhưng chưa COMPLETED → để Client trigger "Đánh dấu hoàn thành".
+    startTime: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+    endTime: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
     status: 'ACCEPTED' as const,
     price: 150,
     chatRoomId: 'room-bk-1',
@@ -781,3 +786,15 @@ export const mockNotifications = [
   }
 ];
 
+// --- MOCK VNPAY PENDING TOPUPS ---
+// Khi mock mode: service tạo paymentUrl → user vào /mock/vnpay/checkout
+// → chọn outcome → /api/finance/vnpay-return tra cứu pending và credit wallet.
+// In-memory only — reset khi server restart, acceptable cho demo.
+export interface MockPendingTopup {
+  orderId: string;
+  userId: string;
+  amount: number;
+  createdAt: string;
+}
+
+export const mockPendingTopups: Map<string, MockPendingTopup> = new Map();

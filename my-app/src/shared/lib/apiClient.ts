@@ -17,10 +17,12 @@
  */
 
 import { ApiError } from './apiError'
+import { refreshTokensFromCookie } from './tokenRefresh'
 import type { ApiErrorDetail } from '@/shared/types'
 
 const TIMEOUT_MS = 10_000
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? 'access_token'
+const REFRESH_COOKIE_NAME = 'refresh_token'
 
 export interface ServerFetchOptions {
   /** NextRequest để extract JWT từ Cookie header */
@@ -37,6 +39,8 @@ export interface ServerFetchOptions {
   cache?: RequestCache
   /** Next.js revalidate + tags */
   next?: NextFetchRequestConfig
+  /** @internal — guard chống retry loop khi 401 → refresh → retry */
+  _retried?: boolean
 }
 
 /**
@@ -115,6 +119,28 @@ export async function serverFetch<T = unknown>(
     }
 
     if (!res.ok) {
+      // Reactive refresh: BE trả 401, có refresh_token, chưa retry → refresh + retry 1 lần.
+      // Race condition: nếu BE rotate refresh_token, request đồng thời thứ 2 fail → caller
+      // sẽ thấy ApiError.unauthorized() và điều hướng login. Document chấp nhận.
+      if (res.status === 401 && !options._retried) {
+        const refreshTokenValue = extractCookieValue(cookieHeader, REFRESH_COOKIE_NAME)
+        if (refreshTokenValue) {
+          const fresh = await refreshTokensFromCookie(refreshTokenValue)
+          if (fresh) {
+            // Cookie cập nhật KHÔNG làm được từ serverFetch (không ở context có cookies().set).
+            // Middleware sẽ refresh cookie ở request kế tiếp. Tạm thời retry với token mới.
+            const retryHeaders: Record<string, string> = { ...extraHeaders ?? {}, Authorization: `Bearer ${fresh.accessToken}` }
+            return serverFetch<T>(path, {
+              ...options,
+              extraHeaders: retryHeaders,
+              _retried: true,
+            })
+          }
+        }
+        // Refresh fail hoặc không có refresh_token → throw unauthorized.
+        throw ApiError.unauthorized(`Phiên đăng nhập đã hết hạn (${method} ${path})`)
+      }
+
       // Parse Naked JSON Error format ở root level: { code, message, details }
       let code: string | number = `HTTP_${res.status}`
       let message = `Backend trả về ${res.status} cho ${method} ${path}`
