@@ -27,6 +27,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/explore",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     const imageDomains = [
       "https://i.pinimg.com",
