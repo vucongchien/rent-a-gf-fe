@@ -1,9 +1,8 @@
 import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { bookingService } from '@/shared/services/bookingService';
-import { companionService } from '@/shared/services/companionService';
-import { authService } from '@/shared/services/authService';
 import type { BookingDetail, BookingStatus } from '@/shared/types';
 import {
   ChevronLeftIcon,
@@ -12,98 +11,62 @@ import {
   CoinIcon,
   CalendarIcon,
 } from '@/shared/components/atoms/Icons';
-import { BookingDetailActions } from './BookingDetailActions';
+import { RequestDetailActions } from './RequestDetailActions';
+
+export const metadata: Metadata = {
+  title: 'Chi tiết yêu cầu | Kanojo',
+};
 
 interface PageProps {
   params: Promise<{ bookingId: string }>;
-  searchParams: Promise<{ reviewed?: string }>;
 }
 
-export default async function BookingDetailPage({ params, searchParams }: PageProps) {
+export default async function RequestDetailPage({ params }: PageProps) {
   const { bookingId } = await params;
-  const { reviewed } = await searchParams;
 
   return (
     <div className="w-full pt-6 md:pt-4 pb-12">
       <div className="max-w-[680px] mx-auto w-full px-4">
         <Link
-          href="/bookings"
+          href="/dashboard/requests"
           className="inline-flex items-center gap-1.5 text-[13px] font-sans font-medium text-neutral-500 hover:text-neutral-800 transition-colors mb-4"
         >
           <ChevronLeftIcon size={16} />
           Quay lại danh sách
         </Link>
 
-        {reviewed === '1' && (
-          <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3">
-            <p className="font-sans text-[13px] text-emerald-800">
-              Cảm ơn bạn đã gửi đánh giá! Cảm nhận của bạn đã được ghi lại.
-            </p>
-          </div>
-        )}
-
-        <Suspense fallback={<BookingDetailSkeleton />}>
-          <BookingDetailLoader bookingId={bookingId} />
+        <Suspense fallback={<RequestDetailSkeleton />}>
+          <RequestDetailLoader bookingId={bookingId} />
         </Suspense>
       </div>
     </div>
   );
 }
 
-async function BookingDetailLoader({ bookingId }: { bookingId: string }) {
-  const [booking, me] = await Promise.all([
-    bookingService.getBookingDetail(bookingId),
-    authService.getMe(),
-  ]);
+async function RequestDetailLoader({ bookingId }: { bookingId: string }) {
+  const booking = await bookingService.getBookingDetail(bookingId);
   if (!booking) notFound();
-
-  // Fetch companion song song để hiển thị avatar + tên (BookingDetail không có)
-  const companion = await companionService.getCompanionDetail(booking.companionId);
-
-  const isClient = !!me && me.userId === booking.clientId;
-
-  return <BookingDetailView booking={booking} companion={companion} isClient={isClient} />;
+  return <RequestDetailView booking={booking} />;
 }
 
-interface BookingDetailViewProps {
-  booking: BookingDetail;
-  companion: Awaited<ReturnType<typeof companionService.getCompanionDetail>>;
-  isClient: boolean;
-}
-
-function BookingDetailView({ booking, companion, isClient }: BookingDetailViewProps) {
-  const partnerName = companion?.displayName ?? 'Bạn đồng hành';
-  const partnerAvatar = companion?.avatarUrl;
+function RequestDetailView({ booking }: { booking: BookingDetail }) {
   const status = getStatusConfig(booking.status);
+  const clientInitial = booking.clientId.charAt(0).toUpperCase();
 
   return (
     <article className="flex flex-col gap-5">
-      {/* Header: avatar + name + status */}
+      {/* Header: client avatar (initials) + status */}
       <header className="flex items-center gap-4">
         <div className="relative w-[80px] h-[80px] sm:w-[96px] sm:h-[96px] flex-shrink-0 rounded-full overflow-hidden border border-neutral-100 bg-neutral-50 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
-          {partnerAvatar ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={partnerAvatar} alt={partnerName} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-chizuru-50 text-chizuru-500 font-sans font-bold text-2xl">
-              {partnerName.charAt(0)}
-            </div>
-          )}
+          <div className="w-full h-full flex items-center justify-center bg-chizuru-50 text-chizuru-500 font-sans font-bold text-2xl">
+            {clientInitial}
+          </div>
         </div>
 
         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-          {companion ? (
-            <Link
-              href={`/explore/${companion.companionId}`}
-              className="font-sans font-bold text-lg sm:text-xl text-neutral-900 leading-tight hover:text-chizuru-600 transition-colors w-fit"
-            >
-              {partnerName}
-            </Link>
-          ) : (
-            <span className="font-sans font-bold text-lg sm:text-xl text-neutral-900 leading-tight">
-              {partnerName}
-            </span>
-          )}
+          <span className="font-sans font-bold text-lg sm:text-xl text-neutral-900 leading-tight">
+            Khách hàng
+          </span>
           <span className={`inline-flex w-fit items-center font-sans font-bold text-[11px] tracking-wider px-2.5 py-1 rounded-full ${status.bg} ${status.text}`}>
             {status.label}
           </span>
@@ -142,17 +105,14 @@ function BookingDetailView({ booking, companion, isClient }: BookingDetailViewPr
 
       {/* Actions */}
       <section>
-        <BookingDetailActions
+        <RequestDetailActions
           bookingId={booking.bookingId}
           status={booking.status}
           chatRoomId={booking.chatRoomId}
-          hasReviewed={booking.hasReviewed}
-          endTime={booking.endTime}
-          isClient={isClient}
         />
       </section>
 
-      {/* Footer meta: chatRoomStatus + id */}
+      {/* Footer meta */}
       <footer className="flex items-center justify-between text-[11px] font-mono text-neutral-400 mt-2">
         <span>ID: {booking.bookingId}</span>
         {booking.chatRoomStatus === 'INACTIVE' && (
@@ -163,12 +123,22 @@ function BookingDetailView({ booking, companion, isClient }: BookingDetailViewPr
   );
 }
 
-function MetaRow({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+function MetaRow({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-start gap-2.5">
       <span className="mt-0.5 flex-none">{icon}</span>
       <div className="flex flex-col gap-0.5 min-w-0">
-        <dt className="font-sans text-[11px] font-semibold uppercase tracking-wider text-neutral-400">{label}</dt>
+        <dt className="font-sans text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+          {label}
+        </dt>
         <dd className="font-sans text-[13.5px] text-neutral-700 break-words">{children}</dd>
       </div>
     </div>
@@ -202,13 +172,13 @@ function formatDateTimeVN(iso: string): string {
   return `${time} · ${date}`;
 }
 
-function BookingDetailSkeleton() {
+function RequestDetailSkeleton() {
   return (
     <div className="flex flex-col gap-5 animate-pulse">
       <div className="flex items-center gap-4">
         <div className="w-[80px] h-[80px] sm:w-[96px] sm:h-[96px] rounded-full bg-neutral-100 flex-shrink-0" />
         <div className="flex-1 flex flex-col gap-2">
-          <div className="h-5 w-40 bg-neutral-200 rounded-md" />
+          <div className="h-5 w-32 bg-neutral-200 rounded-md" />
           <div className="h-4 w-20 bg-neutral-100 rounded-full" />
         </div>
       </div>
@@ -228,8 +198,8 @@ function BookingDetailSkeleton() {
         </div>
       </div>
       <div className="flex gap-2.5">
-        <div className="h-11 w-32 bg-neutral-200 rounded-full" />
-        <div className="h-11 w-32 bg-neutral-100 rounded-full" />
+        <div className="h-11 w-28 bg-emerald-100 rounded-full" />
+        <div className="h-11 w-28 bg-neutral-100 rounded-full" />
       </div>
     </div>
   );

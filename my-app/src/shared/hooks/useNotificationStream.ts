@@ -29,15 +29,22 @@ interface UseNotificationStreamOptions {
  * lịch sử, không retry tự động (browser EventSource đã auto-reconnect). Caller
  * gắn vào UI (toast, badge) tự quyết.
  */
+export interface UseNotificationStreamResult {
+  /** Sự kiện mới nhất nhận được — null nếu chưa có. */
+  latest: NotificationStreamEvent | null;
+  /** True khi EventSource đang ở trạng thái OPEN. */
+  connected: boolean;
+  /** True nếu lần kết nối gần nhất kết thúc bằng error. */
+  error: boolean;
+}
+
 export function useNotificationStream(
   options: UseNotificationStreamOptions = {},
-): {
-  latest: NotificationStreamEvent | null;
-  connected: boolean;
-} {
+): UseNotificationStreamResult {
   const { enabled = true, url = '/api/notifications/stream' } = options;
   const [latest, setLatest] = useState<NotificationStreamEvent | null>(null);
   const [connected, setConnected] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!enabled) return;
@@ -45,8 +52,14 @@ export function useNotificationStream(
 
     const es = new EventSource(url, { withCredentials: true });
 
-    const handleOpen = () => setConnected(true);
-    const handleError = () => setConnected(false);
+    const handleOpen = () => {
+      setConnected(true);
+      setError(false);
+    };
+    const handleError = () => {
+      setConnected(false);
+      setError(true);
+    };
     const handleMessage = (ev: MessageEvent) => {
       try {
         const data = JSON.parse(ev.data) as NotificationStreamEvent;
@@ -72,5 +85,5 @@ export function useNotificationStream(
     };
   }, [enabled, url]);
 
-  return { latest, connected };
+  return { latest, connected, error };
 }

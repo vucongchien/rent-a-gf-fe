@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import type { BookingListItem } from '@/shared/types';
 import { Avatar } from '@/shared/components/atoms/Avatar';
 import { Button } from '../atoms/Button';
@@ -59,10 +60,18 @@ export const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
 
       {/* Nhóm nút hành động và thông tin thời gian phẳng ở chân card */}
       <div className="flex items-center justify-between pt-2.5 border-t border-neutral-100/60">
-        <span className="font-mono text-[10px] text-neutral-400">
-          {formatDate(booking.startTime)}
-        </span>
-        
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-[10px] text-neutral-400">
+            {formatDate(booking.startTime)}
+          </span>
+          <Link
+            href={`/dashboard/requests/${booking.bookingId}`}
+            className="font-sans text-[11px] font-semibold text-neutral-400 hover:text-neutral-700 transition-colors"
+          >
+            Chi tiết
+          </Link>
+        </div>
+
         <div className="flex items-center gap-3">
           <Button
             disabled={loadingId !== null}
@@ -72,7 +81,7 @@ export const PendingRequestItem: React.FC<PendingRequestItemProps> = ({
           >
             Từ chối
           </Button>
-          
+
           <Button
             disabled={loadingId !== null}
             onClick={() => onAccept(booking.bookingId)}
