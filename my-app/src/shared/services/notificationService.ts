@@ -2,23 +2,29 @@ import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
 import { isMockMode } from '@/shared/lib/env';
 import { mockNotifications } from '@/mocks/fixtures/data';
-import type { Notification, NotificationType, NotificationCategory, ServiceRequestOptions } from '@/shared/types';
+import type {
+  Notification,
+  NotificationType,
+  NotificationCategory,
+  NotificationsResponse,
+  ServiceRequestOptions,
+} from '@/shared/types';
 
 export const notificationService = {
   /**
-   * Lấy danh sách thông báo của user hiện tại.
+   * Lấy danh sách thông báo của user hiện tại (cursor-based, SSOT §2.7).
    *
-   * KHÔNG cache (user-specific) — AGENTS.md 2026-06: cấm `'use cache'` cho user data.
+   * KHÔNG cache (user-specific) — AGENTS.md: cấm `'use cache'` cho user data.
    * BE đọc JWT từ Bearer header để scope theo user.
+   *
+   * Query params (forward via searchParams):
+   *  - `cursor`: chuỗi cursor từ lần gọi trước (rỗng = trang đầu).
+   *  - `limit`: số bản ghi tối đa (mặc định 20, max 100).
+   *  - `unreadOnly`: lọc tin chưa đọc.
    */
   async getNotifications(options?: ServiceRequestOptions & {
     searchParams?: URLSearchParams;
-  }): Promise<{
-    items: Notification[];
-    total: number;
-    page: number;
-    pageSize: number;
-  }> {
+  }): Promise<NotificationsResponse> {
     if (isMockMode()) {
       const items: Notification[] = mockNotifications.map(n => ({
         id: n.id,
@@ -33,18 +39,14 @@ export const notificationService = {
         senderName: n.senderName,
         senderAvatar: n.senderAvatar,
       }));
-      return {
-        items,
-        total: mockNotifications.length,
-        page: 1,
-        pageSize: 20
-      };
+      // Mock dataset nhỏ → trả luôn hết, hasMore=false.
+      return { items, nextCursor: null, hasMore: false };
     }
 
     const req = await getRequestCookieHeader(options?.req);
 
-    // SSOT trả cursor-based: `{ data: [{ id, payload:{title,body,bookingId}, status, ...}], paging:{nextCursor, hasMore} }`.
-    // FE UI hiện đang offset-based — map về shape cũ `{ items, total, page, pageSize }`.
+    // SSOT: `{ data: [{ id, payload:{title,body,bookingId}, status, ... }], paging:{nextCursor, hasMore} }`.
+    // Flatten `payload` ra Notification để UI giữ shape cũ.
     type WireItem = {
       id: string;
       eventId?: string;
@@ -81,13 +83,10 @@ export const notificationService = {
       senderAvatar: n.senderAvatar,
     }));
 
-    // TODO(SSOT-mismatch): SSOT là cursor-based (nextCursor/hasMore) nhưng FE UI dùng
-    // offset (page/pageSize/total). Tạm approximate total = items.length khi còn trang.
     return {
       items,
-      total: items.length,
-      page: 1,
-      pageSize: items.length,
+      nextCursor: raw.paging?.nextCursor ?? null,
+      hasMore: Boolean(raw.paging?.hasMore),
     };
   },
 

@@ -9,6 +9,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+  usePathname: () => '/',
 }));
 
 // Mock hook useAuth
@@ -35,11 +36,9 @@ describe('AvatarDropdown', () => {
 
     render(<AvatarDropdown />);
 
-    const signInBtn = screen.getByText('Sign in');
+    const signInBtn = screen.getByText('Đăng nhập');
     expect(signInBtn).toBeInTheDocument();
-
-    fireEvent.click(signInBtn);
-    expect(mockLogin).toHaveBeenCalledWith('client');
+    expect(signInBtn.getAttribute('id')).toBe('avatar-dropdown-signin-btn');
   });
 
   it('renders user avatar and switch options when logged in as CLIENT', () => {

@@ -28,7 +28,7 @@ export const bookingService = {
   }): Promise<BookingsResponse> {
     if (isMockMode()) {
       if (!currentMockUser) {
-        return { bookings: [], total: 0, page: 1, pageSize: 10 };
+        return { bookings: [], nextPageToken: null };
       }
       const mappedBookings: BookingListItem[] = mockBookings.map(b => ({
         bookingId: b.bookingId,
@@ -41,10 +41,12 @@ export const bookingService = {
         hasReviewed: b.hasReviewed,
         status: b.status,
       }));
-      return { bookings: mappedBookings, total: mappedBookings.length, page: 1, pageSize: 10 };
+      // Mock dataset nhỏ → trả hết, nextPageToken=null.
+      return { bookings: mappedBookings, nextPageToken: null };
     }
 
     const req = await getRequestCookieHeader(options?.req);
+    // Pass-through SSOT response (`{ bookings, nextPageToken }`).
     return serverFetch<BookingsResponse>('/bookings', {
       req,
       searchParams: options?.searchParams,

@@ -27,7 +27,8 @@ async function NotificationsLoader() {
   return (
     <NotificationListClient
       initialNotifications={data.items}
-      total={data.total}
+      initialNextCursor={data.nextCursor}
+      initialHasMore={data.hasMore}
     />
   );
 }

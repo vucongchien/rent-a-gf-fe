@@ -35,3 +35,14 @@ export interface Notification {
   senderName?: string
   senderAvatar?: string
 }
+
+/**
+ * Phản hồi danh sách notifications — cursor-based (SSOT api_draft §2.7).
+ * BE trả `{ data, paging:{ nextCursor, hasMore } }`; service flatten
+ * `data[].payload` → `items[]` để UI giữ shape Notification cũ.
+ */
+export interface NotificationsResponse {
+  items: Notification[]
+  nextCursor: string | null
+  hasMore: boolean
+}

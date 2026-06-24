@@ -1,15 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/shared/contexts/AuthContext';
+import { useOAuthPopup } from '@/shared/hooks/useOAuthPopup';
 import { Button } from '../atoms/Button';
 import { Avatar } from '../atoms/Avatar';
 import { LogOutIcon } from '../atoms/Icons';
 
 
 export const AvatarDropdown: React.FC = () => {
-  const { user, logout, login, isLoading } = useAuth();
+  const { user, logout, login, isLoading, refreshUser } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
+  const { login: openOAuthPopup } = useOAuthPopup({
+    onSuccess: async () => { await refreshUser(); },
+  });
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -33,10 +36,7 @@ export const AvatarDropdown: React.FC = () => {
     return (
       <Button
         id="avatar-dropdown-signin-btn"
-        onClick={() => {
-          const redirect = encodeURIComponent(pathname ?? '/explore');
-          window.location.href = `/api/auth/google?redirect=${redirect}`;
-        }}
+        onClick={() => openOAuthPopup()}
         className="h-9 px-3.5 rounded-md bg-neutral-900 text-white font-sans font-semibold text-[13.5px] border-none shadow-none hover:bg-neutral-900/90 active:scale-95 transition-all"
       >
         Đăng nhập

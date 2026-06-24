@@ -85,8 +85,6 @@ export const bookingHandlers = [
 
     const url = new URL(request.url)
     const status = url.searchParams.get('status')
-    const page = Number(url.searchParams.get('page') ?? 1)
-    const pageSize = 10
 
     let items = bookings
     const user = currentMockUser
@@ -96,10 +94,7 @@ export const bookingHandlers = [
 
     if (status) items = items.filter(b => b.status.toLowerCase() === status.toLowerCase())
 
-    const start = (page - 1) * pageSize
-    const sliced = items.slice(start, start + pageSize)
-    
-    const mappedItems: BookingListItem[] = sliced.map(b => ({
+    const mappedItems: BookingListItem[] = items.map(b => ({
       bookingId: b.bookingId,
       partnerName: b.companionName,
       partnerAvatar: b.companionAvatarUrl,
@@ -113,9 +108,7 @@ export const bookingHandlers = [
 
     return HttpResponse.json({
       bookings: mappedItems,
-      total: items.length,
-      page,
-      pageSize,
+      nextPageToken: null,
     })
   }),
 
@@ -234,16 +227,11 @@ export const bookingHandlers = [
 
     const url = new URL(request.url)
     const status = url.searchParams.get('status')
-    const page = Number(url.searchParams.get('page') ?? 1)
-    const pageSize = 10
 
     let items = bookings.filter(b => b.companionId === user.userId)
     if (status) items = items.filter(b => b.status.toLowerCase() === status.toLowerCase())
 
-    const start = (page - 1) * pageSize
-    const sliced = items.slice(start, start + pageSize)
-    
-    const mappedItems: BookingListItem[] = sliced.map(b => ({
+    const mappedItems: BookingListItem[] = items.map(b => ({
       bookingId: b.bookingId,
       partnerName: b.clientName,
       partnerAvatar: b.clientAvatarUrl,
@@ -257,9 +245,7 @@ export const bookingHandlers = [
 
     return HttpResponse.json({
       bookings: mappedItems,
-      total: items.length,
-      page,
-      pageSize,
+      nextPageToken: null,
     })
   }),
 

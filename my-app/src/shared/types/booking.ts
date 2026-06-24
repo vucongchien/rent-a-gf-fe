@@ -2,8 +2,6 @@
  * booking.ts — Types cho Booking domain.
  */
 
-import type { PaginatedMeta } from './api'
-
 export type BookingStatus =
   | 'PENDING'
   | 'ACCEPTED'
@@ -99,7 +97,11 @@ export type CancellationReason =
   | 'CANCELLATION_REASON_COMPANION_EARLY'
   | 'CANCELLATION_REASON_COMPANION_LATE'
 
-/** Phản hồi danh sách bookings có phân trang */
-export interface BookingsResponse extends PaginatedMeta {
+/**
+ * Phản hồi danh sách bookings — cursor-based (SSOT api_draft §2.3).
+ * BE trả `{ bookings, nextPageToken }`. `nextPageToken === null` ⇒ hết trang.
+ */
+export interface BookingsResponse {
   bookings: BookingListItem[]
+  nextPageToken: string | null
 }

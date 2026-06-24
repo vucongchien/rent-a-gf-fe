@@ -1,15 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import type { BookingListItem } from '@/shared/types';
+import type { BookingListItem, BookingsResponse } from '@/shared/types';
 import { BookingCard } from '@/shared/components/molecules/BookingCard';
 import { CalendarXIcon } from '@/shared/components/atoms/Icons';
+import { Button } from '@/shared/components/atoms/Button';
 import { BookingCardMenu } from './BookingCardMenu';
 
 interface BookingsClientViewProps {
   initialBookings: BookingListItem[];
+  initialNextPageToken: string | null;
 }
 
 const tabItems = [
@@ -19,12 +21,40 @@ const tabItems = [
   { id: 'cancelled', label: 'Đã hủy' },
 ];
 
-export const BookingsClientView: React.FC<BookingsClientViewProps> = ({ initialBookings }) => {
+export const BookingsClientView: React.FC<BookingsClientViewProps> = ({
+  initialBookings,
+  initialNextPageToken,
+}) => {
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab') || 'all';
 
+  const [bookings, setBookings] = useState<BookingListItem[]>(initialBookings);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(initialNextPageToken);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const handleLoadMore = useCallback(async () => {
+    if (isLoadingMore || !nextPageToken) return;
+    setIsLoadingMore(true);
+    try {
+      const qs = new URLSearchParams({ pageToken: nextPageToken });
+      const res = await fetch(`/api/bookings?${qs.toString()}`);
+      if (res.ok) {
+        const data = (await res.json()) as BookingsResponse;
+        setBookings((prev) => {
+          const seen = new Set(prev.map((b) => b.bookingId));
+          return [...prev, ...(data.bookings ?? []).filter((b) => !seen.has(b.bookingId))];
+        });
+        setNextPageToken(data.nextPageToken ?? null);
+      }
+    } catch (err) {
+      console.error('[BookingsClientView] Lỗi load more:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, nextPageToken]);
+
   // Lọc danh sách bookings ngay tại client-side
-  const filteredBookings = initialBookings.filter((booking) => {
+  const filteredBookings = bookings.filter((booking) => {
     if (currentTab === 'pending') {
       return (
         booking.status === 'PENDING' ||
@@ -110,6 +140,19 @@ export const BookingsClientView: React.FC<BookingsClientViewProps> = ({ initialB
               }
             />
           ))}
+
+          {nextPageToken && (
+            <div className="flex justify-center mt-4">
+              <Button
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
+                variant="unstyled"
+                className="px-6 py-2.5 rounded-xl border border-neutral-200 text-sm font-medium text-neutral-600 hover:bg-neutral-50 active:bg-neutral-100 disabled:opacity-50 transition-all shadow-sm cursor-pointer"
+              >
+                {isLoadingMore ? 'Đang tải...' : 'Xem thêm'}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

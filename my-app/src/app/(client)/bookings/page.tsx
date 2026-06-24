@@ -46,7 +46,12 @@ async function BookingsLoader() {
   // Fetch bookings (handles mock/offline automatically via bookingService)
   const data = await bookingService.getBookings();
 
-  return <BookingsClientView initialBookings={data.bookings} />;
+  return (
+    <BookingsClientView
+      initialBookings={data.bookings}
+      initialNextPageToken={data.nextPageToken}
+    />
+  );
 }
 
 

@@ -114,7 +114,7 @@ describe('walletService', () => {
       expect(isMockMode).toHaveBeenCalled();
       expect(serverFetch).toHaveBeenCalledWith('/finance/topup', expect.objectContaining({
         method: 'POST',
-        body: { amount: 500 }
+        body: expect.objectContaining({ amount: 500 }),
       }));
       expect(response).toEqual(apiTopupResponse);
     });

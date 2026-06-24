@@ -8,7 +8,7 @@ import { DashboardSkeleton } from '@/shared/components/organisms/DashboardSkelet
 async function DashboardContent() {
   // Fetch song song để tránh waterfall
   const [bookingsData] = await Promise.all([
-    bookingService.getBookings().catch(() => ({ bookings: [], total: 0 })),
+    bookingService.getBookings().catch(() => ({ bookings: [], nextPageToken: null })),
   ]);
 
   const bookings = bookingsData?.bookings || [];
