@@ -86,14 +86,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       if (typeof window !== 'undefined' && window.location.pathname !== '/notifications') {
         toast({
-          message: (
-            <div className="flex flex-col gap-0.5 text-left font-sans">
-              <span className="font-bold text-chizuru-400 text-xs uppercase tracking-wider">
-                {data.title}
-              </span>
-              <span className="text-white text-sm font-normal">{data.body}</span>
-            </div>
-          ),
+          title: data.title,
+          message: data.body,
+          variant: 'info',
           duration: 3500,
         });
       }
