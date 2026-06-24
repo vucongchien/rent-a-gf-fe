@@ -36,7 +36,7 @@ export const RequestDetailActions: React.FC<RequestDetailActionsProps> = ({
   const canAccept = status === 'PENDING';
   const canReject = status === 'PENDING';
   const canChat = !!chatRoomId;
-  const canCancel = status === 'PENDING' || status === 'ACCEPTED';
+  const canCancel = status === 'ACCEPTED';
 
   const handleAccept = () => {
     setAcceptError(null);

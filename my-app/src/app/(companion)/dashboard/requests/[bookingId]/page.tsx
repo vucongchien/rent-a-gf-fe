@@ -1,17 +1,16 @@
 import React, { Suspense } from 'react';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { bookingService } from '@/shared/services/bookingService';
 import type { BookingDetail, BookingStatus } from '@/shared/types';
 import {
-  ChevronLeftIcon,
   ClockIcon,
   MapPinIcon,
   CoinIcon,
   CalendarIcon,
 } from '@/shared/components/atoms/Icons';
 import { RequestDetailActions } from './RequestDetailActions';
+import { BackButton } from './BackButton';
 
 export const metadata: Metadata = {
   title: 'Chi tiết yêu cầu | Kanojo',
@@ -27,13 +26,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
   return (
     <div className="w-full pt-6 md:pt-4 pb-12">
       <div className="max-w-[680px] mx-auto w-full px-4">
-        <Link
-          href="/dashboard/requests"
-          className="inline-flex items-center gap-1.5 text-[13px] font-sans font-medium text-neutral-500 hover:text-neutral-800 transition-colors mb-4"
-        >
-          <ChevronLeftIcon size={16} />
-          Quay lại danh sách
-        </Link>
+        <BackButton />
 
         <Suspense fallback={<RequestDetailSkeleton />}>
           <RequestDetailLoader bookingId={bookingId} />
