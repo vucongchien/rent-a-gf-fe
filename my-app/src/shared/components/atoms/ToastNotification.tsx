@@ -1,6 +1,15 @@
 "use client";
 
 import * as React from "react";
+import { Button } from "./Button";
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  AlertTriangleIcon,
+  InfoCircleIcon,
+  HeartFilledIcon,
+  XIcon,
+} from "./Icons";
 
 export type ToastVariant = "default" | "success" | "error" | "warning" | "info";
 
@@ -69,40 +78,18 @@ const VARIANT_STYLES: Record<
 };
 
 const ToastIcon: React.FC<{ variant: ToastVariant; className?: string }> = ({ variant, className }) => {
-  const common = "w-4 h-4";
-  const cls = `${common} ${className ?? ""}`;
+  const cls = `w-4 h-4 ${className ?? ""}`;
   switch (variant) {
     case "success":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={cls} aria-hidden="true">
-          <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      );
+      return <CheckCircleIcon size={16} className={cls} aria-hidden="true" />;
     case "error":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={cls} aria-hidden="true">
-          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-        </svg>
-      );
+      return <XCircleIcon size={16} className={cls} aria-hidden="true" />;
     case "warning":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={cls} aria-hidden="true">
-          <path d="M12 9v4m0 3.5v.5M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      );
+      return <AlertTriangleIcon size={16} className={cls} aria-hidden="true" />;
     case "info":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={cls} aria-hidden="true">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
-          <path d="M12 11v5M12 7.5v.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-        </svg>
-      );
+      return <InfoCircleIcon size={16} className={cls} aria-hidden="true" />;
     default:
-      return (
-        <svg viewBox="0 0 24 24" fill="currentColor" className={cls} aria-hidden="true">
-          <path d="M12 21s-7-4.35-9.33-9.06A5.5 5.5 0 0 1 12 5.09a5.5 5.5 0 0 1 9.33 6.85C19 16.65 12 21 12 21Z" />
-        </svg>
-      );
+      return <HeartFilledIcon size={16} className={cls} aria-hidden="true" />;
   }
 };
 
@@ -214,16 +201,15 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 </div>
               </div>
 
-              <button
+              <Button
+                variant="unstyled"
                 type="button"
                 onClick={() => remove(item.id)}
                 aria-label="Đóng thông báo"
-                className="shrink-0 -mr-1 -mt-1 p-1.5 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+                className="shrink-0 -mr-1 -mt-1 p-1.5 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
               >
-                <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5" aria-hidden="true">
-                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-                </svg>
-              </button>
+                <XIcon size={14} aria-hidden="true" />
+              </Button>
             </div>
           );
         })}

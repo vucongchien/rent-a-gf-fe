@@ -207,7 +207,8 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({ bookingId, accusedId }
                   alt={`Bằng chứng ${idx + 1}`}
                   className="w-full h-full object-cover"
                 />
-                <button
+                <Button
+                  variant="unstyled"
                   type="button"
                   onClick={() => removeEvidence(idx)}
                   disabled={isSubmitting}
@@ -215,7 +216,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({ bookingId, accusedId }
                   className="absolute top-1 right-1 w-6 h-6 rounded-full bg-neutral-900/80 text-white grid place-items-center hover:bg-neutral-900 transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   <XIcon size={12} />
-                </button>
+                </Button>
               </li>
             ))}
           </ul>

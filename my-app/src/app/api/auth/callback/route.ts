@@ -27,7 +27,7 @@ function bridgeHtml(targetOrigin: string, message: BridgeMessage): string {
   return `<!doctype html>
 <html lang="vi">
   <head><meta charset="utf-8" /><title>Đang hoàn tất đăng nhập...</title></head>
-  <body style="font-family: system-ui, sans-serif; padding: 24px; text-align: center;">
+  <body class="font-sans">
     <p>Đang hoàn tất đăng nhập...</p>
     <script>
       (function () {

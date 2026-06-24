@@ -25,6 +25,7 @@ export interface BookingListItem {
   scenarioTitle: string
   price: number
   startTime: string
+  endTime: string
   chatRoomId: string | null
   hasReviewed: boolean
   status: BookingStatus

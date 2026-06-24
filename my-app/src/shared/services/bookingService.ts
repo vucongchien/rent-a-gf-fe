@@ -37,6 +37,7 @@ export const bookingService = {
         scenarioTitle: b.scenarioTitle,
         price: b.price,
         startTime: b.startTime,
+        endTime: b.endTime,
         chatRoomId: b.chatRoomId,
         hasReviewed: b.hasReviewed,
         status: b.status,

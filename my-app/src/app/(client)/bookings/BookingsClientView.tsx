@@ -136,6 +136,8 @@ export const BookingsClientView: React.FC<BookingsClientViewProps> = ({
                   bookingId={booking.bookingId}
                   status={booking.status}
                   chatRoomId={booking.chatRoomId}
+                  endTime={booking.endTime}
+                  hasReviewed={booking.hasReviewed}
                 />
               }
             />
