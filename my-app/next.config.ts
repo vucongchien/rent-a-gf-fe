@@ -27,15 +27,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/explore",
-        permanent: false,
-      },
-    ];
-  },
   async headers() {
     const imageDomains = [
       "https://i.pinimg.com",
@@ -69,7 +60,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: ${imageDomains}; connect-src 'self' ${imageDomains}; worker-src 'self' blob:`,
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: ${imageDomains}; media-src 'self' https: blob:; connect-src 'self' ${imageDomains}; worker-src 'self' blob:`,
           },
         ],
       },

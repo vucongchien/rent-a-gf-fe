@@ -198,7 +198,8 @@ export const GlobalNavBar: React.FC = () => {
   const pathname = usePathname();
 
   // Admin console có sidebar riêng — không render global navbar
-  if (pathname.startsWith('/admin')) {
+  // Landing page (/) có hero full-screen — không render global navbar
+  if (pathname.startsWith('/admin') || pathname === '/') {
     return null;
   }
 
