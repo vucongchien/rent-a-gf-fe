@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { BookingListItem } from '@/shared/types';
 import {
   ChatIcon,
@@ -36,6 +37,7 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({
   hasReviewed,
 }) => {
   const { toast } = useToast();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState<ConfirmMode>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -98,6 +100,7 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({
       }
       setOpen(false);
       setConfirming(null);
+      router.refresh();
     });
   };
 
@@ -112,6 +115,7 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({
       toast({ message: 'Đã đánh dấu hoàn thành.' });
       setOpen(false);
       setConfirming(null);
+      router.refresh();
     });
   };
 
@@ -136,7 +140,9 @@ export const BookingCardMenu: React.FC<BookingCardMenuProps> = ({
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-[calc(100%+6px)] w-[220px] bg-white border border-neutral-200 rounded-xl shadow-[0_8px_24px_-6px_rgba(0,0,0,0.12)] py-1.5"
+          className={`absolute right-0 top-[calc(100%+6px)] bg-white border border-neutral-200 rounded-xl shadow-[0_8px_24px_-6px_rgba(0,0,0,0.12)] py-1.5 ${
+            confirming ? 'w-[300px]' : 'w-[220px]'
+          }`}
         >
           {!confirming && (
             <>
@@ -267,9 +273,9 @@ const ConfirmPanel: React.FC<ConfirmPanelProps> = ({
     : 'bg-emerald-500 hover:bg-emerald-600';
 
   return (
-    <div className="px-3.5 py-2.5">
-      <p className="font-sans font-semibold text-[13px] text-neutral-800 mb-0.5">{title}</p>
-      <p className="font-sans text-[11.5px] text-neutral-500 leading-snug mb-2.5">{description}</p>
+    <div className="px-4 py-3">
+      <p className="font-sans font-semibold text-[14px] text-neutral-800 mb-1">{title}</p>
+      <p className="font-sans text-[12.5px] text-neutral-500 leading-relaxed mb-3">{description}</p>
 
       {errorMsg && (
         <p className="font-sans text-[11.5px] text-rose-500 leading-snug mb-2" role="alert">
@@ -277,13 +283,13 @@ const ConfirmPanel: React.FC<ConfirmPanelProps> = ({
         </p>
       )}
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         <Button
           variant="unstyled"
           type="button"
           onClick={onCancel}
           disabled={isPending}
-          className="flex-1 h-8 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-sans font-semibold text-[12px] transition-colors disabled:opacity-50 cursor-pointer"
+          className="flex-1 h-9 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-sans font-semibold text-[12.5px] transition-colors disabled:opacity-50 cursor-pointer"
         >
           Quay lại
         </Button>
@@ -292,7 +298,7 @@ const ConfirmPanel: React.FC<ConfirmPanelProps> = ({
           type="button"
           onClick={onConfirm}
           disabled={isPending}
-          className={`flex-1 h-8 rounded-lg ${toneClass} text-white font-sans font-semibold text-[12px] transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer`}
+          className={`flex-1 h-9 rounded-lg ${toneClass} text-white font-sans font-semibold text-[12.5px] transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer`}
         >
           {isPending && <SpinnerIcon size={13} className="animate-spin" />}
           {actionLabel}

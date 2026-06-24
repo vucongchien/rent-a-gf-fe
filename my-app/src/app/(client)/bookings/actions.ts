@@ -3,10 +3,16 @@
 import { revalidatePath } from 'next/cache';
 import { bookingService } from '@/shared/services/bookingService';
 import type {
+  BookingsResponse,
   CancelBookingResponse,
   CancellationReason,
   CompleteBookingResponse,
 } from '@/shared/types';
+
+export async function loadMoreBookingsAction(pageToken: string): Promise<BookingsResponse> {
+  const sp = new URLSearchParams({ pageToken });
+  return bookingService.getBookings({ searchParams: sp });
+}
 
 export type CancelBookingActionState =
   | { status: 'success'; data: CancelBookingResponse }

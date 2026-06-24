@@ -65,6 +65,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     fetchWallet();
   }, [fetchWallet]);
 
+  /**
+   * Khởi tạo nạp tiền: gọi BFF/BE để lấy paymentUrl (VNPay sandbox/prod hoặc
+   * /mock/vnpay/checkout ở mock mode), rồi redirect browser sang đó.
+   * KHÔNG credit wallet ở đây — chỉ được credit sau khi user hoàn tất ở VNPay
+   * và quay về qua /api/finance/vnpay-return.
+   */
   const topup = async (amountInCoin: number): Promise<boolean> => {
     if (!user) return false;
     try {
@@ -73,13 +79,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: amountInCoin }),
       });
-      if (res.ok) {
-        // Mock server đã tự động cộng tiền và ghi nhận
-        // Chúng ta fetch lại ví mới nhất để đồng bộ số dư
-        await fetchWallet();
-        return true;
-      }
-      return false;
+      if (!res.ok) return false;
+      const data = (await res.json()) as { paymentUrl?: string };
+      if (!data.paymentUrl) return false;
+      window.location.href = data.paymentUrl;
+      return true;
     } catch (err) {
       console.error('Failed to topup', err);
       return false;

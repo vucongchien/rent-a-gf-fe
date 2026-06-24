@@ -13,7 +13,9 @@ export const walletHandlers = [
     })
   }),
 
-  // POST /api/finance/topup
+  // POST /api/finance/topup — Phase 1.A: trả paymentUrl trỏ về mock checkout,
+  // KHÔNG credit ngay. Wallet chỉ được credit khi user xác nhận ở
+  // /api/finance/vnpay-return (mô phỏng flow VNPay thật).
   http.post('/api/finance/topup', async ({ request }) => {
     await delay(1200)
     const body = await request.json() as { userId: string; amount: number }
@@ -24,21 +26,10 @@ export const walletHandlers = [
       )
     }
 
-    mockWallet.availableBalance += body.amount
-    
-    const txId = `tx-topup-${Date.now()}`
-    mockWallet.transactions.unshift({
-      transactionId: txId,
-      walletId: mockWallet.walletId,
-      description: 'Nạp tiền VNPay',
-      amount: body.amount,
-      type: 'CREDIT' as const,
-      status: 'SUCCESS' as const,
-      createdAt: new Date().toISOString()
-    })
-
+    const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+    const qs = new URLSearchParams({ orderId, amount: String(body.amount) })
     return HttpResponse.json({
-      paymentUrl: `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=${body.amount * 1000 * 100}&vnp_TxnRef=${txId}`
+      paymentUrl: `/mock/vnpay/checkout?${qs.toString()}`,
     })
   }),
 

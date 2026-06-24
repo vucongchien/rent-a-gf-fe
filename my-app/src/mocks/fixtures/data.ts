@@ -786,3 +786,15 @@ export const mockNotifications = [
   }
 ];
 
+// --- MOCK VNPAY PENDING TOPUPS ---
+// Khi mock mode: service tạo paymentUrl → user vào /mock/vnpay/checkout
+// → chọn outcome → /api/finance/vnpay-return tra cứu pending và credit wallet.
+// In-memory only — reset khi server restart, acceptable cho demo.
+export interface MockPendingTopup {
+  orderId: string;
+  userId: string;
+  amount: number;
+  createdAt: string;
+}
+
+export const mockPendingTopups: Map<string, MockPendingTopup> = new Map();
