@@ -87,6 +87,7 @@ describe('NotificationContext', () => {
       isLoading: false,
       login: vi.fn(),
       logout: vi.fn(),
+      refreshUser: vi.fn(),
     });
 
     vi.mocked(useToast).mockReturnValue({

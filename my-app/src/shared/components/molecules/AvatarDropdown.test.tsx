@@ -30,6 +30,7 @@ describe('AvatarDropdown', () => {
       isLoading: false,
       login: mockLogin,
       logout: mockLogout,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
     });
 
     render(<AvatarDropdown />);
@@ -53,6 +54,7 @@ describe('AvatarDropdown', () => {
       isLoading: false,
       login: mockLogin,
       logout: mockLogout,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
     });
 
     render(<AvatarDropdown />);
@@ -90,6 +92,7 @@ describe('AvatarDropdown', () => {
       isLoading: false,
       login: mockLogin,
       logout: mockLogout,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
     });
 
     render(<AvatarDropdown />);

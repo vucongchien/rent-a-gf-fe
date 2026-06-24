@@ -4,6 +4,8 @@ import React, { useEffect, useRef } from 'react';
 import { CloseButton } from '../atoms/CloseButton';
 import { Button } from '../atoms/Button';
 import { HeartIcon, SpinnerIcon, GoogleIcon } from '../atoms/Icons';
+import { useOAuthPopup } from '@/shared/hooks/useOAuthPopup';
+import { useAuth } from '@/shared/contexts/AuthContext';
 
 interface AuthRequiredModalProps {
   /** Có đang mở không */
@@ -32,7 +34,17 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
   description = 'Bạn cần đăng nhập để sử dụng tính năng này.',
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const { refreshUser } = useAuth();
+  const { login, isLoading } = useOAuthPopup({
+    onSuccess: async () => {
+      await refreshUser();
+      onClose();
+    },
+    onError: (err) => {
+      setErrorMsg(err.message ?? 'Đăng nhập thất bại, thử lại nhé.');
+    },
+  });
 
   // Điều khiển đóng/mở dialog native
   useEffect(() => {
@@ -51,12 +63,8 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
   };
 
   const handleLogin = () => {
-    setIsLoading(true);
-    // Đọc pathname từ window tại thời điểm click — tránh dùng usePathname() hook
-    // để không block static prerendering của các trang public
-    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/explore';
-    const redirectPath = encodeURIComponent(currentPath);
-    window.location.href = `/api/auth/google?redirect=${redirectPath}`;
+    setErrorMsg(null);
+    login();
   };
 
   return (
@@ -117,6 +125,15 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
               </>
             )}
           </Button>
+
+          {errorMsg && (
+            <p
+              role="alert"
+              className="mt-3 text-center font-sans text-[12px] text-red-600 leading-relaxed"
+            >
+              {errorMsg}
+            </p>
+          )}
 
           {/* Footnote */}
           <p className="mt-3 text-center font-sans text-[11px] text-neutral-400 leading-relaxed">

@@ -65,7 +65,7 @@ export const adminDisputeService = {
     if (params.q) sp.set('q', params.q);
     if (params.page) sp.set('page', String(params.page));
     if (params.pageSize) sp.set('pageSize', String(params.pageSize));
-    return serverFetch<AdminDisputeListResponse>('/admin/disputes', {
+    return serverFetch<AdminDisputeListResponse>('/disputes', {
       searchParams: sp,
       req: options?.req,
     });
@@ -77,7 +77,7 @@ export const adminDisputeService = {
   ): Promise<AdminDisputeDetail | null> {
     if (isMock()) return getAdminDispute(disputeId);
     try {
-      return await serverFetch<AdminDisputeDetail>(`/admin/disputes/${disputeId}`, {
+      return await serverFetch<AdminDisputeDetail>(`/disputes/${disputeId}`, {
         req: options?.req,
       });
     } catch (err) {
@@ -124,11 +124,16 @@ export const adminDisputeService = {
         auditEntry,
       };
     }
+    // SSOT body: `{ resolution, notes }` với resolution ∈ REFUND_CLIENT | PAYOUT_COMPANION | REJECT_DISPUTE.
+    const resolution =
+      outcome === 'REFUND' ? 'REFUND_CLIENT'
+      : outcome === 'CHARGE' ? 'PAYOUT_COMPANION'
+      : 'REJECT_DISPUTE';
     return serverFetch<AdminDisputeResolveResult>(
-      `/admin/disputes/${disputeId}/resolve`,
+      `/disputes/${disputeId}/resolve`,
       {
         method: 'POST',
-        body: { outcome, note },
+        body: { resolution, notes: note },
         req: options?.req,
       },
     );

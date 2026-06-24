@@ -1,30 +1,38 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Button } from '@/shared/components/atoms/Button'
 import { SpinnerIcon, GoogleIcon } from '@/shared/components/atoms/Icons'
+import { useOAuthPopup } from '@/shared/hooks/useOAuthPopup'
+import { useAuth } from '@/shared/contexts/AuthContext'
 
 interface GoogleLoginButtonProps {
-  /**
-   * Path để redirect về sau khi đăng nhập thành công.
-   * Nếu không truyền, mặc định về /explore.
-   */
-  redirect?: string
+  /** Callback chạy sau khi login thành công (sau khi refresh user) */
+  onSuccess?: () => void
+  /** Callback nhận thông báo lỗi để hiển thị toast */
+  onError?: (message: string) => void
 }
 
 /**
  * GoogleLoginButton — Nút đăng nhập OAuth qua Google.
  * Style Neo-brutalist: viền đậm, shadow offset, hover shift up.
- * Màu dùng CSS vars thay vì hardcode hex.
  */
-export default function GoogleLoginButton({ redirect }: GoogleLoginButtonProps = {}) {
-  const [isLoading, setIsLoading] = useState(false)
+export default function GoogleLoginButton({ onSuccess, onError }: GoogleLoginButtonProps = {}) {
+  const { refreshUser } = useAuth()
+  const { login, isLoading } = useOAuthPopup({
+    onSuccess: async () => {
+      await refreshUser()
+      onSuccess?.()
+    },
+    onError: (err) => {
+      const msg = err.message ?? 'Đăng nhập thất bại, thử lại nhé.'
+      if (onError) onError(msg)
+      else console.error('[GoogleLoginButton] OAuth error:', err)
+    },
+  })
 
   const handleLogin = () => {
-    setIsLoading(true)
-    // Append redirect param vào OAuth flow để callback biết quay về đâu
-    const params = redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''
-    window.location.href = `/api/auth/google${params}`
+    login()
   }
 
   return (

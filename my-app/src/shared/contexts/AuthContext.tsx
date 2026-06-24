@@ -12,6 +12,8 @@ interface AuthContextType {
   isLoading: boolean;
   login: (role?: 'client' | 'companion' | 'admin') => Promise<void>;
   logout: () => Promise<void>;
+  /** Refetch /api/auth/me — gọi sau OAuth popup success */
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -72,7 +74,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, refreshUser: fetchUser }}>
       {children}
     </AuthContext.Provider>
   );

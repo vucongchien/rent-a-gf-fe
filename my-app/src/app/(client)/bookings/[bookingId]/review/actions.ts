@@ -3,6 +3,7 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { bookingService } from '@/shared/services/bookingService';
 import { CACHE_TAGS } from '@/shared/lib/cacheTags';
+import { getCurrentUserId } from '@/shared/lib/userContext';
 import type { CreateReviewResponse } from '@/shared/types';
 
 export type SubmitReviewActionState =
@@ -30,7 +31,14 @@ export async function submitReviewAction(
   }
 
   try {
-    const data = await bookingService.submitReview(bookingId, { rating, comment });
+    const clientId = (await getCurrentUserId()) ?? '';
+    const data = await bookingService.submitReview({
+      bookingId,
+      clientId,
+      companionId,
+      rating,
+      comment,
+    });
 
     if (companionId) {
       revalidateTag(CACHE_TAGS.companion(companionId), { expire: 0 });

@@ -1,21 +1,17 @@
-import { redirect } from 'next/navigation'
+import LoginView from './LoginView'
 
 interface LoginPageProps {
-  searchParams: Promise<{ redirect?: string }>
+  searchParams: Promise<{ error?: string; redirect?: string }>
 }
 
 /**
- * /login — Không còn hiển thị UI, redirect thẳng vào OAuth flow.
- * Giữ route để các link cũ hoặc bookmark không bị 404.
+ * /login — Trang đăng nhập.
+ *
+ * Flow chuẩn: user click nút → useOAuthPopup mở popup → bridge postMessage.
+ * Fallback: popup bị chặn → hook tự `window.location.href = /api/auth/google`,
+ * bridge sẽ redirect về `/login?error=...` nếu callback lỗi (không có opener).
  */
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const { redirect: redirectTo } = await searchParams
-
-  // Sanitize: chỉ chấp nhận path nội bộ để tránh open redirect
-  const safeRedirect = redirectTo?.startsWith('/') && !redirectTo.startsWith('//')
-    ? redirectTo
-    : '/explore'
-
-  // Redirect thẳng vào OAuth, bypass trang login UI
-  redirect(`/api/auth/google?redirect=${encodeURIComponent(safeRedirect)}`)
+  const { error } = await searchParams
+  return <LoginView initialError={error ?? null} />
 }

@@ -39,7 +39,7 @@ export async function updateProfileAction(
 ): Promise<ActionState<CompanionProfileMe>> {
   const parsed = {
     displayName: String(formData.get('displayName') ?? ''),
-    biography: String(formData.get('biography') ?? ''),
+    introText: String(formData.get('introText') ?? ''),
     availableCities: parseCities(formData),
   };
   const v = validateProfile(parsed);

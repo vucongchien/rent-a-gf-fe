@@ -85,6 +85,20 @@ export interface RejectBookingResponse {
   status: string
 }
 
+/** Phản hồi khi complete booking (SSOT: POST /bookings/{id}/complete) */
+export interface CompleteBookingResponse {
+  bookingId: string
+  status: string
+  message: string
+}
+
+/** Mã lý do hủy booking (SSOT enum). */
+export type CancellationReason =
+  | 'CANCELLATION_REASON_CLIENT_EARLY'
+  | 'CANCELLATION_REASON_CLIENT_LATE'
+  | 'CANCELLATION_REASON_COMPANION_EARLY'
+  | 'CANCELLATION_REASON_COMPANION_LATE'
+
 /** Phản hồi danh sách bookings có phân trang */
 export interface BookingsResponse extends PaginatedMeta {
   bookings: BookingListItem[]

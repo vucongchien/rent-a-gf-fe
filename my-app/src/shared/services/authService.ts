@@ -6,6 +6,12 @@ import { isMockMode } from '@/shared/lib/env';
 import { currentMockUser, mockUsers, setMockUser } from '@/mocks/fixtures/data';
 import type { LogoutResponse, ServiceRequestOptions, User } from '@/shared/types';
 
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
 function parseCookie(cookieString: string | null, name: string): string | null {
   if (!cookieString) return null;
   const match = cookieString.match(new RegExp(`(^|;)\\s*${name}\\s*=\\s*([^;]+)`));
@@ -71,12 +77,45 @@ export const authService = {
 
   /**
    * Đăng xuất khỏi hệ thống.
+   *
+   * SSOT yêu cầu body `{ refreshToken }` để BE revoke. Đọc từ cookie HttpOnly
+   * `refresh_token`. Nếu không có thì gửi chuỗi rỗng — vẫn include field theo SSOT.
    */
   async logout(options?: ServiceRequestOptions): Promise<LogoutResponse> {
     if (isMockMode()) {
       return { message: 'Logout successful' };
     }
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<LogoutResponse>('/auth/logout', { req, method: 'POST' });
+    const cookieHeader = req?.headers.get('cookie') ?? '';
+    const refreshToken = parseCookie(cookieHeader, 'refresh_token') ?? '';
+    return serverFetch<LogoutResponse>('/auth/logout', {
+      req,
+      method: 'POST',
+      body: { refreshToken },
+    });
+  },
+
+  /**
+   * Refresh access token bằng refresh token rotation.
+   *
+   * SSOT: POST /auth/refresh body `{ refreshToken }` → `{ accessToken, refreshToken, expiresIn }`.
+   * Refresh token đọc từ cookie HttpOnly `refresh_token`. Service KHÔNG nuốt lỗi.
+   */
+  async refresh(options?: ServiceRequestOptions): Promise<RefreshTokenResponse> {
+    if (isMockMode()) {
+      return {
+        accessToken: `mock_access_${Date.now()}`,
+        refreshToken: `mock_refresh_${Date.now()}`,
+        expiresIn: 3600,
+      };
+    }
+    const req = await getRequestCookieHeader(options?.req);
+    const cookieHeader = req?.headers.get('cookie') ?? '';
+    const refreshToken = parseCookie(cookieHeader, 'refresh_token') ?? '';
+    return serverFetch<RefreshTokenResponse>('/auth/refresh', {
+      req,
+      method: 'POST',
+      body: { refreshToken },
+    });
   },
 };

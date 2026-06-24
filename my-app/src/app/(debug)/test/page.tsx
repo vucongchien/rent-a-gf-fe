@@ -179,7 +179,9 @@ export default function Home() {
     addLog(`Requesting cancel for booking: ${bookingId}...`)
     try {
       const res = await fetch(`/api/bookings/${bookingId}/cancel`, {
-        method: 'PATCH',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'CANCELLATION_REASON_CLIENT_EARLY' }),
       })
       if (res.ok) {
         const json = await res.json()
@@ -203,7 +205,7 @@ export default function Home() {
     addLog(`Companion accepting booking: ${bookingId}...`)
     try {
       const res = await fetch(`/api/bookings/${bookingId}/accept`, {
-        method: 'PATCH',
+        method: 'POST',
       })
       if (res.ok) {
         addLog(`Booking ${bookingId} accepted! Opening chat...`)
@@ -222,7 +224,9 @@ export default function Home() {
     addLog(`Companion rejecting booking: ${bookingId}...`)
     try {
       const res = await fetch(`/api/bookings/${bookingId}/reject`, {
-        method: 'PATCH',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: '' }),
       })
       if (res.ok) {
         addLog(`Booking ${bookingId} rejected!`)

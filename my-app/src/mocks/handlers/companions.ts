@@ -144,6 +144,7 @@ export const companionHandlers = [
     }
 
     const newScenario = {
+      publicPlace: '',
       ...body,
       scenarioId: `sc-new-${Date.now()}`,
     }

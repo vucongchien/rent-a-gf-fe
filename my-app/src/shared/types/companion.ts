@@ -26,7 +26,7 @@ export interface CompanionScenario {
 export interface CompanionDetail {
   companionId: string
   displayName: string
-  biography: string
+  introText: string
   avatarUrl: string
   albumUrls: string[]
   voiceIntroUrl: string | null
@@ -42,7 +42,7 @@ export interface CompanionDetail {
 export interface CompanionProfileMe {
   companionId: string
   displayName: string
-  biography: string
+  introText: string
   avatarUrl: string
   albumUrls: string[]
   voiceIntroUrl: string | null
@@ -63,8 +63,12 @@ export interface CompanionReview {
   authorAvatarUrl?: string
 }
 
-/** Request body khi Client submit review cho 1 booking đã COMPLETED */
+/** Request body khi Client submit review cho 1 booking đã COMPLETED.
+ * SSOT: POST /interaction/reviews { bookingId, clientId, companionId, rating, comment }. */
 export interface CreateReviewBody {
+  bookingId: string
+  clientId: string
+  companionId: string
   rating: number
   comment: string
 }
@@ -73,12 +77,12 @@ export interface CreateReviewBody {
 export type CreateReviewResponse = CompanionReview
 
 
+/** Body khi tạo scenario mới (SSOT: title, description, price, durationMinutes). */
 export interface CreateScenarioBody {
   title: string
   description: string
   price: number
   durationMinutes: number
-  publicPlace: string
 }
 
 export type UpdateScenarioBody = Partial<CreateScenarioBody>

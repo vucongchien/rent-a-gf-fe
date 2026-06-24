@@ -34,7 +34,7 @@ export type ValidationResult<T> =
 
 export interface ProfileInput {
   displayName: string
-  biography: string
+  introText: string
   availableCities: string[]
 }
 
@@ -46,9 +46,9 @@ export function validateProfile(input: ProfileInput): ValidationResult<ProfileIn
     fieldErrors.displayName = `Tên hiển thị từ ${MIN_NAME_LEN}–${MAX_NAME_LEN} ký tự.`
   }
 
-  const bio = input.biography ?? ''
+  const bio = input.introText ?? ''
   if (bio.length > MAX_BIO_LEN) {
-    fieldErrors.biography = `Tiểu sử tối đa ${MAX_BIO_LEN} ký tự.`
+    fieldErrors.introText = `Tiểu sử tối đa ${MAX_BIO_LEN} ký tự.`
   }
 
   const cities = Array.isArray(input.availableCities) ? input.availableCities : []
@@ -59,7 +59,7 @@ export function validateProfile(input: ProfileInput): ValidationResult<ProfileIn
   }
 
   if (Object.keys(fieldErrors).length > 0) return { ok: false, fieldErrors }
-  return { ok: true, value: { displayName: name, biography: bio, availableCities: cities } }
+  return { ok: true, value: { displayName: name, introText: bio, availableCities: cities } }
 }
 
 export interface ScenarioInput {

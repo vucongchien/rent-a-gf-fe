@@ -29,7 +29,7 @@ export const MediaSection: React.FC<MediaSectionProps> = ({ initial }) => {
   const persist = (next: { avatarUrl?: string; album?: string[]; voiceUrl?: string | null }) => {
     const fd = new FormData();
     fd.set('displayName', initial.displayName);
-    fd.set('biography', initial.biography ?? '');
+    fd.set('introText', initial.introText ?? '');
     for (const c of initial.availableCities ?? []) fd.append('availableCities', c);
     fd.set('avatarUrl', next.avatarUrl ?? avatarUrl);
     for (const u of next.album ?? album) fd.append('albumUrls', u);

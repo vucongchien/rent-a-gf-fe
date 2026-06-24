@@ -11,14 +11,14 @@ describe('validateProfile', () => {
   it('accepts a valid profile', () => {
     const res = validateProfile({
       displayName: 'Chizuru',
-      biography: 'Hello',
+      introText: 'Hello',
       availableCities: ['TP.HCM'],
     })
     expect(res.ok).toBe(true)
   })
 
   it('rejects short displayName', () => {
-    const res = validateProfile({ displayName: 'A', biography: '', availableCities: ['TP.HCM'] })
+    const res = validateProfile({ displayName: 'A', introText: '', availableCities: ['TP.HCM'] })
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.fieldErrors.displayName).toBeTruthy()
   })
@@ -26,15 +26,15 @@ describe('validateProfile', () => {
   it('rejects bio too long', () => {
     const res = validateProfile({
       displayName: 'Chizuru',
-      biography: 'a'.repeat(MAX_BIO_LEN + 1),
+      introText: 'a'.repeat(MAX_BIO_LEN + 1),
       availableCities: ['TP.HCM'],
     })
     expect(res.ok).toBe(false)
-    if (!res.ok) expect(res.fieldErrors.biography).toBeTruthy()
+    if (!res.ok) expect(res.fieldErrors.introText).toBeTruthy()
   })
 
   it('requires at least 1 city', () => {
-    const res = validateProfile({ displayName: 'Chizuru', biography: '', availableCities: [] })
+    const res = validateProfile({ displayName: 'Chizuru', introText: '', availableCities: [] })
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.fieldErrors.availableCities).toBeTruthy()
   })
@@ -42,7 +42,7 @@ describe('validateProfile', () => {
   it('rejects invalid city code', () => {
     const res = validateProfile({
       displayName: 'Chizuru',
-      biography: '',
+      introText: '',
       availableCities: ['Mars'],
     })
     expect(res.ok).toBe(false)

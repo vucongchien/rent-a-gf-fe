@@ -47,7 +47,7 @@ export interface AdminAuditLogEntry {
 }
 
 export interface AdminCompanionDetail extends AdminCompanionRow {
-  biography: string;
+  introText: string;
   albumUrls: string[];
   voiceIntroUrl: string | null;
   scenarios: CompanionScenario[];
@@ -223,6 +223,37 @@ export interface AdminDisputeResolveResult {
   status: AdminDisputeStatus;
   outcome: AdminDisputeDetail['outcome'];
   auditEntry: AdminAuditLogEntry;
+}
+
+// ─── UPGRADE REQUESTS (Client → Companion) ────────────────────────────────
+
+export type AdminUpgradeRequestStatus =
+  | 'UPGRADE_STATUS_PENDING'
+  | 'UPGRADE_STATUS_APPROVED'
+  | 'UPGRADE_STATUS_REJECTED';
+
+export interface AdminUpgradeRequest {
+  id: string;
+  userId: string;
+  status: AdminUpgradeRequestStatus;
+  reason: string;
+  rejectReason: string;
+  reviewedBy: string;
+  reviewedAt: string | null;
+  createdAt: string;
+}
+
+export interface AdminUpgradeRequestListParams {
+  page?: number;
+  pageSize?: number;
+}
+
+export interface AdminUpgradeRequestListResponse extends PaginatedMeta {
+  data: AdminUpgradeRequest[];
+}
+
+export interface AdminUpgradeRequestActionResult {
+  message: string;
 }
 
 // ─── FEATURE FLAGS ─────────────────────────────────────────────────────────

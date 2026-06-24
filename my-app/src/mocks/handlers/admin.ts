@@ -115,7 +115,7 @@ export const adminHandlers = [
     const overlay = adminCompanionOverlay[companion.companionId];
     const detail: AdminCompanionDetail = {
       ...toRow(companion),
-      biography: companion.biography,
+      introText: companion.introText,
       albumUrls: companion.albumUrls,
       voiceIntroUrl: companion.voiceIntroUrl,
       scenarios: companion.scenarios,

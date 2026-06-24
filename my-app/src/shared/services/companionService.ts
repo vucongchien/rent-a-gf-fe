@@ -9,6 +9,7 @@ import type {
   Companion,
   CompanionDetail,
   CompanionProfileMe,
+  CompanionReview,
   CompanionsResponse,
   ServiceRequestOptions,
   CreateScenarioBody,
@@ -27,7 +28,7 @@ async function getMyProfileImpl(): Promise<CompanionProfileMe> {
     return {
       companionId: found.companionId,
       displayName: found.displayName,
-      biography: found.biography,
+      introText: found.introText,
       avatarUrl: found.avatarUrl,
       albumUrls: found.albumUrls,
       voiceIntroUrl: found.voiceIntroUrl,
@@ -76,7 +77,19 @@ export const companionService = {
     if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
     if (params?.city && params.city !== 'all') searchParams.set('city', params.city);
 
-    return serverFetch<CompanionsResponse>('/companions', { searchParams });
+    // SSOT trả `{ data, total, page, pageSize }` — map sang FE shape `{ companions, ... }`.
+    const raw = await serverFetch<{
+      data: Companion[];
+      total: number;
+      page: number;
+      pageSize: number;
+    }>('/companions', { searchParams });
+    return {
+      companions: raw.data ?? [],
+      total: raw.total ?? 0,
+      page: raw.page ?? 1,
+      pageSize: raw.pageSize ?? (params?.pageSize ?? 9),
+    };
   },
 
   /**
@@ -99,9 +112,15 @@ export const companionService = {
     const searchParams = new URLSearchParams();
     searchParams.set('pageSize', '1');
 
-    const raw = await serverFetch<CompanionsResponse>('/companions', { searchParams });
+    // SSOT: `/companions` trả `{ data, total, page, pageSize }`.
+    const raw = await serverFetch<{
+      data: Companion[];
+      total: number;
+      page: number;
+      pageSize: number;
+    }>('/companions', { searchParams });
     return {
-      featuredCompanion: raw.companions[0] || null,
+      featuredCompanion: raw.data?.[0] || null,
       totalCount: raw.total || 0,
     };
   },
@@ -120,7 +139,7 @@ export const companionService = {
       return {
         companionId: found.companionId,
         displayName: found.displayName,
-        biography: found.biography || 'Đây là bio mặc định cho mock.',
+        introText: found.introText || 'Đây là bio mặc định cho mock.',
         avatarUrl: found.avatarUrl,
         albumUrls: found.albumUrls || [],
         voiceIntroUrl: found.voiceIntroUrl,
@@ -135,11 +154,31 @@ export const companionService = {
     return serverFetch<CompanionDetail>(`/companions/${companionId}`);
   },
 
-  /** Companion Management API */
-  async applyCompanion(options?: ServiceRequestOptions) {
+  /**
+   * Lấy danh sách review của một Companion (public).
+   * SSOT: GET /interaction/reviews/companion/{companionId} → array `CompanionReview[]`.
+   */
+  async getCompanionReviews(companionId: string): Promise<CompanionReview[]> {
+    'use cache';
+    cacheLife('minutes');
+    cacheTag(CACHE_TAGS.companion(companionId));
+
+    if (isMockMode()) {
+      const found = mockCompanions.find(c => c.companionId === companionId);
+      return found?.recentReviews ?? [];
+    }
+
+    const raw = await serverFetch<CompanionReview[]>(
+      `/interaction/reviews/companion/${companionId}`,
+    );
+    return Array.isArray(raw) ? raw : [];
+  },
+
+  /** Companion Management API — POST /upgrade-requests { reason } (SSOT). */
+  async applyCompanion(body: { reason: string }, options?: ServiceRequestOptions) {
     if (isMockMode()) return { status: 'PENDING' };
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch('/upgrade-requests', { method: 'POST', req });
+    return serverFetch('/upgrade-requests', { method: 'POST', body, req });
   },
 
   /**
@@ -163,7 +202,13 @@ export const companionService = {
   async createMyScenario(body: CreateScenarioBody, options?: ServiceRequestOptions) {
     if (isMockMode()) return { scenarioId: `sc-new-${Date.now()}`, ...body };
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch('/profile/me/scenarios', { method: 'POST', body, req });
+    // SSOT chỉ nhận { title, description, price, durationMinutes }.
+    const { title, description, price, durationMinutes } = body;
+    return serverFetch('/profile/me/scenarios', {
+      method: 'POST',
+      body: { title, description, price, durationMinutes },
+      req,
+    });
   },
 
   async updateMyScenario(scenarioId: string, body: UpdateScenarioBody, options?: ServiceRequestOptions) {

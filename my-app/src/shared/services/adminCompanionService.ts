@@ -108,7 +108,7 @@ export const adminCompanionService = {
       const overlay = adminCompanionOverlay[companion.companionId];
       return {
         ...toRow(companion),
-        biography: companion.biography,
+        introText: companion.introText,
         albumUrls: companion.albumUrls,
         voiceIntroUrl: companion.voiceIntroUrl,
         scenarios: companion.scenarios,
