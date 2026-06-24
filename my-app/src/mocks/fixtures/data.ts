@@ -548,8 +548,9 @@ const rawBookings = [
     companionName: 'Nguyễn Thị Linh',
     companionAvatarUrl: 'https://i.pravatar.cc/100?u=comp-1',
     scenarioTitle: 'Cà phê & trò chuyện',
-    startTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-    endTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(),
+    // endTime đã qua (3h trước) nhưng chưa COMPLETED → để Client trigger "Đánh dấu hoàn thành".
+    startTime: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+    endTime: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
     status: 'ACCEPTED' as const,
     price: 150,
     chatRoomId: 'room-bk-1',
