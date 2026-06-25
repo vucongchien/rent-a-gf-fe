@@ -25,11 +25,10 @@ describe('adminUserService', () => {
     } as never)
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({
-        rows: [],
+        data: [],
         total: 0,
         page: 1,
         pageSize: 12,
-        counts: { ACTIVE: 0, LOCKED: 0 },
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },

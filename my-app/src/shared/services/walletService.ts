@@ -61,7 +61,56 @@ export const walletService = {
    * OpenAPI hiện chưa expose `/finance/transactions`; trả rỗng để UI không
    * gọi endpoint ngoài contract và không làm vỡ trang ví/earnings.
    */
-  async getTransactions(_options?: ServiceRequestOptions): Promise<WalletTransaction[]> {
-    return [];
+  async getTransactions(options?: ServiceRequestOptions): Promise<WalletTransaction[]> {
+    const req = await getRequestCookieHeader(options?.req);
+    const userId = await resolveFinanceUserId(req);
+
+    interface ApiTransactionItem {
+      transactionId: string;
+      userId: string;
+      amount: number;
+      type: 'TOPUP' | 'BOOKING_RESERVATION' | 'ESCROW_RELEASE' | 'PENALTY_DEDUCTION' | 'REFUND';
+      status: 'PENDING' | 'SUCCESS' | 'FAILED';
+      referenceId: string;
+      createdAt: string;
+    }
+
+    interface ApiTransactionsResponse {
+      transactions: ApiTransactionItem[];
+      page: number;
+      pageSize: number;
+      total: number;
+    }
+
+    try {
+      const res = await serverFetch<ApiTransactionsResponse>('/finance/transactions', {
+        req,
+        extraHeaders: { 'user-id': userId },
+      });
+
+      const typeLabels: Record<string, string> = {
+        TOPUP: 'Nạp tiền vào ví',
+        BOOKING_RESERVATION: 'Tạm khóa thanh toán (Đặt cọc)',
+        ESCROW_RELEASE: 'Nhận thanh toán (Giải ngân)',
+        PENALTY_DEDUCTION: 'Khấu trừ do vi phạm',
+        REFUND: 'Hoàn tiền',
+      };
+
+      return (res.transactions || []).map((tx): WalletTransaction => {
+        const isCredit = ['TOPUP', 'ESCROW_RELEASE', 'REFUND'].includes(tx.type);
+        return {
+          transactionId: tx.transactionId,
+          walletId: tx.userId,
+          amount: tx.amount,
+          type: isCredit ? 'CREDIT' : 'DEBIT',
+          status: tx.status,
+          createdAt: tx.createdAt,
+          description: typeLabels[tx.type] || `Giao dịch ${tx.type}`,
+        };
+      });
+    } catch (err) {
+      console.error('[walletService.getTransactions] Lỗi gọi API giao dịch:', err);
+      return [];
+    }
   }
 };

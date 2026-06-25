@@ -12,6 +12,7 @@ import type {
   AdminUserDetail,
   AdminUserListParams,
   AdminUserListResponse,
+  AdminUserRow,
   AdminUserStatus,
   ServiceRequestOptions,
 } from '@/shared/types';
@@ -56,10 +57,61 @@ export const adminUserService = {
     if (params.q) sp.set('q', params.q);
     if (params.page) sp.set('page', String(params.page));
     if (params.pageSize) sp.set('pageSize', String(params.pageSize));
-    return serverFetch<AdminUserListResponse>('/admin/accounts', {
-      searchParams: sp,
-      req,
-    });
+
+    interface ApiAccountsListResponse {
+      data?: ApiAccountResponse[];
+      total?: number;
+      page?: number;
+      pageSize?: number;
+    }
+
+    try {
+      const raw = await serverFetch<ApiAccountsListResponse>('/admin/accounts', {
+        searchParams: sp,
+        req,
+      });
+
+      const rawData = raw.data || [];
+      const rows: AdminUserRow[] = rawData.map((item): AdminUserRow => {
+        const email = item.email ?? '';
+        const userId = item.id;
+        return {
+          userId,
+          email,
+          displayName: email || userId,
+          avatarUrl: `https://i.pravatar.cc/160?u=${encodeURIComponent(email || userId)}`,
+          role: normalizeRole(item.role),
+          status: normalizeStatus(item.status),
+          walletBalance: 0, // Backend API admin/accounts chưa hỗ trợ trả về số dư
+          totalBookings: 0, // Backend API chưa hỗ trợ số lượng booking
+          violationCount: item.violationCount ?? 0,
+          createdAt: item.createdAt ?? '',
+        };
+      });
+
+      // Tự tính toán counts của danh sách trả về để tránh crash
+      const counts = {
+        ACTIVE: rows.filter((r) => r.status === 'ACTIVE').length,
+        LOCKED: rows.filter((r) => r.status === 'LOCKED').length,
+      };
+
+      return {
+        rows,
+        page: raw.page ?? params.page ?? 1,
+        pageSize: raw.pageSize ?? params.pageSize ?? 12,
+        total: raw.total ?? rows.length,
+        counts,
+      };
+    } catch (err) {
+      console.error('[adminUserService.list] Lỗi gọi API accounts:', err);
+      return {
+        rows: [],
+        page: params.page ?? 1,
+        pageSize: params.pageSize ?? 12,
+        total: 0,
+        counts: { ACTIVE: 0, LOCKED: 0 },
+      };
+    }
   },
 
   async getById(userId: string, options?: ServiceRequestOptions): Promise<AdminUserDetail | null> {

@@ -30,8 +30,12 @@ export async function createProxyNotificationStream(
     }
 
     return backendRes.body;
-  } catch (err) {
-    console.error('[SSE Proxy Error] Lỗi kết nối:', err);
+  } catch (err: any) {
+    if (err.name === 'AbortError' || err.message?.includes('aborted') || reqSignal.aborted) {
+      console.log('[SSE Proxy] Kết nối bị ngắt do Client abort (reload hoặc chuyển trang)');
+    } else {
+      console.error('[SSE Proxy Error] Lỗi kết nối:', err);
+    }
     return null;
   }
 }

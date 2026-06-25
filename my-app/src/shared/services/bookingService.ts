@@ -1,6 +1,5 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
-import { authService } from '@/shared/services/authService';
 import { companionService } from '@/shared/services/companionService';
 import type {
   AcceptBookingResponse,
@@ -46,17 +45,10 @@ export const bookingService = {
       };
     }
 
-    // Lấy thông tin user hiện tại để xác định vai trò (client/companion)
-    let isCompanion = false;
-    try {
-      const me = await authService.getMe(options);
-      isCompanion = me?.role === 'COMPANION';
-    } catch (err) {
-      console.warn('[bookingService.getBookings] Lỗi lấy thông tin user hiện tại:', err);
-    }
-
-    // Lấy tất cả unique companionId từ list bookings
-    const companionIds = Array.from(
+    // Thu thập toàn bộ unique companionId từ tất cả bookings.
+    // Luôn dùng companionId để fetch tên — API /companions/{id} hoạt động ổn định.
+    // API /profiles/{clientId} bị backend trả 404 cho client thông thường nên không dùng.
+    const allCompanionIds = Array.from(
       new Set(
         raw.bookings
           .map((b: any) => b.companionId)
@@ -64,39 +56,34 @@ export const bookingService = {
       )
     ) as string[];
 
-    // Fetch thông tin chi tiết companion song song
+    // Fetch companion details song song (getCompanionDetail có cache 'minutes' → safe)
     const companionDetailsArray = await Promise.all(
-      companionIds.map((id) =>
-        companionService.getCompanionDetail(id).catch((err) => {
-          console.error(`[bookingService.getBookings] Lỗi fetch companion ${id}:`, err);
+      allCompanionIds.map((id) =>
+        companionService.getCompanionDetail(id).catch(() => {
+          console.warn(`[bookingService.getBookings] Không fetch được companion ${id}`);
           return null;
         })
       )
     );
 
     const companionMap = new Map(
-      companionIds.map((id, index) => [id, companionDetailsArray[index]])
+      allCompanionIds.map((id, index) => [id, companionDetailsArray[index]])
     );
 
     // Chuẩn hóa và mapping dữ liệu
     const normalizedBookings = raw.bookings.map((b: any): BookingListItem => {
       const cleanStatus = normalizeBookingStatus(b.status);
       const companion = companionMap.get(b.companionId);
-      
-      // Tìm scenario khớp với price và durationMinutes của booking
       const price = Number(b.price || 0);
       const durationMin = Number(b.durationMinutes || 0);
+
+      // Tìm scenario từ companion profile để lấy title
       const scenario = companion?.scenarios?.find(
         (s) => Number(s.price) === price && Number(s.durationMinutes) === durationMin
       );
-      
-      const partnerName = isCompanion
-        ? 'Khách hàng'
-        : (companion?.displayName || 'Bạn đồng hành');
-      
-      const partnerAvatar = isCompanion
-        ? ''
-        : (companion?.avatarUrl || '');
+
+      const partnerName = companion?.displayName || `Bạn đồng hành #${b.companionId?.slice(0, 6) ?? '?'}`;
+      const partnerAvatar = companion?.avatarUrl || '';
 
       return {
         bookingId: b.bookingId || '',
@@ -122,6 +109,7 @@ export const bookingService = {
     const req = await getRequestCookieHeader(options?.req);
     const raw = await serverFetch<any>(`/bookings/${bookingId}`, { req });
     if (!raw) return null;
+
 
     const priceNum = Number(raw.price || (raw.scenarioSnapshot?.price) || 0);
     const durationMinNum = Number(raw.durationMinutes || (raw.scenarioSnapshot?.durationMinutes) || 0);

@@ -96,9 +96,82 @@ describe('walletService finance contract', () => {
     )
   })
 
-  it('getTransactions không gọi endpoint ngoài OpenAPI', async () => {
-    const transactions = await walletService.getTransactions()
-    expect(transactions).toEqual([])
-    expect(globalThis.fetch).not.toHaveBeenCalled()
-  })
+  it('getTransactions gửi user-id header và map đúng Credit/Debit', async () => {
+    vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          transactions: [
+            {
+              transactionId: 'tx-1',
+              userId: 'user-123',
+              amount: 100,
+              type: 'TOPUP',
+              status: 'SUCCESS',
+              referenceId: 'ref-1',
+              createdAt: '2026-06-25T13:00:00Z',
+            },
+            {
+              transactionId: 'tx-2',
+              userId: 'user-123',
+              amount: 200,
+              type: 'BOOKING_RESERVATION',
+              status: 'PENDING',
+              referenceId: 'ref-2',
+              createdAt: '2026-06-25T14:00:00Z',
+            },
+          ],
+          page: 1,
+          pageSize: 10,
+          total: 2,
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    );
+
+    const txs = await walletService.getTransactions({
+      req: {
+        headers: {
+          get: (name: string) => {
+            const key = name.toLowerCase();
+            if (key === 'cookie') return 'access_token=jwt-token';
+            if (key === 'user-id') return 'user-123';
+            return null;
+          },
+        },
+      },
+    });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      'https://api.example.test/api/v1/finance/transactions',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'user-id': 'user-123',
+          Authorization: 'Bearer jwt-token',
+        }),
+      }),
+    );
+
+    expect(txs).toHaveLength(2);
+    expect(txs[0]).toEqual({
+      transactionId: 'tx-1',
+      walletId: 'user-123',
+      amount: 100,
+      type: 'CREDIT',
+      status: 'SUCCESS',
+      createdAt: '2026-06-25T13:00:00Z',
+      description: 'Nạp tiền vào ví',
+    });
+    expect(txs[1]).toEqual({
+      transactionId: 'tx-2',
+      walletId: 'user-123',
+      amount: 200,
+      type: 'DEBIT',
+      status: 'PENDING',
+      createdAt: '2026-06-25T14:00:00Z',
+      description: 'Tạm khóa thanh toán (Đặt cọc)',
+    });
+  });
 })
