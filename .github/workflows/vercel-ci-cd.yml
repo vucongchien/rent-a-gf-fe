@@ -6,10 +6,6 @@ on:
       - main
   pull_request:
 
-defaults:
-  run:
-    working-directory: my-app
-
 jobs:
   verify:
     name: Verify Build
@@ -29,10 +25,10 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-          cache-dependency-path: my-app/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Run Build Check
-        run: pnpm build
+        run: pnpm --dir my-app build
