@@ -1,11 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isMockMode } from '@/shared/lib/env'
-
-function generateMockJwt(userId: string, role: string): string {
-  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-  const payload = btoa(JSON.stringify({ userId, sub: userId, role }))
-  return `${header}.${payload}.mock_signature`
-}
 
 /**
  * GET /api/auth/google — Init endpoint cho popup OAuth flow.
@@ -13,18 +6,8 @@ function generateMockJwt(userId: string, role: string): string {
  * SSOT §2.1: BE `GET /auth/google/init` trả JSON `{ authUrl }`. BFF gọi
  * server-to-server lấy authUrl rồi 302 popup sang IdP. FE không sinh
  * state / PKCE / lưu gì.
- *
- * Mock mode: nhảy thẳng sang /api/auth/callback giả lập IdP đã trả code+state.
  */
-export async function GET(req: NextRequest) {
-  if (isMockMode()) {
-    const mockToken = generateMockJwt('usr-client', 'CLIENT')
-    const callbackUrl = new URL('/api/auth/callback', req.url)
-    callbackUrl.searchParams.set('code', `mock_code_${mockToken}`)
-    callbackUrl.searchParams.set('state', 'mock_state')
-    return NextResponse.redirect(callbackUrl)
-  }
-
+export async function GET(_req: NextRequest) {
   const apiUrl = process.env.API_URL
   if (!apiUrl) {
     return NextResponse.json(
@@ -33,7 +16,7 @@ export async function GET(req: NextRequest) {
     )
   }
 
-  const backendInitUrl = `${apiUrl.replace(/\/$/, '')}/api/v1/auth/google/init`
+  const backendInitUrl = `${apiUrl.replace(/\/$/, '')}/auth/google/init`
   try {
     const beRes = await fetch(backendInitUrl, {
       method: 'GET',

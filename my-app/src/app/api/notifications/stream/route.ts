@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server';
-import { createMockNotificationStream } from './createMockNotificationStream';
 import { createProxyNotificationStream } from './createProxyNotificationStream';
 
 const SSE_HEADERS = {
@@ -10,18 +9,14 @@ const SSE_HEADERS = {
 
 /**
  * GET /api/notifications/stream
- * Điểm kết nối SSE chính của Client.
+ * Điểm kết nối SSE chính của Client. Proxy thẳng sang BE.
  */
 export async function GET(req: NextRequest) {
   const apiUrl = process.env.API_URL;
-  const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !apiUrl;
-
-  if (isMock) {
-    const stream = createMockNotificationStream(req.signal);
-    return new Response(stream, { headers: SSE_HEADERS });
+  if (!apiUrl) {
+    return new Response('API_URL chưa được cấu hình', { status: 500 });
   }
 
-  // Real Mode: Proxy kết nối SSE sang Backend Gateway
   const stream = await createProxyNotificationStream(apiUrl, req.signal);
 
   if (!stream) {

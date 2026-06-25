@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#f5f2ef;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#3a3338;-webkit-font-smoothing:antialiased}
+::selection{background:#e8b9c8;color:#221d27}
+@keyframes sway{0%{transform:translateX(-2.6%) rotate(-1.9deg)}50%{transform:translateX(2.6%) rotate(1.9deg)}100%{transform:translateX(-2.6%) rotate(-1.9deg)}}
+@keyframes floaty{0%{transform:translateY(0) scale(1);opacity:.45}50%{transform:translateY(-26px) scale(1.18);opacity:.85}100%{transform:translateY(0) scale(1);opacity:.45}}
+@keyframes scrollcue{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(9px);opacity:.25}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="position:relative;width:100%;overflow-x:clip;background:#f5f2ef">
+
+  <!-- ===== NAV ===== -->
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px clamp(18px,4vw,52px);background:rgba(245,242,239,.72);backdrop-filter:blur(12px);border-bottom:1px solid #e4ddd7">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:30px;height:30px;border:1.5px solid #3a3338;border-radius:50% 50% 50% 4px;display:flex;align-items:center;justify-content:center;font-size:13px">♥</div>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;letter-spacing:.3px">Rent-a-Girlfriend</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:clamp(12px,2vw,26px);flex-wrap:wrap;justify-content:flex-end">
+      <a href="#how" style="font-size:14px;color:#6d6369;text-decoration:none">Cách hoạt động</a>
+      <a href="#profiles" style="font-size:14px;color:#6d6369;text-decoration:none">Hồ sơ</a>
+      <a href="#reviews" style="font-size:14px;color:#6d6369;text-decoration:none">Đánh giá</a>
+      <a href="#safety" style="font-size:14px;color:#6d6369;text-decoration:none">An toàn</a>
+      <a href="#faq" style="font-size:14px;color:#6d6369;text-decoration:none">FAQ</a>
+      <button style="font-family:inherit;font-size:13px;font-weight:600;padding:9px 18px;border:1.5px solid #3a3338;border-radius:999px;background:#3a3338;color:#f5f2ef;cursor:pointer">Đăng ký</button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section id="hero" style="position:relative;width:100%;height:100vh;background:#f5f2ef">
+    <div id="heroStage" style="position:sticky;top:0;height:100vh;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden">
+
+      <!-- the "video" screen -->
+      <div id="heroScreen" style="position:relative;width:min(1080px,92vw);height:min(78vh,700px);background:radial-gradient(120% 120% at 50% 20%, #2c2533 0%, #1c1822 100%);border-radius:16px;overflow:hidden;box-shadow:0 36px 90px rgba(40,28,46,.28);display:flex;align-items:center;justify-content:center;will-change:transform">
+
+        <!-- ambient particles -->
+        <div style="position:absolute;left:18%;top:30%;width:10px;height:10px;border-radius:50%;background:#e8b9c8;opacity:.6;animation:floaty 6s ease-in-out infinite"></div>
+        <div style="position:absolute;left:74%;top:24%;width:7px;height:7px;border-radius:50%;background:#c9bfe0;opacity:.6;animation:floaty 7.5s ease-in-out .8s infinite"></div>
+        <div style="position:absolute;left:62%;top:62%;width:12px;height:12px;border-radius:50%;background:#e8b9c8;opacity:.5;animation:floaty 8s ease-in-out 1.4s infinite"></div>
+        <div style="position:absolute;left:30%;top:68%;width:6px;height:6px;border-radius:50%;background:#c9bfe0;opacity:.6;animation:floaty 6.8s ease-in-out .4s infinite"></div>
+
+        <!-- figure placeholder (Furina dancing) -->
+        <div id="heroFigure" style="position:relative;width:min(210px,38%);aspect-ratio:3/4;border:1.5px dashed rgba(245,242,239,.45);border-radius:110px 110px 18px 18px;background:repeating-linear-gradient(135deg,rgba(245,242,239,.05) 0 9px,rgba(245,242,239,.11) 9px 18px);display:flex;align-items:flex-end;justify-content:center;color:rgba(245,242,239,.6);font-family:'Space Mono',monospace;font-size:11px;padding-bottom:16px;will-change:transform">NHÂN VẬT</div>
+
+        <!-- faux video chrome -->
+        <div style="position:absolute;top:16px;left:18px;z-index:3;font-family:'Space Mono',monospace;font-size:11px;color:rgba(245,242,239,.55)">00:00 / 00:06</div>
+        <div style="position:absolute;top:16px;right:18px;z-index:3;display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11px;color:rgba(245,242,239,.55)"><span style="width:8px;height:8px;border-radius:50%;background:#e8b9c8;animation:blink 1.4s infinite"></span>REC</div>
+        <div style="position:absolute;bottom:46px;left:50%;transform:translateX(-50%);z-index:3;width:62%;height:3px;border-radius:3px;background:rgba(245,242,239,.18)"><div id="heroProgress" style="height:100%;background:#e8b9c8;border-radius:3px"></div></div>
+        <div style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:3;font-family:'Space Mono',monospace;font-size:10.5px;color:rgba(245,242,239,.45);text-align:center;width:92%;line-height:1.5">▣ VIDEO PLACEHOLDER — Furina nhảy múa → tiến lại gần camera → tương tác bất ngờ → chuyển cảnh → chữ hiện</div>
+
+        <!-- letterbox bars (variant C) -->
+        <div class="letterbar" style="position:absolute;top:0;left:0;width:100%;background:#14101a;z-index:6"></div>
+        <div class="letterbar" style="position:absolute;bottom:0;left:0;width:100%;background:#14101a;z-index:6"></div>
+
+        <!-- transition flash -->
+        <div id="heroFlash" style="position:absolute;inset:0;background:#fff;z-index:8;pointer-events:none"></div>
+      </div>
+
+      <!-- headline reveal (overlaid on screen) -->
+      <div id="heroHeadline" style="position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;pointer-events:none">
+        <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:#e8b9c8;margin-bottom:18px">DỊCH VỤ NGƯỜI ĐỒNG HÀNH</div>
+        <h1 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(44px,9vw,118px);line-height:.98;color:#f5f2ef;margin:0;text-shadow:0 4px 40px rgba(0,0,0,.35)">Rent-a-Girlfriend</h1>
+        <p style="max-width:560px;margin:22px auto 0;font-size:clamp(15px,1.6vw,18px);line-height:1.6;color:rgba(245,242,239,.82)">Người đồng hành dịu dàng cho từng khoảnh khắc — trò chuyện, dạo phố, hay đơn giản là có ai đó bên cạnh.</p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:34px;pointer-events:auto">
+          <button style="font-family:inherit;font-size:15px;font-weight:600;padding:14px 30px;border:none;border-radius:999px;background:#f5f2ef;color:#221d27;cursor:pointer">Tìm người đồng hành</button>
+          <button style="font-family:inherit;font-size:15px;font-weight:500;padding:14px 28px;border:1.5px solid rgba(245,242,239,.55);border-radius:999px;background:transparent;color:#f5f2ef;cursor:pointer">Xem cách hoạt động</button>
+        </div>
+        <div style="margin-top:46px;display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(245,242,239,.7);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px">CUỘN ĐỂ KHÁM PHÁ<span style="font-size:18px;animation:scrollcue 1.8s ease-in-out infinite">↓</span></div>
+      </div>
+
+      <!-- annotation -->
+      <div data-anno style="position:absolute;left:clamp(16px,4vw,46px);bottom:96px;z-index:5;font-family:'Space Mono',monospace;font-size:11px;color:#b08597;max-width:200px;line-height:1.5;border-left:2px solid #e8b9c8;padding-left:10px">// hero kể chuyện bằng video, chữ chỉ hiện ở cao trào</div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section id="how" style="position:relative;padding:clamp(80px,12vh,140px) clamp(18px,5vw,90px);max-width:1280px;margin:0 auto">
+    <div data-reveal style="max-width:720px">
+      <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:#b08597">QUY TRÌNH 4 BƯỚC</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(34px,5.5vw,64px);line-height:1.02;margin:14px 0 0">Cách hoạt động</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:26px;margin-top:54px">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+        <div data-reveal style="border:1.5px solid #ddd6d1;border-radius:14px;padding:26px;background:#fbf9f7">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;color:#b08597">{{ s.n }}</div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;margin:10px 0 12px">{{ s.t }}</h3>
+          <p style="font-size:14.5px;line-height:1.6;color:#6d6369;margin:0">{{ s.d }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== PROFILES ===== -->
+  <section id="profiles" style="position:relative;padding:clamp(60px,9vh,110px) clamp(18px,5vw,90px);background:#efe9e4">
+    <div style="max-width:1280px;margin:0 auto">
+      <div data-reveal style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:#b08597">GẶP GỠ</div>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(34px,5.5vw,64px);line-height:1.02;margin:14px 0 0">Hồ sơ người đồng hành</h2>
+        </div>
+        <span data-anno style="font-family:'Space Mono',monospace;font-size:11px;color:#b08597">// thẻ hover → nhấc nhẹ + viền hồng</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px;margin-top:48px">
+        <sc-for list="{{ profiles }}" as="p" hint-placeholder-count="6">
+          <div data-reveal style="transition:box-shadow .3s ease,border-color .3s ease;border:1.5px solid #ddd6d1;border-radius:16px;overflow:hidden;background:#fbf9f7;cursor:pointer" style-hover="transform:translateY(-6px);box-shadow:0 18px 40px rgba(60,40,55,.14);border-color:#e8b9c8">
+            <div style="aspect-ratio:3/4;background:repeating-linear-gradient(135deg,#e7dfd9 0 9px,#efe9e4 9px 18px);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;color:#a99a8f;border-bottom:1.5px solid #ddd6d1">ẢNH HỒ SƠ</div>
+            <div style="padding:16px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline">
+                <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:21px;margin:0">{{ p.name }}</h3>
+                <span style="font-size:12px;color:#9a8f86">{{ p.loc }}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+                <sc-for list="{{ p.tags }}" as="tag" hint-placeholder-count="2">
+                  <span style="font-size:11.5px;color:#8a7f86;border:1px solid #ddd6d1;border-radius:999px;padding:4px 10px">{{ tag }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS ===== -->
+  <section id="reviews" style="position:relative;padding:clamp(80px,12vh,140px) clamp(18px,5vw,90px);max-width:1280px;margin:0 auto">
+    <div data-reveal style="text-align:center;max-width:620px;margin:0 auto">
+      <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:#b08597">TRẢI NGHIỆM THẬT</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(34px,5.5vw,64px);line-height:1.02;margin:14px 0 0">Người dùng nói gì</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:54px">
+      <sc-for list="{{ testimonials }}" as="t" hint-placeholder-count="3">
+        <div data-reveal style="border:1.5px solid #ddd6d1;border-radius:16px;padding:28px;background:#fbf9f7">
+          <div style="font-size:34px;font-family:'Cormorant Garamond',serif;color:#e8b9c8;line-height:.6">“</div>
+          <p style="font-size:15.5px;line-height:1.7;color:#4a4047;margin:14px 0 22px">{{ t.quote }}</p>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;border-radius:50%;background:repeating-linear-gradient(135deg,#e7dfd9 0 6px,#efe9e4 6px 12px);border:1px solid #ddd6d1"></div>
+            <div>
+              <div style="font-weight:600;font-size:14px">{{ t.name }}</div>
+              <div style="font-size:12px;color:#9a8f86">{{ t.role }}</div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== SAFETY ===== -->
+  <section id="safety" style="position:relative;padding:clamp(70px,10vh,130px) clamp(18px,5vw,90px);background:#221d27;color:#f5f2ef">
+    <div style="max-width:1100px;margin:0 auto;text-align:center">
+      <div data-reveal style="opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease">
+        <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:#e8b9c8">BẢO MẬT & TIN CẬY</div>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(34px,5.5vw,64px);line-height:1.02;margin:14px 0 0">An toàn là trên hết</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;margin-top:56px;text-align:left">
+        <sc-for list="{{ safety }}" as="f" hint-placeholder-count="3">
+          <div data-reveal style="opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease">
+            <div style="width:46px;height:46px;border:1.5px dashed rgba(245,242,239,.4);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;color:rgba(245,242,239,.55)">ICON</div>
+            <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:23px;margin:18px 0 10px">{{ f.t }}</h3>
+            <p style="font-size:14.5px;line-height:1.65;color:rgba(245,242,239,.7);margin:0">{{ f.d }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq" style="position:relative;padding:clamp(80px,12vh,140px) clamp(18px,5vw,90px);max-width:860px;margin:0 auto">
+    <div data-reveal style="text-align:center">
+      <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:#b08597">GIẢI ĐÁP</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(34px,5.5vw,64px);line-height:1.02;margin:14px 0 0">Câu hỏi thường gặp</h2>
+    </div>
+    <div data-reveal style="margin-top:46px">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="5">
+        <div data-faq data-open="0" style="border-bottom:1.5px solid #ddd6d1">
+          <div onClick="{{ toggleFaq }}" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 4px;cursor:pointer">
+            <span style="font-size:17px;font-weight:500;color:#3a3338">{{ f.q }}</span>
+            <span data-chev style="font-size:20px;color:#b08597;flex-shrink:0">+</span>
+          </div>
+          <div data-ans style="max-height:0;overflow:hidden">
+            <p style="font-size:14.5px;line-height:1.7;color:#6d6369;margin:0 4px 22px">{{ f.a }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== FINAL CTA ===== -->
+  <section style="position:relative;padding:clamp(80px,12vh,150px) clamp(18px,5vw,90px);text-align:center;background:#efe9e4">
+    <div data-reveal style="max-width:680px;margin:0 auto">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(36px,6vw,76px);line-height:1.02;margin:0">Sẵn sàng tìm người đồng hành của bạn?</h2>
+      <button style="font-family:inherit;font-size:16px;font-weight:600;padding:16px 40px;border:none;border-radius:999px;background:#3a3338;color:#f5f2ef;cursor:pointer;margin-top:34px">Bắt đầu ngay</button>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer style="position:relative;padding:clamp(50px,7vh,80px) clamp(18px,5vw,90px) 40px;background:#221d27;color:rgba(245,242,239,.7)">
+    <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:36px">
+      <div style="max-width:260px">
+        <div style="display:flex;align-items:center;gap:10px;color:#f5f2ef">
+          <div style="width:28px;height:28px;border:1.5px solid #f5f2ef;border-radius:50% 50% 50% 4px;display:flex;align-items:center;justify-content:center;font-size:12px">♥</div>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600">Rent-a-Girlfriend</span>
+        </div>
+        <p style="font-size:13.5px;line-height:1.6;margin:16px 0 0">Người đồng hành dịu dàng, an toàn và minh bạch cho mọi khoảnh khắc.</p>
+      </div>
+      <sc-for list="{{ footcols }}" as="c" hint-placeholder-count="3">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;color:#e8b9c8;margin-bottom:16px">{{ c.h }}</div>
+          <sc-for list="{{ c.items }}" as="it" hint-placeholder-count="4">
+            <div style="font-size:14px;margin-bottom:12px">{{ it }}</div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    <div style="max-width:1280px;margin:48px auto 0;padding-top:24px;border-top:1px solid rgba(245,242,239,.15);font-family:'Space Mono',monospace;font-size:11px;color:rgba(245,242,239,.4)">© 2026 Rent-a-Girlfriend · Wireframe placeholder</div>
+  </footer>
+
+  <!-- ===== HERO VARIANT SWITCHER ===== -->
+  <div style="position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:rgba(251,249,247,.94);backdrop-filter:blur(12px);border:1.5px solid #ddd6d1;border-radius:999px;padding:8px 10px 8px 16px;box-shadow:0 14px 40px rgba(40,28,46,.16);font-family:'Space Mono',monospace;flex-wrap:wrap;justify-content:center;max-width:94vw">
+    <span style="font-size:11px;letter-spacing:1.5px;color:#b08597">HERO</span>
+    <div style="display:flex;gap:4px">
+      <button data-vbtn="A" onClick="{{ setA }}" style="font-family:inherit;font-size:13px;font-weight:700;width:34px;height:34px;border:1.5px solid #3a3338;border-radius:50%;background:transparent;color:#3a3338;cursor:pointer">A</button>
+      <button data-vbtn="B" onClick="{{ setB }}" style="font-family:inherit;font-size:13px;font-weight:700;width:34px;height:34px;border:1.5px solid #3a3338;border-radius:50%;background:transparent;color:#3a3338;cursor:pointer">B</button>
+      <button data-vbtn="C" onClick="{{ setC }}" style="font-family:inherit;font-size:13px;font-weight:700;width:34px;height:34px;border:1.5px solid #3a3338;border-radius:50%;background:transparent;color:#3a3338;cursor:pointer">C</button>
+    </div>
+    <span id="variantDesc" style="font-size:11px;color:#6d6369;max-width:240px">—</span>
+    <button onClick="{{ replay }}" title="Phát lại" style="font-family:inherit;font-size:15px;width:34px;height:34px;border:1.5px solid #ddd6d1;border-radius:50%;background:transparent;color:#3a3338;cursor:pointer">↺</button>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroVariant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A&quot;,&quot;B&quot;,&quot;C&quot;],&quot;default&quot;:&quot;A&quot;,&quot;tsType&quot;:&quot;'A'|'B'|'C'&quot;},&quot;showAnnotations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  state = { variant: 'A' };
+  timers = [];
+
+  componentDidMount() {
+    this.variant = (this.props.heroVariant) || 'A';
+    this.revealed = new Set();
+    const root = this.rootRef.current;
+    this.revealEls = [...root.querySelectorAll('[data-reveal]')];
+    this.tweens = [];
+    this.hideReveal(this.revealEls);
+    this._seen = new Set(this.revealEls);
+    this.startLoop();
+    this._onScroll = () => { this.checkReveal(); if (this.scrub) this.scrub(); };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    this.checkReveal();
+    this.applyAnnotations();
+    if (this.variant !== this.state.variant) this.setState({ variant: this.variant });
+    else this.startHero();
+  }
+
+  componentDidUpdate(prev) {
+    if (prev.variant !== this.state.variant) {
+      this.variant = this.state.variant;
+      this.startHero();
+    }
+    if (this.revealed) this.revealed.forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
+    if (!this.revealed) this.revealed = new Set();
+    this.startLoop();
+    this.applyAnnotations();
+    this.markActive();
+  }
+
+  componentWillUnmount() {
+    this.clearTimers();
+    if (this._interval) clearInterval(this._interval);
+    if (this._onScroll) window.removeEventListener('scroll', this._onScroll);
+    this._loopOn = false;
+  }
+
+  checkReveal() {
+    const root = this.rootRef.current; if (!root) return;
+    const trigger = window.innerHeight * 0.92;
+    root.querySelectorAll('[data-reveal]').forEach(el => {
+      if (this.revealed.has(el)) return;
+      if (el.getBoundingClientRect().top < trigger) {
+        this.revealed.add(el);
+        el.style.transition = 'none';
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      }
+    });
+  }
+
+  hideReveal(els) {
+    els.forEach((el, i) => {
+      if (this.revealed && this.revealed.has(el)) return;
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(28px)';
+      el.style.transition = 'none';
+    });
+  }
+
+  easeInOut(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+
+  addTween(getEl, dur, delay, apply) {
+    (this.tweens || (this.tweens = [])).push({ getEl, dur, delay: delay || 0, t0: performance.now(), apply, done: false });
+  }
+
+  updateTweens() {
+    if (!this.tweens || !this.tweens.length) return;
+    const now = performance.now();
+    for (const tw of this.tweens) {
+      const el = tw.getEl(); if (!el) continue;
+      let p = (now - tw.t0 - tw.delay) / tw.dur;
+      if (p < 0) continue;
+      if (p >= 1) { p = 1; tw.done = true; }
+      tw.apply(el, this.easeInOut(p), p);
+    }
+    this.tweens = this.tweens.filter(t => !t.done);
+  }
+
+  startLoop() {
+    if (this._loopOn) return;
+    this._loopOn = true;
+    if (!this._seen) this._seen = new Set();
+    this._interval = setInterval(() => {
+      const root = this.rootRef.current;
+      if (!root) return;
+      this.checkReveal();
+      if (this.scrub) this.scrub();
+      this.updateTweens();
+    }, 16);
+  }
+
+  clearTimers() { this.timers.forEach(clearTimeout); this.timers = []; }
+  at(ms, fn) { this.timers.push(setTimeout(fn, ms)); }
+
+  applyAnnotations() {
+    const show = this.props.showAnnotations !== false;
+    const root = this.rootRef.current; if (!root) return;
+    root.querySelectorAll('[data-anno]').forEach(el => { el.style.display = show ? '' : 'none'; });
+  }
+
+  markActive() {
+    const root = this.rootRef.current; if (!root) return;
+    root.querySelectorAll('[data-vbtn]').forEach(b => {
+      const on = b.getAttribute('data-vbtn') === this.variant;
+      b.style.background = on ? '#3a3338' : 'transparent';
+      b.style.color = on ? '#f5f2ef' : '#3a3338';
+    });
+    const desc = root.querySelector('#variantDesc');
+    if (desc) desc.textContent = {
+      A: 'Tự phát → tiến gần → flash → chữ hiện',
+      B: 'Cuộn để nhân vật tiến lại, chữ lộ dần',
+      C: 'Letterbox điện ảnh → shutter → reveal'
+    }[this.variant] || '';
+  }
+
+  setVariant(v) { if (v === this.state.variant) { this.startHero(); } else { this.setState({ variant: v }); } }
+
+  startHero() {
+    const root = this.rootRef.current; if (!root) return;
+    this.tweens = [];
+    this.scrub = null;
+    const hero = root.querySelector('#hero');
+    const fig = root.querySelector('#heroFigure');
+    const flash = root.querySelector('#heroFlash');
+    const head = root.querySelector('#heroHeadline');
+    const prog = root.querySelector('#heroProgress');
+    const screen = root.querySelector('#heroScreen');
+    const bars = root.querySelectorAll('.letterbar');
+    if (!hero) return;
+    // reset (instant, no CSS transitions)
+    fig.style.transition = 'none'; fig.style.animation = 'sway 2.6s ease-in-out infinite';
+    fig.style.transform = 'scale(1)'; fig.style.opacity = '1';
+    flash.style.transition = 'none'; flash.style.opacity = '0';
+    head.style.transition = 'none'; head.style.opacity = '0'; head.style.clipPath = 'inset(0 100% 0 0)';
+    prog.style.transition = 'none'; prog.style.width = '0%';
+    screen.style.transition = 'none'; screen.style.transform = 'scale(1)';
+    bars.forEach(b => { b.style.transition = 'none'; b.style.height = '0%'; });
+    this.markActive();
+    const v = this.variant;
+    if (v === 'A') this.runA(hero, fig, flash, head, prog, screen);
+    else if (v === 'B') this.runB(hero, fig, flash, head, prog, screen);
+    else this.runC(hero, fig, flash, head, prog, screen, bars);
+  }
+
+  revealHead(head, instant) {
+    if (instant) {
+      head.style.transition = 'opacity .35s ease';
+      head.style.opacity = '1'; head.style.clipPath = 'inset(0 0 0 0)';
+    } else {
+      head.style.transition = 'clip-path 1s cubic-bezier(.66,0,.34,1), opacity .8s ease';
+      head.style.opacity = '1'; head.style.clipPath = 'inset(0 0 0 0)';
+    }
+  }
+
+  runA(hero, fig, flash, head, prog, screen) {
+    hero.style.height = '100vh';
+    this.addTween(() => prog, 4000, 80, (e, ez) => { e.style.width = (86 * ez) + '%'; });
+    this.addTween(() => fig, 1500, 2600, (e, ez) => { e.style.animation = 'none'; e.style.transform = 'scale(' + (1 + 1.7 * ez) + ') translateY(' + (8 * ez) + '%)'; });
+    this.addTween(() => screen, 1500, 2600, (e, ez) => { e.style.transform = 'scale(' + (1 + 0.12 * ez) + ')'; });
+    this.addTween(() => prog, 240, 4150, (e, ez) => { e.style.width = (86 + 14 * ez) + '%'; });
+    this.addTween(() => flash, 150, 4150, (e, ez) => { e.style.opacity = String(ez); });
+    this.addTween(() => flash, 650, 4330, (e, ez) => { e.style.opacity = String(1 - ez); });
+    this.addTween(() => fig, 350, 4330, (e, ez) => { e.style.opacity = String(1 - ez); });
+    this.addTween(() => head, 950, 4330, (e, ez) => { e.style.opacity = String(Math.min(1, ez * 1.3)); e.style.clipPath = 'inset(0 ' + (100 * (1 - ez)) + '% 0 0)'; });
+  }
+
+  runB(hero, fig, flash, head, prog, screen) {
+    hero.style.height = '240vh';
+    fig.style.animation = 'none';
+    this.scrub = () => {
+      const total = hero.offsetHeight - window.innerHeight;
+      let p = total > 0 ? (-hero.getBoundingClientRect().top) / total : 0;
+      p = Math.max(0, Math.min(1, p));
+      fig.style.transform = 'scale(' + (1 + p * 2.4) + ') translateY(' + (p * 8) + '%)';
+      screen.style.transform = 'scale(' + (1 + p * 0.15) + ')';
+      prog.style.width = (p * 100) + '%';
+      const rc = Math.max(0, Math.min(1, (p - 0.6) / 0.3));
+      head.style.opacity = String(rc);
+      head.style.clipPath = 'inset(0 ' + ((1 - rc) * 100) + '% 0 0)';
+      flash.style.opacity = (p > 0.54 && p < 0.7) ? String(Math.max(0, 1 - Math.abs(p - 0.62) / 0.08)) : '0';
+      fig.style.opacity = p > 0.7 ? String(Math.max(0, 1 - (p - 0.7) / 0.1)) : '1';
+    };
+    this.scrub();
+  }
+
+  runC(hero, fig, flash, head, prog, screen, bars) {
+    hero.style.height = '100vh';
+    const b0 = bars[0], b1 = bars[1];
+    this.addTween(() => b0, 800, 90, (e, ez) => { e.style.height = (13 * ez) + '%'; });
+    this.addTween(() => b1, 800, 90, (e, ez) => { e.style.height = (13 * ez) + '%'; });
+    this.addTween(() => prog, 2900, 130, (e, ez) => { e.style.width = (80 * ez) + '%'; });
+    this.addTween(() => fig, 900, 2300, (e, ez) => { e.style.animation = 'none'; e.style.transform = 'scale(' + (1 + 1.2 * ez) + ') translateY(' + (6 * ez) + '%)'; });
+    this.addTween(() => screen, 900, 2300, (e, ez) => { e.style.transform = 'scale(' + (1 + 0.1 * ez) + ')'; });
+    this.addTween(() => b0, 480, 3100, (e, ez) => { e.style.height = (13 + 39 * ez) + '%'; });
+    this.addTween(() => b1, 480, 3100, (e, ez) => { e.style.height = (13 + 39 * ez) + '%'; });
+    this.addTween(() => fig, 200, 3560, (e, ez) => { e.style.opacity = String(1 - ez); });
+    this.addTween(() => head, 120, 3560, (e) => { e.style.opacity = '1'; e.style.clipPath = 'inset(0 0 0 0)'; });
+    this.addTween(() => flash, 180, 3560, (e, ez) => { e.style.opacity = String(ez); });
+    this.addTween(() => flash, 520, 3760, (e, ez) => { e.style.opacity = String(1 - ez); });
+    this.addTween(() => b0, 950, 3640, (e, ez) => { e.style.height = (52 * (1 - ez)) + '%'; });
+    this.addTween(() => b1, 950, 3640, (e, ez) => { e.style.height = (52 * (1 - ez)) + '%'; });
+    this.addTween(() => prog, 250, 3640, (e, ez) => { e.style.width = (80 + 20 * ez) + '%'; });
+  }
+
+  toggleFaq(e) {
+    const item = e.currentTarget.closest('[data-faq]');
+    const ans = item.querySelector('[data-ans]');
+    const chev = item.querySelector('[data-chev]');
+    const open = item.getAttribute('data-open') === '1';
+    item.setAttribute('data-open', open ? '0' : '1');
+    ans.style.maxHeight = open ? '0px' : ans.scrollHeight + 'px';
+    chev.style.transform = open ? 'rotate(0deg)' : 'rotate(45deg)';
+  }
+
+  renderVals() {
+    return {
+      rootRef: this.rootRef,
+      setA: () => this.setVariant('A'),
+      setB: () => this.setVariant('B'),
+      setC: () => this.setVariant('C'),
+      replay: () => this.startHero(),
+      toggleFaq: (e) => this.toggleFaq(e),
+      steps: [
+        { n: '01', t: 'Tạo hồ sơ', d: 'Đăng ký nhanh và cho chúng tôi biết bạn mong muốn điều gì ở người đồng hành.' },
+        { n: '02', t: 'Chọn người đồng hành', d: 'Duyệt qua các hồ sơ đã được xác minh và chọn người phù hợp với bạn.' },
+        { n: '03', t: 'Đặt lịch & xác nhận', d: 'Chọn thời gian, địa điểm và xác nhận buổi gặp một cách an toàn.' },
+        { n: '04', t: 'Gặp gỡ & tận hưởng', d: 'Gặp gỡ trong khuôn khổ minh bạch, lịch sự và luôn được tôn trọng.' },
+      ],
+      profiles: [
+        { name: 'Linh', loc: 'TP.HCM', tags: ['Dịu dàng', 'Cà phê'] },
+        { name: 'Mai', loc: 'Hà Nội', tags: ['Vui vẻ', 'Phim ảnh'] },
+        { name: 'An', loc: 'Đà Nẵng', tags: ['Trầm lắng', 'Sách'] },
+        { name: 'Thảo', loc: 'TP.HCM', tags: ['Năng động', 'Du lịch'] },
+        { name: 'Hà', loc: 'Hà Nội', tags: ['Ấm áp', 'Âm nhạc'] },
+        { name: 'Vy', loc: 'Cần Thơ', tags: ['Hài hước', 'Ẩm thực'] },
+      ],
+      testimonials: [
+        { quote: 'Một buổi tối trò chuyện thật dễ chịu và không hề gượng gạo. Mọi thứ rất chuyên nghiệp.', name: 'Khách hàng A', role: 'TP.HCM' },
+        { quote: 'Quy trình rõ ràng, người đồng hành thân thiện. Mình cảm thấy được tôn trọng.', name: 'Khách hàng B', role: 'Hà Nội' },
+        { quote: 'Đặt lịch tiện, thông tin được bảo mật tốt. Trải nghiệm vượt mong đợi.', name: 'Khách hàng C', role: 'Đà Nẵng' },
+      ],
+      safety: [
+        { t: 'Xác minh danh tính', d: 'Mọi người đồng hành đều được xác minh kỹ lưỡng trước khi xuất hiện trên nền tảng.' },
+        { t: 'Bảo mật thông tin', d: 'Dữ liệu cá nhân và lịch sử của bạn được mã hoá và không chia sẻ với bên thứ ba.' },
+        { t: 'Hỗ trợ 24/7', d: 'Đội ngũ hỗ trợ luôn sẵn sàng can thiệp khi bạn cần trong mọi tình huống.' },
+      ],
+      faqs: [
+        { q: 'Dịch vụ này có an toàn không?', a: 'Có. Mọi buổi gặp đều diễn ra trong khuôn khổ minh bạch, có quy tắc ứng xử rõ ràng và hỗ trợ kịp thời.' },
+        { q: 'Người đồng hành có được xác minh không?', a: 'Tất cả hồ sơ đều trải qua quy trình xác minh danh tính trước khi được hiển thị công khai.' },
+        { q: 'Chi phí được tính như thế nào?', a: 'Chi phí minh bạch theo từng gói thời gian, hiển thị rõ trước khi bạn xác nhận đặt lịch.' },
+        { q: 'Tôi có thể huỷ lịch không?', a: 'Bạn có thể huỷ hoặc đổi lịch theo chính sách linh hoạt được nêu rõ khi đặt.' },
+        { q: 'Thông tin của tôi có được bảo mật?', a: 'Có. Thông tin cá nhân được mã hoá và chỉ dùng cho mục đích vận hành dịch vụ.' },
+      ],
+      footcols: [
+        { h: 'DỊCH VỤ', items: ['Cách hoạt động', 'Hồ sơ', 'Bảng giá', 'Quà tặng'] },
+        { h: 'CÔNG TY', items: ['Về chúng tôi', 'Tuyển dụng', 'Liên hệ', 'Blog'] },
+        { h: 'PHÁP LÝ', items: ['Điều khoản', 'Bảo mật', 'An toàn', 'Cookie'] },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

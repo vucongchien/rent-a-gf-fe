@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { isMockMode } from '@/shared/lib/env'
 
 interface BackendCallbackResponse {
   accessToken: string
   refreshToken: string
-  /** Spec §2.1: BE trả "Bearer". FE chưa dùng nhưng giữ type cho khớp SSOT. */
-  tokenType?: string
   expiresIn: number
 }
 
@@ -96,34 +93,24 @@ export async function GET(req: NextRequest) {
 
   let tokens: BackendCallbackResponse
   try {
-    if (isMockMode()) {
-      // Mock branch: code chứa luôn JWT giả lập (xem /api/auth/google route mock)
-      const mockToken = code.replace(/^mock_code_/, '')
-      tokens = {
-        accessToken: mockToken,
-        refreshToken: `mock_refresh_${Date.now()}`,
-        expiresIn: 3600,
-      }
-    } else {
-      const apiUrl = process.env.API_URL
-      if (!apiUrl) throw new Error('API_URL chưa cấu hình')
-      const beUrl = new URL(`${apiUrl.replace(/\/$/, '')}/api/v1/auth/google/callback`)
-      beUrl.searchParams.set('code', code)
-      if (state) beUrl.searchParams.set('state', state)
+    const apiUrl = process.env.API_URL
+    if (!apiUrl) throw new Error('API_URL chưa cấu hình')
+    const beUrl = new URL(`${apiUrl.replace(/\/$/, '')}/auth/google/callback`)
+    beUrl.searchParams.set('code', code)
+    if (state) beUrl.searchParams.set('state', state)
 
-      const res = await fetch(beUrl.toString(), {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-        cache: 'no-store',
-      })
-      if (!res.ok) {
-        const detail = await res.text().catch(() => '')
-        throw new Error(`BE callback ${res.status}: ${detail.slice(0, 200)}`)
-      }
-      tokens = (await res.json()) as BackendCallbackResponse
-      if (!tokens?.accessToken || !tokens?.refreshToken) {
-        throw new Error('BE callback thiếu accessToken/refreshToken')
-      }
+    const res = await fetch(beUrl.toString(), {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    })
+    if (!res.ok) {
+      const detail = await res.text().catch(() => '')
+      throw new Error(`BE callback ${res.status}: ${detail.slice(0, 200)}`)
+    }
+    tokens = (await res.json()) as BackendCallbackResponse
+    if (!tokens?.accessToken || !tokens?.refreshToken) {
+      throw new Error('BE callback thiếu accessToken/refreshToken')
     }
   } catch (err) {
     console.error('[BFF callback] Lỗi đổi code lấy token:', err)

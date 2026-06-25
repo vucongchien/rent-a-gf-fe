@@ -1,8 +1,6 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
 import { getCurrentUserId } from '@/shared/lib/userContext';
-import { isMockMode } from '@/shared/lib/env';
-import { mockWallet, mockPendingTopups, currentMockUser } from '@/mocks/fixtures/data';
 import type { Wallet, TopupResponse, WalletTransaction, ServiceRequestOptions } from '@/shared/types';
 
 export interface InitiateTopupOptions extends ServiceRequestOptions {
@@ -16,15 +14,6 @@ export const walletService = {
    * KHÔNG cache (user-specific + tài chính cần fresh).
    */
   async getWallet(options?: ServiceRequestOptions): Promise<Wallet> {
-    if (isMockMode()) {
-      return {
-        walletId: mockWallet.walletId,
-        userId: mockWallet.userId,
-        availableBalance: mockWallet.availableBalance,
-        frozenBalance: mockWallet.frozenBalance,
-      };
-    }
-
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch<Wallet>('/finance/wallet', { req });
   },
@@ -38,22 +27,6 @@ export const walletService = {
    * Handler / Server Action để BE chống double-charge khi client retry.
    */
   async initiateTopup(body: { amount: number }, options?: InitiateTopupOptions): Promise<TopupResponse> {
-    if (isMockMode()) {
-      // Phase 1.A — generate orderId, lưu pending, trỏ paymentUrl về trang
-      // mock checkout. Chỉ credit wallet khi user xác nhận thành công ở return URL.
-      const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-      mockPendingTopups.set(orderId, {
-        orderId,
-        userId: currentMockUser?.userId ?? 'u-client-1',
-        amount: body.amount,
-        createdAt: new Date().toISOString(),
-      });
-      const qs = new URLSearchParams({ orderId, amount: String(body.amount) });
-      return {
-        paymentUrl: `/mock/vnpay/checkout?${qs.toString()}`,
-      };
-    }
-
     const req = await getRequestCookieHeader(options?.req);
     const userId = (await getCurrentUserId()) ?? '';
     return serverFetch<TopupResponse>('/finance/topup', {
@@ -70,10 +43,6 @@ export const walletService = {
    * Lấy lịch sử giao dịch của user hiện tại. KHÔNG cache.
    */
   async getTransactions(options?: ServiceRequestOptions): Promise<WalletTransaction[]> {
-    if (isMockMode()) {
-      return mockWallet.transactions;
-    }
-
     const req = await getRequestCookieHeader(options?.req);
     return serverFetch<WalletTransaction[]>('/finance/transactions', { req });
   }

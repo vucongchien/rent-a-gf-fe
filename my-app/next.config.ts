@@ -37,7 +37,6 @@ const nextConfig: NextConfig = {
 
     return [
       {
-        // CSP cho Service Worker - cần cho phép external domains để MSW passthrough hoạt động
         source: "/sw.js",
         headers: [
           {

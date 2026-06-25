@@ -68,13 +68,10 @@ export async function middleware(req: NextRequest) {
 
   // Skip refresh logic cho auth endpoints (chính refresh/callback/logout) — tránh recursion.
   const isAuthEndpoint = pathname.startsWith('/api/auth')
-  // Skip mock mode (không có BE thật để gọi).
-  const isMockMode =
-    process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL
 
   if (
     !isAuthEndpoint &&
-    !isMockMode &&
+    process.env.API_URL &&
     refreshToken &&
     shouldRefreshAccessToken(accessToken, 60)
   ) {
