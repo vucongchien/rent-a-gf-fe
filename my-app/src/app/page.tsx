@@ -25,7 +25,13 @@ export const metadata: Metadata = {
 };
 
 export default async function LandingPage() {
-  const { companions } = await companionService.getCompanions({ pageSize: 6 });
+  let companions: any[] = [];
+  try {
+    const res = await companionService.getCompanions({ pageSize: 6 });
+    companions = res?.companions || [];
+  } catch (err) {
+    console.error('[LandingPage] Lỗi lấy danh sách companions khi prerender:', err);
+  }
 
   const cards: CompanionCardProps[] = companions.map((c) => ({
     id: c.companionId,

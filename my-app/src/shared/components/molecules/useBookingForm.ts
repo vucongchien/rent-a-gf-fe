@@ -30,6 +30,7 @@ export function formatLocalDatetime(date: Date): string {
 }
 
 export function useBookingForm(_props: UseBookingFormProps) {
+  const { companionId, scenarioId } = _props
   const router = useRouter()
   const { balance, open: openWallet, fetchWallet } = useWallet()
   const { user, login } = useAuth()
@@ -38,6 +39,7 @@ export function useBookingForm(_props: UseBookingFormProps) {
   const [scheduledAt, setScheduledAt] = useState('')
   const [note, setNote] = useState('')
   const [validationError, setValidationError] = useState('')
+  const [isRestored, setIsRestored] = useState(false)
 
   const [state, formAction, isPending] = useActionState(
     createBookingAction,
@@ -46,9 +48,45 @@ export function useBookingForm(_props: UseBookingFormProps) {
 
   const errorMessage = validationError || (state.status === 'error' ? state.message : '')
 
+  // 1. Phục hồi draft từ sessionStorage sau khi mount (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const raw = sessionStorage.getItem('rentagf.booking.draft')
+      if (raw) {
+        try {
+          const draft = JSON.parse(raw)
+          if (draft.companionId === companionId && draft.scenarioId === scenarioId) {
+            if (draft.scheduledAt) setScheduledAt(draft.scheduledAt)
+            if (draft.note !== undefined) setNote(draft.note)
+            if (draft.step) setStep(draft.step)
+          }
+        } catch (e) {
+          console.error('Failed to parse booking draft', e)
+        }
+      }
+      setIsRestored(true)
+    }
+  }, [companionId, scenarioId])
+
+  // 2. Đồng bộ các thay đổi lên sessionStorage (chỉ sau khi đã phục hồi xong)
+  useEffect(() => {
+    if (!isRestored) return
+
+    const draft = {
+      companionId,
+      scenarioId,
+      scheduledAt,
+      note,
+      step,
+    }
+    sessionStorage.setItem('rentagf.booking.draft', JSON.stringify(draft))
+  }, [isRestored, companionId, scenarioId, scheduledAt, note, step])
+
+  // 3. Xoá draft khi đặt lịch thành công
   useEffect(() => {
     if (state.status === 'success') {
       fetchWallet()
+      sessionStorage.removeItem('rentagf.booking.draft')
     }
   }, [state.status, fetchWallet])
 

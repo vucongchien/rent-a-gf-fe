@@ -139,8 +139,18 @@ export const companionService = {
     if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
     if (city !== 'all') searchParams.set('city', city);
 
-    const raw = await serverFetch<BackendCompanionsResponse>('/companions', { searchParams });
-    return normalizeCompanionsResponse(raw, params?.pageSize ?? 9);
+    try {
+      const raw = await serverFetch<BackendCompanionsResponse>('/companions', { searchParams });
+      return normalizeCompanionsResponse(raw, params?.pageSize ?? 9);
+    } catch (err) {
+      console.error('[companionService.getCompanions] Lỗi fetch companions:', err);
+      return {
+        companions: [],
+        total: 0,
+        page: params?.page ?? 1,
+        pageSize: params?.pageSize ?? 9,
+      };
+    }
   },
 
   async getFeaturedCompanion(): Promise<{
@@ -154,12 +164,20 @@ export const companionService = {
     const searchParams = new URLSearchParams();
     searchParams.set('pageSize', '1');
 
-    const raw = await serverFetch<BackendCompanionsResponse>('/companions', { searchParams });
-    const { companions, total } = normalizeCompanionsResponse(raw, 1);
-    return {
-      featuredCompanion: companions[0] || null,
-      totalCount: total,
-    };
+    try {
+      const raw = await serverFetch<BackendCompanionsResponse>('/companions', { searchParams });
+      const { companions, total } = normalizeCompanionsResponse(raw, 1);
+      return {
+        featuredCompanion: companions[0] || null,
+        totalCount: total,
+      };
+    } catch (err) {
+      console.error('[companionService.getFeaturedCompanion] Lỗi fetch:', err);
+      return {
+        featuredCompanion: null,
+        totalCount: 0,
+      };
+    }
   },
 
   async getCompanionDetail(companionId: string): Promise<CompanionDetail | null> {

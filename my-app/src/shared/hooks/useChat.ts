@@ -9,7 +9,7 @@ export interface OptimisticMessage extends ChatMessage {
   isError?: boolean;
 }
 
-export const useChat = (role: 'CLIENT' | 'COMPANION') => {
+export const useChat = (role: 'CLIENT' | 'COMPANION', currentUserId: string) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -32,12 +32,19 @@ export const useChat = (role: 'CLIENT' | 'COMPANION') => {
   // 1. Tải danh sách phòng chat
   const fetchRooms = useCallback(async () => {
     try {
-      const res = await fetch('/api/interaction/rooms');
+      const res = await fetch(`/api/interaction/rooms?role=${role}`);
       if (res.ok) {
         const data = await res.json();
-        setRooms(data);
-        setRoomsError(null);
+        if (Array.isArray(data)) {
+          setRooms(data);
+          setRoomsError(null);
+        } else {
+          console.error('[useChat] getChatRooms: response không phải array:', data);
+          setRoomsError('Dữ liệu phòng chat không hợp lệ');
+        }
       } else {
+        const errBody = await res.json().catch(() => ({}));
+        console.error('[useChat] getChatRooms lỗi HTTP:', res.status, errBody);
         setRoomsError('Không thể tải danh sách phòng chat');
       }
     } catch (err) {
@@ -143,7 +150,7 @@ export const useChat = (role: 'CLIENT' | 'COMPANION') => {
     const tempMsg: OptimisticMessage = {
       messageId: tempId,
       roomId: activeRoomId,
-      senderId: role === 'CLIENT' ? 'u-client-1' : 'u-comp-1', // Khớp với mockUser ID
+      senderId: currentUserId, // Dùng userId thật để ChatMessageBubble nhận diện isSelf đúng
       content: text,
       createdAt: new Date().toISOString(),
       isSending: true,
@@ -186,7 +193,7 @@ export const useChat = (role: 'CLIENT' | 'COMPANION') => {
         )
       );
     }
-  }, [activeRoomId, role, fetchRooms]);
+  }, [activeRoomId, currentUserId, fetchRooms]);
 
   // 7. Gửi lại tin nhắn bị lỗi
   const retryMessage = useCallback(async (tempId: string) => {

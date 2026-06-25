@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { CompanionCard, type CompanionCardProps } from '@/shared/components/molecules/CompanionCard';
 
-// TODO: swap bằng video Furina thật khi có asset chính thức.
-const HERO_VIDEO_URL = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+const HERO_VIDEO_URL = '/0624(2).mp4';
 
 interface Props {
   companions: CompanionCardProps[];
@@ -58,44 +57,74 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const eng = useRef<Engine>({ tweens: [], revealed: new Set() });
 
+  const [isMuted, setIsMuted] = useState(false);
+  const [isEnded, setIsEnded] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startTimer = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setShowContent(true);
+    }, 6000);
+  };
+
+  // Xử lý phát video mặc định có tiếng và trì hoãn 5s hiện chữ.
+  useEffect(() => {
+    const video = videoRef.current;
+
+    startTimer();
+
+    if (!video) {
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+      };
+    }
+
+    let cleanupListeners: (() => void) | undefined;
+
+    // Thử phát video có tiếng ngay từ đầu
+    video.play().catch((err) => {
+      console.warn('[LandingPage] Autoplay with audio was blocked, falling back to muted:', err);
+      setIsMuted(true);
+
+      const enableAudio = () => {
+        setIsMuted(false);
+        removeListeners();
+      };
+
+      const events = ['click', 'scroll', 'touchstart', 'keydown'];
+      const removeListeners = () => {
+        events.forEach((ev) => window.removeEventListener(ev, enableAudio));
+      };
+
+      events.forEach((ev) => window.addEventListener(ev, enableAudio, { passive: true }));
+      cleanupListeners = removeListeners;
+    });
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (video) {
+        video.pause();
+        video.muted = true;
+      }
+      if (cleanupListeners) {
+        cleanupListeners();
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
     const A = eng.current;
-    const q = <T extends HTMLElement = HTMLElement>(s: string) => root.querySelector<T>(s);
-    const easeInOut = (p: number) => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2);
 
     root.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(28px)';
       el.style.transition = 'opacity .65s cubic-bezier(.22,.61,.36,1), transform .65s cubic-bezier(.22,.61,.36,1)';
     });
-
-    const addTween = (
-      getEl: () => HTMLElement | null,
-      dur: number,
-      delay: number,
-      apply: (el: HTMLElement, ez: number) => void,
-    ) => {
-      A.tweens.push({ getEl, dur, delay: delay || 0, t0: performance.now(), apply, done: false });
-    };
-
-    const updateTweens = () => {
-      if (!A.tweens.length) return;
-      const now = performance.now();
-      for (const tw of A.tweens) {
-        const el = tw.getEl();
-        if (!el) continue;
-        let p = (now - tw.t0 - tw.delay) / tw.dur;
-        if (p < 0) continue;
-        if (p >= 1) {
-          p = 1;
-          tw.done = true;
-        }
-        tw.apply(el, easeInOut(p));
-      }
-      A.tweens = A.tweens.filter((t) => !t.done);
-    };
 
     const checkReveal = () => {
       const trigger = window.innerHeight * 0.92;
@@ -109,38 +138,10 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
       });
     };
 
-    const head = q('#heroHeadline');
-    const flash = q('#heroFlash');
-    const bars = root.querySelectorAll<HTMLElement>('.letterbar');
-    if (head && flash && bars.length >= 2) {
-      const b0 = bars[0];
-      const b1 = bars[1];
-      flash.style.transition = 'none';
-      flash.style.opacity = '0';
-      head.style.transition = 'none';
-      head.style.opacity = '0';
-      head.style.clipPath = 'inset(0 100% 0 0)';
-      bars.forEach((b) => {
-        b.style.transition = 'none';
-        b.style.height = '0%';
-      });
-      // Style C: cinematic letterbox shutter → flash → reveal headline.
-      addTween(() => b0, 800, 90, (e, ez) => { e.style.height = 13 * ez + '%'; });
-      addTween(() => b1, 800, 90, (e, ez) => { e.style.height = 13 * ez + '%'; });
-      addTween(() => b0, 480, 3100, (e, ez) => { e.style.height = 13 + 39 * ez + '%'; });
-      addTween(() => b1, 480, 3100, (e, ez) => { e.style.height = 13 + 39 * ez + '%'; });
-      addTween(() => head, 120, 3560, (e) => { e.style.opacity = '1'; e.style.clipPath = 'inset(0 0 0 0)'; });
-      addTween(() => flash, 180, 3560, (e, ez) => { e.style.opacity = String(ez); });
-      addTween(() => flash, 520, 3760, (e, ez) => { e.style.opacity = String(1 - ez); });
-      addTween(() => b0, 950, 3640, (e, ez) => { e.style.height = 52 * (1 - ez) + '%'; });
-      addTween(() => b1, 950, 3640, (e, ez) => { e.style.height = 52 * (1 - ez) + '%'; });
-    }
-
     const onScroll = () => checkReveal();
     window.addEventListener('scroll', onScroll, { passive: true });
     const iv = window.setInterval(() => {
       checkReveal();
-      updateTweens();
     }, 16);
     checkReveal();
 
@@ -154,53 +155,153 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
     <div ref={rootRef} className="relative w-full overflow-x-clip bg-surface text-text font-sans">
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes landing-scrollcue{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(9px);opacity:.25}}
+        @keyframes anime-char-pop {
+          0% {
+            opacity: 0;
+            transform: translateY(40px) scale(0.5) rotate(-15deg);
+            filter: blur(10px);
+          }
+          60% {
+            opacity: 1;
+            transform: translateY(-10px) scale(1.15) rotate(4deg);
+            filter: blur(0);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1) rotate(0deg);
+            filter: blur(0);
+          }
+        }
+        @keyframes anime-shadow-glow {
+          0%, 100% {
+            filter: drop-shadow(0 0 15px rgba(255, 105, 180, 0.5)) drop-shadow(0 0 30px rgba(255, 105, 180, 0.3));
+          }
+          50% {
+            filter: drop-shadow(0 0 25px rgba(255, 105, 180, 0.85)) drop-shadow(0 0 50px rgba(255, 105, 180, 0.5));
+          }
+        }
+        .animate-char {
+          display: inline-block;
+          animation: anime-char-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .anime-title-container {
+          animation: anime-shadow-glow 3s ease-in-out infinite;
+        }
       ` }} />
 
-      <section id="hero" className="relative w-full h-screen bg-surface">
+      <section id="hero" className="relative w-full h-screen bg-white">
         <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
-          <div id="heroScreen" className="absolute inset-0 w-full h-full bg-surface-inverted overflow-hidden">
+          <div id="heroScreen" className="absolute inset-0 w-full h-full bg-white overflow-hidden">
             <video
+              ref={videoRef}
               autoPlay
-              muted
-              loop
+              muted={isMuted}
               playsInline
               preload="auto"
               src={HERO_VIDEO_URL}
+              onEnded={() => setIsEnded(true)}
               className="absolute inset-0 w-full h-full object-cover z-[1]"
             />
-            <div className="letterbar absolute top-0 left-0 w-full bg-neutral-900 z-[6]" />
-            <div className="letterbar absolute bottom-0 left-0 w-full bg-neutral-900 z-[6]" />
-            <div id="heroFlash" className="absolute inset-0 bg-white z-[8] pointer-events-none" />
+            {/* Lớp phủ mờ siêu nhẹ để làm dịu chuyển động video */}
+            <div className="absolute inset-0 bg-white/20 backdrop-blur-[0.5px] z-[2] pointer-events-none" />
+            {/* Hai thanh rèm khép màu trắng transition ở giây thứ 5 */}
+            <div className="absolute top-0 left-0 w-full bg-white z-[6] transition-all duration-[1600ms] ease-out" style={{ height: showContent ? '50%' : '0%' }} />
+            <div className="absolute bottom-0 left-0 w-full bg-white z-[6] transition-all duration-[1600ms] ease-out" style={{ height: showContent ? '50%' : '0%' }} />
           </div>
 
-          <div id="heroHeadline" className="absolute inset-0 z-[4] flex flex-col items-center justify-center text-center p-6 pointer-events-none">
-            <div className="font-mono text-[12px] tracking-[3px] text-chizuru-600 mb-[18px]">DỊCH VỤ NGƯỜI ĐỒNG HÀNH</div>
+          <div id="heroHeadline" className="absolute inset-0 z-[8] flex flex-col items-center justify-center text-center p-6 pointer-events-none">
+            <div className={`font-mono text-[12px] tracking-[3px] text-chizuru-600 mb-[18px] font-bold transition-all duration-1000 delay-[1000ms] ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>DỊCH VỤ NGƯỜI ĐỒNG HÀNH</div>
             <h1
-              className="font-display font-medium text-[clamp(44px,9vw,118px)] leading-[.98] text-text-inverted m-0"
-              style={{ textShadow: '0 4px 40px rgba(0,0,0,.35)' }}
+              className="font-display font-medium text-[clamp(54px,10vw,128px)] leading-[1.05] text-white m-0 anime-title-container select-none"
+              style={{
+                WebkitTextStroke: '3.5px #ff5a8a',
+                paintOrder: 'stroke fill',
+                textShadow: '0 4px 15px rgba(255,90,138,0.4), 0 8px 30px rgba(255,90,138,0.2)',
+              }}
             >
-              Rent-a-Girlfriend
+              {"Rent-a-Girlfriend".split("").map((char, index) => (
+                <span
+                  key={index}
+                  className={`opacity-0 ${showContent ? 'animate-char' : ''}`}
+                  style={{
+                    animationDelay: `${0.6 + index * 0.04}s`,
+                    marginRight: char === '-' ? '2px' : '0px',
+                  }}
+                >
+                  {char}
+                </span>
+              ))}
             </h1>
-            <p className="max-w-[560px] mx-auto mt-[22px] text-[clamp(15px,1.6vw,18px)] leading-[1.6] text-text-inverted/80 font-sans">
+            <p 
+              className={`max-w-[560px] mx-auto mt-[22px] text-[clamp(15px,1.6vw,18px)] leading-[1.6] text-neutral-800 font-semibold font-sans transition-all duration-1000 delay-[1200ms] ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              style={{ textShadow: '0 1px 4px rgba(255,255,255,0.8)' }}
+            >
               Người đồng hành dịu dàng cho từng khoảnh khắc — trò chuyện, dạo phố, hay đơn giản là có ai đó bên cạnh.
             </p>
-            <div className="flex gap-[14px] flex-wrap justify-center mt-[34px] pointer-events-auto">
+            <div className={`flex gap-[14px] flex-wrap justify-center mt-[34px] pointer-events-auto transition-all duration-1000 delay-[1400ms] ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               <Link
                 href="/explore"
-                className="font-sans text-[15px] font-semibold py-[14px] px-[30px] rounded-full bg-white text-text no-underline"
+                className="font-sans text-[15px] font-bold py-[14px] px-[30px] rounded-full bg-chizuru-600 text-white hover:bg-chizuru-500 hover:scale-105 active:scale-95 shadow-md shadow-chizuru-500/20 hover:shadow-chizuru-500/30 transition-all duration-200 no-underline"
               >
                 Tìm người đồng hành
               </Link>
               <a
                 href="#how"
-                className="font-sans text-[15px] font-medium py-[14px] px-[28px] border-[1.5px] border-white/55 rounded-full bg-transparent text-text-inverted no-underline"
+                className="font-sans text-[15px] font-semibold py-[14px] px-[28px] border-[1.5px] border-neutral-300 rounded-full bg-white/80 text-neutral-800 hover:bg-neutral-50 hover:scale-105 active:scale-95 transition-all duration-200 no-underline"
               >
                 Xem cách hoạt động
               </a>
             </div>
-            <div className="mt-[46px] flex flex-col items-center gap-2 text-text-inverted/70 font-mono text-[11px] tracking-[1px]">
+            <div className={`mt-[46px] flex flex-col items-center gap-2 text-neutral-600 font-mono text-[11px] tracking-[1px] font-bold transition-all duration-1000 delay-[1600ms] ${showContent ? 'opacity-100' : 'opacity-0'}`}>
               CUỘN ĐỂ KHÁM PHÁ
               <span className="text-[18px]" style={{ animation: 'landing-scrollcue 1.8s ease-in-out infinite' }}>↓</span>
+            </div>
+
+            {/* Video Controls */}
+            <div className={`absolute bottom-8 right-8 z-[10] pointer-events-auto flex items-center gap-3 transition-opacity duration-500 ${showContent && !isEnded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+              {!isEnded ? (
+                <button
+                  type="button"
+                  onClick={() => setIsMuted((prev) => !prev)}
+                  className="w-10 h-10 rounded-full bg-white/80 backdrop-blur border border-neutral-200 flex items-center justify-center text-neutral-800 hover:bg-white hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm"
+                  aria-label={isMuted ? 'Bật âm thanh' : 'Tắt âm thanh'}
+                  title={isMuted ? 'Bật âm thanh' : 'Tắt âm thanh'}
+                >
+                  {isMuted ? (
+                    <svg className="w-5 h-5 fill-current text-neutral-600" viewBox="0 0 24 24">
+                      <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 fill-current text-neutral-600" viewBox="0 0 24 24">
+                      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                    </svg>
+                  )}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (videoRef.current) {
+                      videoRef.current.currentTime = 0;
+                      videoRef.current.play().then(() => {
+                        setIsEnded(false);
+                        setIsMuted(false);
+                        setShowContent(false);
+                        startTimer();
+                      }).catch((err) => {
+                        console.error('[LandingPage] Replay failed:', err);
+                      });
+                    }
+                  }}
+                  className="px-4 py-2 rounded-full bg-white/80 backdrop-blur border border-neutral-200 flex items-center gap-2 text-neutral-800 text-[13px] font-semibold hover:bg-white hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm"
+                  aria-label="Xem lại"
+                >
+                  <svg className="w-4 h-4 fill-current text-neutral-600" viewBox="0 0 24 24">
+                    <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+                  </svg>
+                  Xem lại
+                </button>
+              )}
             </div>
           </div>
         </div>

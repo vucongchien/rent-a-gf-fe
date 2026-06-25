@@ -48,6 +48,27 @@ vi.mock('@/app/(marketing)/explore/[companionId]/actions', () => ({
   }),
 }))
 
+// Mock sessionStorage
+const sessionStorageMock = (() => {
+  let store: Record<string, string> = {}
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString()
+    },
+    removeItem: (key: string) => {
+      delete store[key]
+    },
+    clear: () => {
+      store = {}
+    },
+  }
+})()
+
+Object.defineProperty(window, 'sessionStorage', {
+  value: sessionStorageMock,
+})
+
 describe('useBookingForm', () => {
   const defaultProps = {
     companionId: 'comp-1',
@@ -60,6 +81,7 @@ describe('useBookingForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    sessionStorage.clear()
     mockBalance = 500
     mockUser = { name: 'Test User' }
     mockActionStatus = 'idle'
@@ -135,5 +157,39 @@ describe('useBookingForm', () => {
 
     expect(result.current.validationError).toBe('')
     expect(result.current.step).toBe(2)
+  })
+
+  it('khôi phục trạng thái từ sessionStorage nếu có bản nháp trùng khớp', () => {
+    const draft = {
+      companionId: 'comp-1',
+      scenarioId: 'sc-1',
+      scheduledAt: '2026-06-25T20:30',
+      note: 'Tin nhắn nháp của tôi',
+      step: 2,
+    }
+    sessionStorage.setItem('rentagf.booking.draft', JSON.stringify(draft))
+
+    const { result } = renderHook(() => useBookingForm(defaultProps))
+
+    expect(result.current.scheduledAt).toBe('2026-06-25T20:30')
+    expect(result.current.note).toBe('Tin nhắn nháp của tôi')
+    expect(result.current.step).toBe(2)
+  })
+
+  it('không khôi phục trạng thái từ sessionStorage nếu companionId hoặc scenarioId khác biệt', () => {
+    const draft = {
+      companionId: 'comp-other',
+      scenarioId: 'sc-1',
+      scheduledAt: '2026-06-25T20:30',
+      note: 'Tin nhắn nháp của tôi',
+      step: 2,
+    }
+    sessionStorage.setItem('rentagf.booking.draft', JSON.stringify(draft))
+
+    const { result } = renderHook(() => useBookingForm(defaultProps))
+
+    expect(result.current.scheduledAt).toBe('')
+    expect(result.current.note).toBe('')
+    expect(result.current.step).toBe(1)
   })
 })

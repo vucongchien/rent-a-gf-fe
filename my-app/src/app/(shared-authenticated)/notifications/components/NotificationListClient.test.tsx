@@ -130,4 +130,20 @@ describe('NotificationListClient', () => {
     expect(screen.getByText('Giao dịch thành công')).toBeInTheDocument();
     expect(screen.getByText('Bạn vừa nạp 500 coin.')).toBeInTheDocument();
   });
+
+  it('renders with companion variant using correct amber/mami classes', () => {
+    render(
+      <NotificationListClient
+        initialNotifications={mockNotifications}
+        initialNextCursor={null}
+        initialHasMore={false}
+        variant="companion"
+      />
+    );
+
+    // Active tab "Tất cả" should have companion style classes
+    const activeTab = screen.getByText('Tất cả');
+    expect(activeTab).toHaveClass('bg-mami-50/50');
+    expect(activeTab).toHaveClass('text-amber-600');
+  });
 });

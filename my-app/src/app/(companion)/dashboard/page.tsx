@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import { connection } from 'next/server';
 import { bookingService } from '@/shared/services/bookingService';
 import { DashboardStats } from '@/shared/components/organisms/DashboardStats';
 import { PendingRequests } from '@/shared/components/organisms/PendingRequests';
@@ -6,6 +7,8 @@ import { UpcomingSchedule } from '@/shared/components/organisms/UpcomingSchedule
 import { DashboardSkeleton } from '@/shared/components/organisms/DashboardSkeleton';
 
 async function DashboardContent() {
+  await connection();
+
   let bookingsData: Awaited<ReturnType<typeof bookingService.getBookings>>;
   try {
     bookingsData = await bookingService.getBookings();

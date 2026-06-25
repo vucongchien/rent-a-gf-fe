@@ -25,6 +25,21 @@ const nextConfig: NextConfig = {
         hostname: "**.gravatar.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "mcuoaizrolhegsvdckna.supabase.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.moibuocmotduyen.site",
+        pathname: "/**",
+      },
     ],
   },
   async headers() {
@@ -33,6 +48,8 @@ const nextConfig: NextConfig = {
       "https://images.unsplash.com",
       "https://i.pravatar.cc",
       "https://*.gravatar.com",
+      "https://*.supabase.co",
+      "https://*.moibuocmotduyen.site",
     ].join(" ");
 
     return [

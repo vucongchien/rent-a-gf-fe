@@ -18,6 +18,7 @@ import type { Notification } from '@/shared/types';
 interface NotificationItemProps {
   notification: Notification;
   onMarkAsReadLocal: (id: string) => void;
+  variant?: 'client' | 'companion';
 }
 
 // Helper định dạng thời gian thân thiện bằng tiếng Việt
@@ -47,6 +48,7 @@ function formatTimeAgo(dateStr?: string) {
 export const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onMarkAsReadLocal,
+  variant = 'client',
 }) => {
   const router = useRouter();
   const { decrementUnreadCount } = useNotifications();
@@ -67,8 +69,8 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         };
       case 'BOOKING_REQUESTED':
         return {
-          icon: <CalendarIcon size={20} className="text-chizuru-500" />,
-          bg: 'bg-chizuru-50/60 text-chizuru-500'
+          icon: <CalendarIcon size={20} className={variant === 'companion' ? 'text-amber-500' : 'text-chizuru-500'} />,
+          bg: variant === 'companion' ? 'bg-mami-50/60 text-amber-500' : 'bg-chizuru-50/60 text-chizuru-500'
         };
       case 'BOOKING_ACCEPTED':
       case 'BOOKING_COMPLETED':
@@ -89,8 +91,8 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         };
       case 'PROMOTION_VOUCHER':
         return {
-          icon: <SakuraIcon size={20} className="text-chizuru-500" />,
-          bg: 'bg-chizuru-50/30 text-chizuru-500'
+          icon: <SakuraIcon size={20} className={variant === 'companion' ? 'text-amber-500' : 'text-chizuru-500'} />,
+          bg: variant === 'companion' ? 'bg-mami-50/30 text-amber-500' : 'bg-chizuru-50/30 text-chizuru-500'
         };
       case 'OTP_CODE':
       case 'SYSTEM_MAINTENANCE':
@@ -133,7 +135,9 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
       className={`flex items-start gap-4 p-4 rounded-2xl border transition-all duration-300 ease-out cursor-pointer shadow-sm select-none ${
         isRead
           ? 'bg-white border-neutral-100/60 hover:bg-neutral-50/40 hover:-translate-y-[1px] hover:shadow-md'
-          : 'bg-chizuru-50/10 border-chizuru-100/20 hover:bg-chizuru-50/20 hover:-translate-y-[1px] hover:shadow-md'
+          : variant === 'companion'
+            ? 'bg-mami-50/10 border-mami-100/20 hover:bg-mami-50/20 hover:-translate-y-[1px] hover:shadow-md'
+            : 'bg-chizuru-50/10 border-chizuru-100/20 hover:bg-chizuru-50/20 hover:-translate-y-[1px] hover:shadow-md'
       }`}
       role="button"
       tabIndex={0}
@@ -179,7 +183,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
       {!isRead && (
         <div className="shrink-0 self-center pl-1">
           <span
-            className="block w-2.5 h-2.5 rounded-full bg-chizuru-500 animate-pulse shadow-[0_0_8px_rgba(251,105,153,0.6)]"
+            className={`block w-2.5 h-2.5 rounded-full animate-pulse ${
+              variant === 'companion'
+                ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]'
+                : 'bg-chizuru-500 shadow-[0_0_8px_rgba(251,105,153,0.6)]'
+            }`}
             aria-hidden="true"
           />
         </div>

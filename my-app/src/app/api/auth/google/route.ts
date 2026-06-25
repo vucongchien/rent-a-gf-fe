@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, connection } from 'next/server'
 
 /**
  * GET /api/auth/google — Init endpoint cho popup OAuth flow.
@@ -8,6 +8,8 @@ import { NextRequest, NextResponse } from 'next/server'
  * state / PKCE / lưu gì.
  */
 export async function GET(_req: NextRequest) {
+  await connection()
+
   const apiUrl = process.env.API_URL
   if (!apiUrl) {
     return NextResponse.json(

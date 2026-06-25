@@ -1,5 +1,7 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
+import { authService } from '@/shared/services/authService';
+import { companionService } from '@/shared/services/companionService';
 import type {
   AcceptBookingResponse,
   BookingDetail,
@@ -13,7 +15,15 @@ import type {
   CreateReviewResponse,
   RejectBookingResponse,
   ServiceRequestOptions,
+  BookingListItem,
+  BookingStatus,
 } from '@/shared/types';
+
+function normalizeBookingStatus(status: string): BookingStatus {
+  if (!status) return 'PENDING';
+  const cleanStatus = status.replace(/^BOOKING_STATUS_/, '');
+  return cleanStatus as BookingStatus;
+}
 
 export const bookingService = {
   /**
@@ -24,20 +34,152 @@ export const bookingService = {
     searchParams?: URLSearchParams;
   }): Promise<BookingsResponse> {
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<BookingsResponse>('/bookings', {
+    const raw = await serverFetch<any>('/bookings', {
       req,
       searchParams: options?.searchParams,
     });
+
+    if (!raw || !Array.isArray(raw.bookings)) {
+      return {
+        bookings: [],
+        nextPageToken: raw?.nextPageToken ?? null,
+      };
+    }
+
+    // Lấy thông tin user hiện tại để xác định vai trò (client/companion)
+    let isCompanion = false;
+    try {
+      const me = await authService.getMe(options);
+      isCompanion = me?.role === 'COMPANION';
+    } catch (err) {
+      console.warn('[bookingService.getBookings] Lỗi lấy thông tin user hiện tại:', err);
+    }
+
+    // Lấy tất cả unique companionId từ list bookings
+    const companionIds = Array.from(
+      new Set(
+        raw.bookings
+          .map((b: any) => b.companionId)
+          .filter(Boolean)
+      )
+    ) as string[];
+
+    // Fetch thông tin chi tiết companion song song
+    const companionDetailsArray = await Promise.all(
+      companionIds.map((id) =>
+        companionService.getCompanionDetail(id).catch((err) => {
+          console.error(`[bookingService.getBookings] Lỗi fetch companion ${id}:`, err);
+          return null;
+        })
+      )
+    );
+
+    const companionMap = new Map(
+      companionIds.map((id, index) => [id, companionDetailsArray[index]])
+    );
+
+    // Chuẩn hóa và mapping dữ liệu
+    const normalizedBookings = raw.bookings.map((b: any): BookingListItem => {
+      const cleanStatus = normalizeBookingStatus(b.status);
+      const companion = companionMap.get(b.companionId);
+      
+      // Tìm scenario khớp với price và durationMinutes của booking
+      const price = Number(b.price || 0);
+      const durationMin = Number(b.durationMinutes || 0);
+      const scenario = companion?.scenarios?.find(
+        (s) => Number(s.price) === price && Number(s.durationMinutes) === durationMin
+      );
+      
+      const partnerName = isCompanion
+        ? 'Khách hàng'
+        : (companion?.displayName || 'Bạn đồng hành');
+      
+      const partnerAvatar = isCompanion
+        ? ''
+        : (companion?.avatarUrl || '');
+
+      return {
+        bookingId: b.bookingId || '',
+        partnerName,
+        partnerAvatar,
+        scenarioTitle: scenario?.title || 'Kịch bản hẹn hò',
+        price,
+        startTime: b.startTime || b.createdAt || '',
+        endTime: b.endTime || '',
+        chatRoomId: b.chatRoomId || null,
+        hasReviewed: !!b.hasReviewed,
+        status: cleanStatus,
+      };
+    });
+
+    return {
+      bookings: normalizedBookings,
+      nextPageToken: raw.nextPageToken ?? null,
+    };
   },
 
   async getBookingDetail(bookingId: string, options?: ServiceRequestOptions): Promise<BookingDetail | null> {
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<BookingDetail>(`/bookings/${bookingId}`, { req });
+    const raw = await serverFetch<any>(`/bookings/${bookingId}`, { req });
+    if (!raw) return null;
+
+    const priceNum = Number(raw.price || (raw.scenarioSnapshot?.price) || 0);
+    const durationMinNum = Number(raw.durationMinutes || (raw.scenarioSnapshot?.durationMinutes) || 0);
+    const cleanStatus = normalizeBookingStatus(raw.status);
+
+    let scenarioSnapshot = raw.scenarioSnapshot;
+    if (!scenarioSnapshot) {
+      try {
+        const companion = await companionService.getCompanionDetail(raw.companionId).catch(() => null);
+        const scenario = companion?.scenarios?.find(
+          (s) => Number(s.price) === priceNum && Number(s.durationMinutes) === durationMinNum
+        );
+        scenarioSnapshot = {
+          title: scenario?.title || 'Kịch bản hẹn hò',
+          price: priceNum,
+          durationMinutes: durationMinNum,
+          publicPlace: scenario?.publicPlace || 'Địa điểm công cộng',
+        };
+      } catch (err) {
+        console.warn(`[bookingService.getBookingDetail] Lỗi dựng scenarioSnapshot cho booking ${bookingId}:`, err);
+        scenarioSnapshot = {
+          title: 'Kịch bản hẹn hò',
+          price: priceNum,
+          durationMinutes: durationMinNum,
+          publicPlace: 'Địa điểm công cộng',
+        };
+      }
+    } else {
+      scenarioSnapshot = {
+        title: scenarioSnapshot.title || 'Kịch bản hẹn hò',
+        price: Number(scenarioSnapshot.price || 0),
+        durationMinutes: Number(scenarioSnapshot.durationMinutes || 0),
+        publicPlace: scenarioSnapshot.publicPlace || 'Địa điểm công cộng',
+      };
+    }
+
+    return {
+      bookingId: raw.bookingId || '',
+      clientId: raw.clientId || '',
+      companionId: raw.companionId || '',
+      scenarioSnapshot,
+      startTime: raw.startTime || raw.createdAt || '',
+      endTime: raw.endTime || '',
+      status: cleanStatus,
+      chatRoomId: raw.chatRoomId || null,
+      chatRoomStatus: raw.chatRoomStatus || 'INACTIVE',
+      hasReviewed: !!raw.hasReviewed,
+    };
   },
 
   async createBooking(body: CreateBookingBody, options?: ServiceRequestOptions): Promise<CreateBookingResponse> {
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<CreateBookingResponse>('/bookings', { req, method: 'POST', body });
+    const raw = await serverFetch<any>('/bookings', { req, method: 'POST', body });
+    if (!raw) return raw;
+    return {
+      ...raw,
+      status: normalizeBookingStatus(raw.status),
+    };
   },
 
   async cancelBooking(
@@ -46,16 +188,26 @@ export const bookingService = {
     options?: ServiceRequestOptions,
   ): Promise<CancelBookingResponse> {
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<CancelBookingResponse>(`/bookings/${bookingId}/cancel`, {
+    const raw = await serverFetch<any>(`/bookings/${bookingId}/cancel`, {
       req,
       method: 'POST',
       body: { reason },
     });
+    if (!raw) return raw;
+    return {
+      ...raw,
+      status: normalizeBookingStatus(raw.status) as 'CANCELLED',
+    };
   },
 
   async acceptBooking(bookingId: string, options?: ServiceRequestOptions): Promise<AcceptBookingResponse> {
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<AcceptBookingResponse>(`/bookings/${bookingId}/accept`, { req, method: 'POST' });
+    const raw = await serverFetch<any>(`/bookings/${bookingId}/accept`, { req, method: 'POST' });
+    if (!raw) return raw;
+    return {
+      ...raw,
+      status: normalizeBookingStatus(raw.status),
+    };
   },
 
   async submitReview(
@@ -75,10 +227,15 @@ export const bookingService = {
     options?: ServiceRequestOptions,
   ): Promise<CompleteBookingResponse> {
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<CompleteBookingResponse>(`/bookings/${bookingId}/complete`, {
+    const raw = await serverFetch<any>(`/bookings/${bookingId}/complete`, {
       req,
       method: 'POST',
     });
+    if (!raw) return raw;
+    return {
+      ...raw,
+      status: normalizeBookingStatus(raw.status),
+    };
   },
 
   async rejectBooking(
@@ -87,10 +244,15 @@ export const bookingService = {
     options?: ServiceRequestOptions,
   ): Promise<RejectBookingResponse> {
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<RejectBookingResponse>(`/bookings/${bookingId}/reject`, {
+    const raw = await serverFetch<any>(`/bookings/${bookingId}/reject`, {
       req,
       method: 'POST',
       body: { reason },
     });
+    if (!raw) return raw;
+    return {
+      ...raw,
+      status: normalizeBookingStatus(raw.status),
+    };
   },
 };

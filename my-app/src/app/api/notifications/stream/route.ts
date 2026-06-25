@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, connection } from 'next/server';
 import { createProxyNotificationStream } from './createProxyNotificationStream';
 
 const SSE_HEADERS = {
@@ -12,6 +12,8 @@ const SSE_HEADERS = {
  * Điểm kết nối SSE chính của Client. Proxy thẳng sang BE.
  */
 export async function GET(req: NextRequest) {
+  await connection();
+
   if (!process.env.API_URL && !process.env.NOTIFICATION_API_URL) {
     return new Response('API_URL chưa được cấu hình', { status: 500 });
   }

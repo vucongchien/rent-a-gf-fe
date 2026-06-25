@@ -101,4 +101,12 @@ Nguồn đối chiếu hiện tại: `../docs/openapi_uni.json`.
 - `/dashboard` không được biến lỗi `GET /bookings` thành danh sách rỗng vì sẽ che lỗi API/auth và gây hiểu nhầm là không có booking.
 - Các action accept/reject booking phải kiểm tra `{ status: 'error' }` từ Server Action trước khi toast thành công hoặc xóa item khỏi UI.
 
+---
+
+## Tích hợp Video Landing Page
+
+- **Nguồn video**: `/public/0624(2).mp4`.
+- **Cơ chế âm thanh**: Mặc định phát có tiếng. Nếu bị trình duyệt block do chính sách Autoplay, video sẽ tạm tắt tiếng để đảm bảo chạy tự động, và tự động bật tiếng khi người dùng tương tác với trang lần đầu.
+- **Nút điều khiển**: Nút tắt/bật tiếng và nút Replay (chỉ hiện khi video kết thúc - không loop) được thiết kế dạng glassmorphism mờ nhẹ ở góc dưới cùng bên phải.
+
 
