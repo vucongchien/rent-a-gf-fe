@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/shared/components/atoms/Button';
 import {
   CheckCircleIcon,
   XCircleIcon,
   InfoCircleIcon,
 } from '@/shared/components/atoms/Icons';
-import { useWallet } from '@/shared/contexts/WalletContext';
+import { TOPUP_RETURN_TO_KEY, useWallet } from '@/shared/contexts/WalletContext';
 
 interface TopupResultViewProps {
   status: 'success' | 'cancelled' | 'failed';
@@ -50,17 +51,34 @@ export const TopupResultView: React.FC<TopupResultViewProps> = ({
   amount,
   code,
 }) => {
-  const { fetchWallet } = useWallet();
+  const router = useRouter();
+  const didHandleSuccess = useRef(false);
+  const { fetchWallet, open, showTopupSuccess } = useWallet();
   const cfg = STATUS_CONFIG[status];
   const { Icon } = cfg;
 
-  // Sau khi nạp thành công → refetch wallet để cập nhật balance ở header/context.
+  // Sau khi VNPay báo thành công, dùng page này như bridge mở wallet modal success.
   useEffect(() => {
-    if (status === 'success') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      fetchWallet();
+    if (status === 'success' && !didHandleSuccess.current) {
+      didHandleSuccess.current = true;
+      void fetchWallet().finally(() => {
+        const returnTo = sessionStorage.getItem(TOPUP_RETURN_TO_KEY) || '/';
+        sessionStorage.removeItem(TOPUP_RETURN_TO_KEY);
+        showTopupSuccess(amount);
+        router.replace(returnTo);
+      });
     }
-  }, [status, fetchWallet]);
+  }, [amount, fetchWallet, router, showTopupSuccess, status]);
+
+  if (status === 'success') {
+    return (
+      <main className="min-h-[80svh] flex items-center justify-center px-4 py-10">
+        <p className="font-sans text-[13.5px] text-neutral-500">
+          Đang cập nhật ví của bạn...
+        </p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-[80svh] flex items-center justify-center px-4 py-10">
@@ -92,7 +110,7 @@ export const TopupResultView: React.FC<TopupResultViewProps> = ({
                   </p>
                 </div>
               )}
-              {code && status !== 'success' && (
+              {code && (
                 <div className="flex items-baseline justify-between mt-1.5">
                   <p className="font-sans text-[12px] text-neutral-500">Mã phản hồi</p>
                   <p className="font-mono text-[11.5px] text-neutral-700">{code}</p>
@@ -108,16 +126,14 @@ export const TopupResultView: React.FC<TopupResultViewProps> = ({
             >
               Về ví của tôi
             </Link>
-            {status !== 'success' && (
-              <Button
-                variant="unstyled"
-                type="button"
-                onClick={() => { window.history.back(); }}
-                className="flex-1 h-11 inline-flex items-center justify-center rounded-xl bg-white border border-neutral-300 text-neutral-700 font-sans font-semibold text-[13.5px] hover:bg-neutral-50 transition-colors cursor-pointer"
-              >
-                Thử lại
-              </Button>
-            )}
+            <Button
+              variant="unstyled"
+              type="button"
+              onClick={open}
+              className="flex-1 h-11 inline-flex items-center justify-center rounded-xl bg-white border border-neutral-300 text-neutral-700 font-sans font-semibold text-[13.5px] hover:bg-neutral-50 transition-colors cursor-pointer"
+            >
+              Thử lại
+            </Button>
           </div>
         </div>
       </div>

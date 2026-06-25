@@ -21,6 +21,7 @@ export interface CompanionScenario {
   price: number
   durationMinutes: number
   publicPlace: string
+  status?: string
 }
 
 export interface CompanionDetail {
@@ -33,6 +34,7 @@ export interface CompanionDetail {
   availableCities: string[]
   averageRating: number
   totalReviews: number
+  status?: string
   scenarios: CompanionScenario[]
   recentReviews?: CompanionReview[]
   metadata?: string[]

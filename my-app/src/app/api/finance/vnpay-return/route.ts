@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 /**
  * GET /api/finance/vnpay-return — Return URL VNPay redirect browser về sau thanh toán.
  *
- * SSOT §2.4: BE verify hash & update wallet qua IPN (server-to-server).
- * BFF chỉ parse query params VNPay rồi redirect tới trang kết quả với status mapped.
- * KHÔNG verify hash (BE đã verify).
+ * BE là nguồn sự thật cho ví: `/finance/vnpay-ipn` verify hash và credit wallet.
+ * BFF route này chỉ là UI adapter khi VNPay/browser quay về FE domain: map status
+ * để hiển thị result page, tuyệt đối không credit wallet và không coi success UI là
+ * bằng chứng thanh toán.
  */
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;

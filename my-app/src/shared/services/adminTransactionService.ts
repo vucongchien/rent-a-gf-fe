@@ -3,6 +3,7 @@
  */
 
 import { serverFetch } from '@/shared/lib/apiClient';
+import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
 import type {
   AdminTransactionListParams,
   AdminTransactionListResponse,
@@ -14,6 +15,7 @@ export const adminTransactionService = {
     params: AdminTransactionListParams = {},
     options?: ServiceRequestOptions,
   ): Promise<AdminTransactionListResponse> {
+    const req = await getRequestCookieHeader(options?.req);
     const sp = new URLSearchParams();
     if (params.type) sp.set('type', params.type);
     if (params.status) sp.set('status', params.status);
@@ -22,7 +24,7 @@ export const adminTransactionService = {
     if (params.pageSize) sp.set('pageSize', String(params.pageSize));
     return serverFetch<AdminTransactionListResponse>('/admin/transactions', {
       searchParams: sp,
-      req: options?.req,
+      req,
     });
   },
 };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { companionService } from '@/shared/services/companionService';
+import { cityLabel } from '@/shared/constants/cities';
 import { HeroContent } from './HeroContent';
 import { HeroFeatured } from './HeroFeatured';
 
@@ -10,7 +11,7 @@ export async function ExploreHero() {
   const formattedFeatured = featuredCompanion ? {
     id: featuredCompanion.companionId,
     name: featuredCompanion.displayName,
-    location: featuredCompanion.availableCities.join(', '),
+    location: featuredCompanion.availableCities.map(cityLabel).join(', '),
     price: featuredCompanion.minPrice ? `${featuredCompanion.minPrice} KC` : 'Liên hệ',
     avatarUrl: featuredCompanion.avatarUrl,
     voiceUrl: featuredCompanion.voiceIntroUrl,

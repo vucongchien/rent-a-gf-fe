@@ -17,12 +17,10 @@
  */
 
 import { ApiError } from './apiError'
-import { refreshTokensFromCookie } from './tokenRefresh'
+import { AUTH_COOKIE_NAME } from './authCookies'
 import type { ApiErrorDetail } from '@/shared/types'
 
 const TIMEOUT_MS = 10_000
-const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? 'access_token'
-const REFRESH_COOKIE_NAME = 'refresh_token'
 
 export interface ServerFetchOptions {
   /** NextRequest để extract JWT từ Cookie header */
@@ -39,8 +37,6 @@ export interface ServerFetchOptions {
   cache?: RequestCache
   /** Next.js revalidate + tags */
   next?: NextFetchRequestConfig
-  /** @internal — guard chống retry loop khi 401 → refresh → retry */
-  _retried?: boolean
 }
 
 /**
@@ -94,6 +90,10 @@ export async function serverFetch<T = unknown>(
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }
+  for (const name of ['user-id', 'user-role', 'user-email']) {
+    const value = req?.headers.get(name)
+    if (value) headers[name] = value
+  }
   if (extraHeaders) {
     for (const [k, v] of Object.entries(extraHeaders)) headers[k] = v
   }
@@ -119,25 +119,11 @@ export async function serverFetch<T = unknown>(
     }
 
     if (!res.ok) {
-      // Reactive refresh: BE trả 401, có refresh_token, chưa retry → refresh + retry 1 lần.
-      // Race condition: nếu BE rotate refresh_token, request đồng thời thứ 2 fail → caller
-      // sẽ thấy ApiError.unauthorized() và điều hướng login. Document chấp nhận.
-      if (res.status === 401 && !options._retried) {
-        const refreshTokenValue = extractCookieValue(cookieHeader, REFRESH_COOKIE_NAME)
-        if (refreshTokenValue) {
-          const fresh = await refreshTokensFromCookie(refreshTokenValue)
-          if (fresh) {
-            // Cookie cập nhật KHÔNG làm được từ serverFetch (không ở context có cookies().set).
-            // Middleware sẽ refresh cookie ở request kế tiếp. Tạm thời retry với token mới.
-            const retryHeaders: Record<string, string> = { ...extraHeaders ?? {}, Authorization: `Bearer ${fresh.accessToken}` }
-            return serverFetch<T>(path, {
-              ...options,
-              extraHeaders: retryHeaders,
-              _retried: true,
-            })
-          }
-        }
-        // Refresh fail hoặc không có refresh_token → throw unauthorized.
+      // Refresh được dồn về middleware (single refresh point). Nếu BE vẫn trả 401
+      // tại đây nghĩa là token thực sự bị revoke (BE force-logout, password change…)
+      // — không thể cứu ở tầng serverFetch. Throw thẳng, caller (route handler)
+      // map sang 401 cho client; client AuthContext sẽ thử POST /api/auth/refresh.
+      if (res.status === 401) {
         throw ApiError.unauthorized(`Phiên đăng nhập đã hết hạn (${method} ${path})`)
       }
 

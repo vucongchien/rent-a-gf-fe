@@ -46,8 +46,13 @@ function getFilesRecursively(dir) {
         results = results.concat(getFilesRecursively(filePath));
       }
     } else {
-      // Chỉ kiểm tra file .ts và .tsx, loại trừ các file test
-      if ((file.endsWith('.ts') || file.endsWith('.tsx')) && !file.includes('.test.')) {
+      // Chỉ kiểm tra file .ts và .tsx, loại trừ các file test và OG image (Satori dùng inline style hex)
+      if (
+        (file.endsWith('.ts') || file.endsWith('.tsx')) &&
+        !file.includes('.test.') &&
+        !file.startsWith('opengraph-image.') &&
+        !file.startsWith('twitter-image.')
+      ) {
         results.push(filePath);
       }
     }

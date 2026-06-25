@@ -53,7 +53,7 @@ describe('shouldRefreshAccessToken', () => {
     expect(shouldRefreshAccessToken(makeJwt({ exp: far }), 60)).toBe(false)
   })
 
-  it('false (không refresh) khi decode fail để tránh loop', () => {
-    expect(shouldRefreshAccessToken('not.a.jwt')).toBe(false)
+  it('true khi decode fail để middleware thử refresh trước khi guard logout', () => {
+    expect(shouldRefreshAccessToken('not.a.jwt')).toBe(true)
   })
 })

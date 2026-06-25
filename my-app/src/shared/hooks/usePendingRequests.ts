@@ -13,7 +13,11 @@ export const usePendingRequests = (initialBookings: BookingListItem[]) => {
   const handleAccept = async (bookingId: string) => {
     setLoadingId(bookingId);
     try {
-      await acceptBookingAction(bookingId);
+      const result = await acceptBookingAction(bookingId);
+      if (result.status === 'error') {
+        toast({ message: result.message });
+        return;
+      }
       toast({ message: 'Đã chấp nhận yêu cầu đặt lịch!' });
       setBookings((prev) => prev.filter((b) => b.bookingId !== bookingId));
     } catch {
@@ -26,7 +30,11 @@ export const usePendingRequests = (initialBookings: BookingListItem[]) => {
   const handleReject = async (bookingId: string) => {
     setLoadingId(bookingId);
     try {
-      await rejectBookingAction(bookingId);
+      const result = await rejectBookingAction(bookingId);
+      if (result.status === 'error') {
+        toast({ message: result.message });
+        return;
+      }
       toast({ message: 'Đã từ chối yêu cầu.' });
       setBookings((prev) => prev.filter((b) => b.bookingId !== bookingId));
     } catch {
@@ -35,9 +43,6 @@ export const usePendingRequests = (initialBookings: BookingListItem[]) => {
       setLoadingId(null);
     }
   };
-
-
-
 
   return {
     bookings,

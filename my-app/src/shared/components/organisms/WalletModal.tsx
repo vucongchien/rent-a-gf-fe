@@ -10,7 +10,17 @@ import { TopUpSuccess } from './TopUpSuccess';
 import { AuthRequiredModal } from '../molecules/AuthRequiredModal';
 
 export const WalletModal: React.FC = () => {
-  const { isOpen, close, balance, frozenBalance, topup, isAuthModalOpen, closeAuthModal } = useWallet();
+  const {
+    isOpen,
+    close,
+    balance,
+    frozenBalance,
+    topup,
+    topupSuccess,
+    clearTopupSuccess,
+    isAuthModalOpen,
+    closeAuthModal,
+  } = useWallet();
   const dialogRef = useRef<HTMLDialogElement>(null);
   
   const form = useTopUpForm({ topup });
@@ -23,9 +33,10 @@ export const WalletModal: React.FC = () => {
     if (isOpen) {
       if (!dialog.open) {
         dialog.showModal();
-        // Reset success state khi mở modal
-        form.setShowSuccess(false);
-        form.handleQuickSelect(200); // Khôi phục gói nạp mặc định
+        if (!topupSuccess) {
+          form.setShowSuccess(false);
+          form.handleQuickSelect(200);
+        }
       }
     } else {
       if (dialog.open) {
@@ -76,11 +87,14 @@ export const WalletModal: React.FC = () => {
             className="absolute top-5 right-5 z-10"
           />
 
-          {form.showSuccess ? (
+          {topupSuccess || form.showSuccess ? (
             <TopUpSuccess
-              amount={form.amount}
+              amount={topupSuccess?.amount ?? form.amount}
               balance={balance}
-              onClose={close}
+              onClose={() => {
+                clearTopupSuccess();
+                close();
+              }}
             />
           ) : (
             <>

@@ -12,16 +12,16 @@ const SSE_HEADERS = {
  * Điểm kết nối SSE chính của Client. Proxy thẳng sang BE.
  */
 export async function GET(req: NextRequest) {
-  const apiUrl = process.env.API_URL;
-  if (!apiUrl) {
+  if (!process.env.API_URL && !process.env.NOTIFICATION_API_URL) {
     return new Response('API_URL chưa được cấu hình', { status: 500 });
   }
 
-  const stream = await createProxyNotificationStream(apiUrl, req.signal);
+  const stream = await createProxyNotificationStream(req, req.signal);
 
   if (!stream) {
     return new Response('Không thể kết nối đến luồng thông báo của backend', {
       status: 502,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     });
   }
 

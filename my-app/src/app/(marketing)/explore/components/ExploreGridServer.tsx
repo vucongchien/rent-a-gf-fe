@@ -1,6 +1,7 @@
 import React from 'react';
 import { companionService } from '@/shared/services/companionService';
 import { CompanionCard } from '@/shared/components/molecules/CompanionCard';
+import { cityLabel } from '@/shared/constants/cities';
 import { LoadMoreClient } from './LoadMoreClient';
 
 const DEFAULT_LIMIT = 6;
@@ -37,12 +38,12 @@ export async function ExploreGridServer({ city, limit = DEFAULT_LIMIT }: Explore
               key={comp.companionId}
               id={comp.companionId}
               name={comp.displayName}
-              location={comp.availableCities.join(', ')}
+              location={comp.availableCities.map(cityLabel).join(', ')}
               price={comp.minPrice ? `${comp.minPrice} KC` : 'Free to meet'}
               avatarUrl={comp.avatarUrl}
               voiceUrl={comp.voiceIntroUrl}
               traits={comp.totalReviews === 0 ? ['new'] : undefined}
-              metadata={comp.availableCities}
+              metadata={comp.averageRating > 0 ? [String(comp.averageRating)] : comp.availableCities.map(cityLabel)}
             />
           ))}
         </div>

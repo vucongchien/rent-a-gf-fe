@@ -3,6 +3,7 @@
  */
 
 import { serverFetch } from '@/shared/lib/apiClient';
+import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
 import type {
   AdminFeatureFlag,
   AdminFeatureFlagListResponse,
@@ -11,8 +12,9 @@ import type {
 
 export const adminSettingsService = {
   async listFlags(options?: ServiceRequestOptions): Promise<AdminFeatureFlagListResponse> {
+    const req = await getRequestCookieHeader(options?.req);
     return serverFetch<AdminFeatureFlagListResponse>('/admin/settings/flags', {
-      req: options?.req,
+      req,
     });
   },
 
@@ -21,10 +23,11 @@ export const adminSettingsService = {
     enabled: boolean,
     options?: ServiceRequestOptions,
   ): Promise<AdminFeatureFlag> {
+    const req = await getRequestCookieHeader(options?.req);
     return serverFetch<AdminFeatureFlag>(`/admin/settings/flags/${key}`, {
       method: 'PATCH',
       body: { enabled },
-      req: options?.req,
+      req,
     });
   },
 };

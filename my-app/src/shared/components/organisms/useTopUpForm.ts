@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import type { TopupResult } from '@/shared/contexts/WalletContext';
 
 export interface UseTopUpFormProps {
-  topup: (amount: number) => Promise<boolean>;
+  topup: (amount: number) => Promise<TopupResult>;
 }
 
 export function useTopUpForm({ topup }: UseTopUpFormProps) {
@@ -50,11 +51,9 @@ export function useTopUpForm({ topup }: UseTopUpFormProps) {
       setIsSubmitting(true);
       setErrorMsg(null);
       
-      const success = await topup(amount);
-      if (success) {
-        setShowSuccess(true);
-      } else {
-        setErrorMsg('Giao dịch nạp tiền thất bại. Vui lòng thử lại sau.');
+      const result = await topup(amount);
+      if (!result.ok) {
+        setErrorMsg(result.message ?? 'Giao dịch nạp tiền thất bại. Vui lòng thử lại sau.');
       }
     } catch {
       setErrorMsg('Có lỗi mạng xảy ra. Vui lòng thử lại.');

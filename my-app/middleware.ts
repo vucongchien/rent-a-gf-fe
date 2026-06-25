@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { refreshTokensFromCookie, shouldRefreshAccessToken } from './src/shared/lib/tokenRefresh'
+import {
+  accessTokenCookieOptions,
+  AUTH_COOKIE_NAME,
+  refreshTokenCookieOptions,
+  REFRESH_COOKIE_NAME,
+} from './src/shared/lib/authCookies'
 
 /**
  * Middleware — decode JWT từ cookie HttpOnly, inject header `user-id`
@@ -12,8 +18,9 @@ import { refreshTokensFromCookie, shouldRefreshAccessToken } from './src/shared/
  *   do BE set; BE thật vẫn re-verify khi nhận Bearer token.
  *
  * Auto-refresh (P0-1):
- * - Nếu access_token sắp/đã hết hạn AND có refresh_token → gọi BE /auth/refresh
- *   server-to-server, set lại cookie + dùng access_token mới cho request hiện tại.
+ * - Nếu access_token sắp/đã hết hạn hoặc đã bị browser drop do maxAge,
+ *   AND có refresh_token → gọi BE /auth/refresh server-to-server, set lại
+ *   cookie + dùng access_token mới cho request hiện tại.
  * - Skip cho `/api/auth/*` (tránh recursion với chính refresh endpoint).
  * - Refresh fail → clear cả 2 cookie, forward tiếp; downstream sẽ thấy unauth.
  *
@@ -21,10 +28,9 @@ import { refreshTokensFromCookie, shouldRefreshAccessToken } from './src/shared/
  * Việc enforce auth vẫn thuộc về service / route handler tiếp theo.
  */
 
-const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? 'access_token'
-const REFRESH_COOKIE_NAME = 'refresh_token'
 const USER_ID_HEADER = 'user-id'
-const REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 // 30 ngày — đồng bộ /api/auth/callback
+const USER_ROLE_HEADER = 'user-role'
+const USER_EMAIL_HEADER = 'user-email'
 
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   const parts = token.split('.')
@@ -47,16 +53,28 @@ function extractUserId(payload: Record<string, unknown> | null): string | null {
   return typeof candidate === 'string' && candidate.length > 0 ? candidate : null
 }
 
-function isProd() {
-  return process.env.NODE_ENV === 'production'
+function extractString(payload: Record<string, unknown> | null, keys: string[]): string | null {
+  if (!payload) return null
+  for (const key of keys) {
+    const value = payload[key]
+    if (typeof value === 'string' && value.length > 0) return value
+  }
+  return null
 }
 
 function buildRequestHeaders(req: NextRequest, accessToken: string | null | undefined): Headers {
   const requestHeaders = new Headers(req.headers)
   requestHeaders.delete(USER_ID_HEADER)
+  requestHeaders.delete(USER_ROLE_HEADER)
+  requestHeaders.delete(USER_EMAIL_HEADER)
   if (accessToken) {
-    const userId = extractUserId(decodeJwtPayload(accessToken))
+    const payload = decodeJwtPayload(accessToken)
+    const userId = extractUserId(payload)
+    const userRole = extractString(payload, ['role', 'userRole', 'user_role'])
+    const userEmail = extractString(payload, ['email'])
     if (userId) requestHeaders.set(USER_ID_HEADER, userId)
+    if (userRole) requestHeaders.set(USER_ROLE_HEADER, userRole)
+    if (userEmail) requestHeaders.set(USER_EMAIL_HEADER, userEmail)
   }
   return requestHeaders
 }
@@ -66,16 +84,38 @@ export async function middleware(req: NextRequest) {
   const accessToken = req.cookies.get(AUTH_COOKIE_NAME)?.value ?? null
   const refreshToken = req.cookies.get(REFRESH_COOKIE_NAME)?.value ?? null
 
-  // Skip refresh logic cho auth endpoints (chính refresh/callback/logout) — tránh recursion.
-  const isAuthEndpoint = pathname.startsWith('/api/auth')
+  // Skip refresh logic cho các endpoint tự quản cookie (refresh/callback/logout/mock-switch)
+  // — tránh recursion (refresh tự call /auth/refresh) hoặc ghi đè cookie họ vừa set.
+  // /api/auth/me KHÔNG nằm trong skip list — nó là thin reader, để middleware refresh giúp.
+  const skipRefresh =
+    pathname === '/api/auth/refresh' ||
+    pathname === '/api/auth/callback' ||
+    pathname === '/api/auth/logout' ||
+    pathname === '/api/auth/mock-switch'
+
+  const debugAuth =
+    process.env.NODE_ENV !== 'production' &&
+    (pathname.startsWith('/api/auth') || pathname === '/' || pathname.startsWith('/me'))
+
+  if (debugAuth) {
+    console.log('[mw]', pathname, {
+      hasAccess: !!accessToken,
+      hasRefresh: !!refreshToken,
+      shouldRefresh: accessToken ? shouldRefreshAccessToken(accessToken, 60) : 'no-access',
+      apiUrl: !!process.env.API_URL,
+      skipRefresh,
+    })
+  }
 
   if (
-    !isAuthEndpoint &&
+    !skipRefresh &&
     process.env.API_URL &&
     refreshToken &&
-    shouldRefreshAccessToken(accessToken, 60)
+    (!accessToken || shouldRefreshAccessToken(accessToken, 60))
   ) {
+    if (debugAuth) console.log('[mw-refresh] try', pathname)
     const fresh = await refreshTokensFromCookie(refreshToken)
+    if (debugAuth) console.log('[mw-refresh] result', pathname, fresh ? 'OK' : 'FAIL')
     if (fresh) {
       // Forward request với access_token mới (inject Bearer downstream qua cookie header).
       const requestHeaders = buildRequestHeaders(req, fresh.accessToken)
@@ -85,20 +125,8 @@ export async function middleware(req: NextRequest) {
       requestHeaders.set('cookie', patched)
 
       const res = NextResponse.next({ request: { headers: requestHeaders } })
-      res.cookies.set(AUTH_COOKIE_NAME, fresh.accessToken, {
-        httpOnly: true,
-        secure: isProd(),
-        sameSite: 'lax',
-        path: '/',
-        maxAge: Math.max(fresh.expiresIn ?? 3600, 60),
-      })
-      res.cookies.set(REFRESH_COOKIE_NAME, fresh.refreshToken, {
-        httpOnly: true,
-        secure: isProd(),
-        sameSite: 'lax',
-        path: '/',
-        maxAge: REFRESH_TOKEN_MAX_AGE,
-      })
+      res.cookies.set(AUTH_COOKIE_NAME, fresh.accessToken, accessTokenCookieOptions(fresh.expiresIn ?? 3600))
+      res.cookies.set(REFRESH_COOKIE_NAME, fresh.refreshToken, refreshTokenCookieOptions())
       return res
     } else {
       // Refresh fail → clear cookies. Downstream service sẽ thấy unauth và 401.
@@ -113,7 +141,7 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // Default path: chỉ inject user-id header.
+  // Default path: chỉ inject user context headers.
   return NextResponse.next({ request: { headers: buildRequestHeaders(req, accessToken) } })
 }
 

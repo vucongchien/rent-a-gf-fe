@@ -10,7 +10,6 @@ export interface Wallet {
 }
 
 export interface TopupRequestBody {
-  userId: string
   amount: number
 }
 

@@ -15,6 +15,37 @@ interface Companion {
   voiceIntroUrl: string | null
 }
 
+interface ApiCompanion {
+  companionId?: string
+  id?: string
+  displayName: string
+  avatarUrl?: string | null
+  city?: string | null
+  availableCities?: string[]
+  averageRating?: number
+  ratingAvg?: number
+  totalReviews?: number
+  reviewCount?: number
+  minPrice?: number
+  startingPrice?: number
+  featuredScenario?: { name: string; priceInCoin: number }
+  voiceIntroUrl?: string | null
+}
+
+function toDebugCompanion(comp: ApiCompanion): Companion {
+  const price = comp.minPrice ?? comp.startingPrice ?? comp.featuredScenario?.priceInCoin ?? 0
+  return {
+    id: comp.companionId ?? comp.id ?? '',
+    displayName: comp.displayName,
+    avatarUrl: comp.avatarUrl ?? 'https://i.pravatar.cc/160?u=debug-companion',
+    city: comp.city ?? comp.availableCities?.[0] ?? 'N/A',
+    ratingAvg: comp.averageRating ?? comp.ratingAvg ?? 0,
+    reviewCount: comp.totalReviews ?? comp.reviewCount ?? 0,
+    featuredScenario: comp.featuredScenario ?? { name: 'Gặp gỡ cơ bản', priceInCoin: price },
+    voiceIntroUrl: comp.voiceIntroUrl ?? null,
+  }
+}
+
 interface Booking {
   id: string
   companionId: string
@@ -106,8 +137,10 @@ export default function Home() {
     try {
       const res = await fetch('/api/companions')
       const json = await res.json()
-      setCompanions(json.data.items)
-      addLog(`Loaded ${json.data.items.length} companions from /api/companions`)
+      const items = (json.companions ?? json.data?.items ?? json.data ?? []) as ApiCompanion[]
+      const nextCompanions = items.map(toDebugCompanion)
+      setCompanions(nextCompanions)
+      addLog(`Loaded ${nextCompanions.length} companions from /api/companions`)
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       addLog(`Failed to fetch companions: ${msg}`)

@@ -1,11 +1,26 @@
 import { serverFetch } from '@/shared/lib/apiClient';
+import { ApiError } from '@/shared/lib/apiError';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
+import { getUserFromRequest } from '@/shared/lib/authSession';
 import { getCurrentUserId } from '@/shared/lib/userContext';
 import type { Wallet, TopupResponse, WalletTransaction, ServiceRequestOptions } from '@/shared/types';
 
 export interface InitiateTopupOptions extends ServiceRequestOptions {
   /** Idempotency key forward từ client để chống double-charge ở BE. */
   idempotencyKey?: string;
+}
+
+async function resolveFinanceUserId(req?: ServiceRequestOptions['req']): Promise<string> {
+  const userIdFromHeader = req?.headers.get('user-id');
+  if (userIdFromHeader) return userIdFromHeader;
+
+  const userIdFromCookie = req ? getUserFromRequest(req)?.userId : null;
+  if (userIdFromCookie) return userIdFromCookie;
+
+  const userIdFromContext = await getCurrentUserId();
+  if (userIdFromContext) return userIdFromContext;
+
+  throw ApiError.unauthorized('Không xác định được user-id cho Finance API');
 }
 
 export const walletService = {
@@ -15,35 +30,38 @@ export const walletService = {
    */
   async getWallet(options?: ServiceRequestOptions): Promise<Wallet> {
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<Wallet>('/finance/wallet', { req });
+    const userId = await resolveFinanceUserId(req);
+    return serverFetch<Wallet>('/finance/wallet', {
+      req,
+      extraHeaders: { 'user-id': userId },
+    });
   },
 
   /**
    * Khởi tạo nạp tiền qua VNPay.
    *
-   * SSOT yêu cầu body `{ userId, amount }`. userId lấy từ header `user-id`
-   * (do middleware decode JWT) qua `getCurrentUserId()`. BE vẫn có thể tự
-   * verify khớp với JWT để chống giả mạo. `idempotencyKey` forward từ Route
-   * Handler / Server Action để BE chống double-charge khi client retry.
+   * OpenAPI yêu cầu header `user-id` và body `{ amount }`. Bearer token vẫn
+   * được `serverFetch` tự gắn từ cookie HttpOnly.
    */
   async initiateTopup(body: { amount: number }, options?: InitiateTopupOptions): Promise<TopupResponse> {
     const req = await getRequestCookieHeader(options?.req);
-    const userId = (await getCurrentUserId()) ?? '';
+    const userId = await resolveFinanceUserId(req);
     return serverFetch<TopupResponse>('/finance/topup', {
       req,
       method: 'POST',
-      body: { userId, amount: body.amount },
-      extraHeaders: options?.idempotencyKey
-        ? { 'x-idempotency-key': options.idempotencyKey }
-        : undefined,
+      body: { amount: body.amount },
+      extraHeaders: {
+        'user-id': userId,
+        ...(options?.idempotencyKey ? { 'x-idempotency-key': options.idempotencyKey } : {}),
+      },
     });
   },
 
   /**
-   * Lấy lịch sử giao dịch của user hiện tại. KHÔNG cache.
+   * OpenAPI hiện chưa expose `/finance/transactions`; trả rỗng để UI không
+   * gọi endpoint ngoài contract và không làm vỡ trang ví/earnings.
    */
-  async getTransactions(options?: ServiceRequestOptions): Promise<WalletTransaction[]> {
-    const req = await getRequestCookieHeader(options?.req);
-    return serverFetch<WalletTransaction[]>('/finance/transactions', { req });
+  async getTransactions(_options?: ServiceRequestOptions): Promise<WalletTransaction[]> {
+    return [];
   }
 };

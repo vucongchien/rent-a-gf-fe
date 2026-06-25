@@ -10,6 +10,7 @@ import {
   GenderMaleIcon 
 } from '@/shared/components/atoms/Icons'
 import { VoiceButton } from '@/shared/components/atoms/VoiceButton'
+import { cityLabel } from '@/shared/constants/cities'
 import { ScrollToScenesButton } from './ScrollToScenesButton'
 
 // Hàm helper phân loại màu pastel và icon tương ứng cho đặc điểm nổi bật
@@ -47,6 +48,7 @@ const getTagStyle = (meta: string) => {
 
 export function ProfileNote({ companion }: { companion: CompanionDetail }) {
   const ratingText = companion.averageRating > 0 ? companion.averageRating.toFixed(1) : 'New'
+  const cityText = companion.availableCities.map(cityLabel).join(', ')
 
   return (
     <div className="bg-white/90 border border-neutral-200/30 rounded-2xl p-6 md:p-8 shadow-[var(--shadow-card-info)] backdrop-blur-md space-y-6">
@@ -68,7 +70,7 @@ export function ProfileNote({ companion }: { companion: CompanionDetail }) {
               
               <div className="flex items-center gap-1 text-neutral-500 font-sans font-medium">
                 <MapPinIcon size={14} className="text-neutral-400" />
-                <span>{companion.availableCities.join(', ')}</span>
+                <span>{cityText}</span>
               </div>
             </div>
           </div>

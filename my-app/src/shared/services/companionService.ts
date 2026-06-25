@@ -3,6 +3,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { serverFetch } from '@/shared/lib/apiClient';
 import { CACHE_TAGS } from '@/shared/lib/cacheTags';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
+import { normalizeCityCode } from '@/shared/constants/cities';
 import type {
   Companion,
   CompanionDetail,
@@ -14,8 +15,102 @@ import type {
   UpdateScenarioBody,
 } from '@/shared/types';
 
-async function getMyProfileImpl(): Promise<CompanionProfileMe> {
-  const req = await getRequestCookieHeader();
+type BackendCompanionListItem = Partial<Companion> & {
+  city?: string | null;
+  startingPrice?: number | null;
+  avatarUrl?: string | null;
+};
+
+type BackendCompanionsResponse = {
+  data?: BackendCompanionListItem[];
+  companions?: BackendCompanionListItem[];
+  total?: number;
+  page?: number;
+  pageSize?: number;
+};
+
+type BackendCompanionScenario = {
+  id?: string;
+  scenarioId?: string;
+  title?: string;
+  description?: string;
+  price?: number;
+  duration?: number;
+  durationMinutes?: number;
+  publicPlace?: string;
+  status?: string;
+};
+
+type BackendCompanionDetail = Omit<Partial<CompanionDetail>, 'scenarios'> & {
+  bio?: string | null;
+  avatarUrl?: string | null;
+  voiceIntroUrl?: string | null;
+  scenarios?: BackendCompanionScenario[];
+  status?: string;
+};
+
+function normalizeCompanion(item: BackendCompanionListItem): Companion {
+  const availableCities = Array.isArray(item.availableCities)
+    ? item.availableCities
+    : item.city
+      ? [item.city]
+      : [];
+
+  return {
+    companionId: item.companionId ?? '',
+    displayName: item.displayName ?? '',
+    avatarUrl: item.avatarUrl ?? '',
+    averageRating: item.averageRating ?? 0,
+    totalReviews: item.totalReviews ?? 0,
+    availableCities,
+    minPrice: item.minPrice ?? item.startingPrice ?? 0,
+    voiceIntroUrl: item.voiceIntroUrl ?? null,
+    ...(item.metadata ? { metadata: item.metadata } : {}),
+  };
+}
+
+function normalizeScenario(item: BackendCompanionScenario): CompanionDetail['scenarios'][number] {
+  return {
+    scenarioId: item.scenarioId ?? item.id ?? '',
+    title: item.title ?? '',
+    description: item.description ?? '',
+    price: item.price ?? 0,
+    durationMinutes: item.durationMinutes ?? item.duration ?? 0,
+    publicPlace: item.publicPlace ?? '',
+    ...(item.status ? { status: item.status } : {}),
+  };
+}
+
+function normalizeCompanionDetail(raw: BackendCompanionDetail): CompanionDetail {
+  return {
+    companionId: raw.companionId ?? '',
+    displayName: raw.displayName ?? '',
+    biography: raw.biography ?? raw.bio ?? '',
+    avatarUrl: raw.avatarUrl ?? '',
+    albumUrls: raw.albumUrls ?? [],
+    voiceIntroUrl: raw.voiceIntroUrl ?? null,
+    availableCities: raw.availableCities ?? [],
+    averageRating: raw.averageRating ?? 0,
+    totalReviews: raw.totalReviews ?? 0,
+    ...(raw.status ? { status: raw.status } : {}),
+    scenarios: (raw.scenarios ?? []).map(normalizeScenario),
+    ...(raw.recentReviews ? { recentReviews: raw.recentReviews } : {}),
+    ...(raw.metadata ? { metadata: raw.metadata } : {}),
+  };
+}
+
+function normalizeCompanionsResponse(raw: BackendCompanionsResponse, fallbackPageSize: number): CompanionsResponse {
+  const rawCompanions = raw.companions ?? raw.data ?? [];
+  return {
+    companions: rawCompanions.map(normalizeCompanion),
+    total: raw.total ?? rawCompanions.length,
+    page: raw.page ?? 1,
+    pageSize: raw.pageSize ?? fallbackPageSize,
+  };
+}
+
+async function getMyProfileImpl(options?: ServiceRequestOptions): Promise<CompanionProfileMe> {
+  const req = await getRequestCookieHeader(options?.req);
   return serverFetch<CompanionProfileMe>('/profile/me', { method: 'GET', req });
 }
 
@@ -36,26 +131,16 @@ export const companionService = {
     cacheLife('minutes');
     cacheTag(CACHE_TAGS.COMPANIONS_LIST);
     const page = params?.page ?? 1;
-    const city = params?.city && params.city !== 'all' ? params.city : 'all';
+    const city = params?.city && params.city !== 'all' ? normalizeCityCode(params.city) : 'all';
     cacheTag(CACHE_TAGS.companionsList(`p${page}-${city}`));
 
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', String(params.page));
     if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
-    if (params?.city && params.city !== 'all') searchParams.set('city', params.city);
+    if (city !== 'all') searchParams.set('city', city);
 
-    const raw = await serverFetch<{
-      companions: Companion[];
-      total: number;
-      page: number;
-      pageSize: number;
-    }>('/companions', { searchParams });
-    return {
-      companions: raw.companions ?? [],
-      total: raw.total ?? 0,
-      page: raw.page ?? 1,
-      pageSize: raw.pageSize ?? (params?.pageSize ?? 9),
-    };
+    const raw = await serverFetch<BackendCompanionsResponse>('/companions', { searchParams });
+    return normalizeCompanionsResponse(raw, params?.pageSize ?? 9);
   },
 
   async getFeaturedCompanion(): Promise<{
@@ -69,15 +154,11 @@ export const companionService = {
     const searchParams = new URLSearchParams();
     searchParams.set('pageSize', '1');
 
-    const raw = await serverFetch<{
-      companions: Companion[];
-      total: number;
-      page: number;
-      pageSize: number;
-    }>('/companions', { searchParams });
+    const raw = await serverFetch<BackendCompanionsResponse>('/companions', { searchParams });
+    const { companions, total } = normalizeCompanionsResponse(raw, 1);
     return {
-      featuredCompanion: raw.companions?.[0] || null,
-      totalCount: raw.total || 0,
+      featuredCompanion: companions[0] || null,
+      totalCount: total,
     };
   },
 
@@ -86,7 +167,8 @@ export const companionService = {
     cacheLife('minutes');
     cacheTag(CACHE_TAGS.companion(companionId));
 
-    return serverFetch<CompanionDetail>(`/companions/${companionId}`);
+    const raw = await serverFetch<BackendCompanionDetail>(`/companions/${companionId}`);
+    return normalizeCompanionDetail(raw);
   },
 
   /**
@@ -115,7 +197,7 @@ export const companionService = {
    */
   getMyProfile(options?: ServiceRequestOptions): Promise<CompanionProfileMe> {
     if (options?.req) {
-      return getMyProfileImpl();
+      return getMyProfileImpl(options);
     }
     return getMyProfileCached();
   },

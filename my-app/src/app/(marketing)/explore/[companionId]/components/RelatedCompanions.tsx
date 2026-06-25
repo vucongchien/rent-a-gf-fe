@@ -1,6 +1,7 @@
 import React from 'react'
 import { companionService } from '@/shared/services/companionService'
 import { CompanionCard } from '@/shared/components/molecules/CompanionCard'
+import { cityLabel } from '@/shared/constants/cities'
 import type { Companion } from '@/shared/types'
 
 interface RelatedCompanionsProps {
@@ -38,11 +39,11 @@ export async function RelatedCompanions({ currentId, city }: RelatedCompanionsPr
             key={c.companionId}
             id={c.companionId}
             name={c.displayName}
-            location={c.availableCities[0]}
+            location={cityLabel(c.availableCities[0] ?? '')}
             price={`${c.minPrice || 150} Coin`}
             avatarUrl={c.avatarUrl}
             voiceUrl={c.voiceIntroUrl}
-            metadata={c.availableCities}
+            metadata={c.averageRating > 0 ? [String(c.averageRating)] : c.availableCities.map(cityLabel)}
             traits={[]}
           />
         ))}

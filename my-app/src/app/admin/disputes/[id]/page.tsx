@@ -26,7 +26,9 @@ const OUTCOME_LABEL: Record<AdminDisputeOutcome, string> = {
 };
 
 function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('vi-VN', {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 'Chưa có dữ liệu';
+  return d.toLocaleString('vi-VN', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',

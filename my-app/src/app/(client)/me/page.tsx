@@ -2,11 +2,12 @@ import React, { Suspense } from 'react';
 import { authService } from '@/shared/services/authService';
 import { walletService } from '@/shared/services/walletService';
 import { ProfileInfoCard } from './components/ProfileInfoCard';
+import { UpgradeToCompanionCard } from './components/UpgradeToCompanionCard';
 import { WalletDashboard } from '@/shared/components/organisms/WalletDashboard';
+import { AuthRequiredPage } from '@/shared/components/organisms/AuthRequiredPage';
 import { TransactionFilters } from './components/TransactionFilters';
 import { TransactionList } from './components/TransactionList';
 import { TransactionSkeleton } from './components/TransactionSkeleton';
-import { AuthRequiredPage } from '@/shared/components/organisms/AuthRequiredPage';
 
 interface PageProps {
   searchParams: Promise<{
@@ -20,21 +21,19 @@ export default async function MePage({ searchParams }: PageProps) {
   const filterType = resolvedSearchParams.type || 'ALL';
   const filterStatus = resolvedSearchParams.status || 'ALL';
 
-  // Gom các request quan trọng của trang để fetch song song tránh fetch waterfall
-  const [user, wallet] = await Promise.all([
-    authService.getMe(),
-    walletService.getWallet(),
-  ]);
+  const user = await authService.getMe();
 
   if (!user) {
     return (
       <AuthRequiredPage
         redirectPath="/me"
-        title="Đăng nhập để xem profile"
-        description="Bạn cần đăng nhập để xem thông tin tài khoản và lịch sử giao dịch của mình."
+        title="Đăng nhập để xem hồ sơ"
+        description="Phiên đăng nhập có thể đã hết hạn. Hãy đăng nhập lại để xem hồ sơ và ví của bạn."
       />
     );
   }
+
+  const wallet = await walletService.getWallet().catch(() => null);
 
   return (
     <div className="w-full pt-6 md:pt-4 pb-12">
@@ -44,6 +43,7 @@ export default async function MePage({ searchParams }: PageProps) {
         {/* Cột trái (Sidebar): Chiếm 4 cột trên desktop, hiển thị thông tin và ví */}
         <aside className="col-span-1 md:col-span-4 flex flex-col gap-6">
           <ProfileInfoCard user={user} />
+          {user.role === 'CLIENT' && <UpgradeToCompanionCard />}
           {wallet && (
             <div className="hidden md:block">
               <WalletDashboard

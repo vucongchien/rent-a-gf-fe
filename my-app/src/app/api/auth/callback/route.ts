@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import {
+  accessTokenCookieOptions,
+  AUTH_COOKIE_NAME,
+  refreshTokenCookieOptions,
+  REFRESH_COOKIE_NAME,
+} from '@/shared/lib/authCookies'
 
 interface BackendCallbackResponse {
   accessToken: string
@@ -13,8 +19,6 @@ interface BridgeMessage {
   code?: string
   message?: string
 }
-
-const REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 // 30 ngày
 
 function escapeForScript(value: string): string {
   return value.replace(/[<>&'"`]/g, ch => `\\u${ch.charCodeAt(0).toString(16).padStart(4, '0')}`)
@@ -127,23 +131,10 @@ export async function GET(req: NextRequest) {
 
   try {
     const cookieStore = await cookies()
-    const isProd = process.env.NODE_ENV === 'production'
     const accessMaxAge = Math.max(tokens.expiresIn ?? 3600, 60)
 
-    cookieStore.set('access_token', tokens.accessToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: accessMaxAge,
-    })
-    cookieStore.set('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: REFRESH_TOKEN_MAX_AGE,
-    })
+    cookieStore.set(AUTH_COOKIE_NAME, tokens.accessToken, accessTokenCookieOptions(accessMaxAge))
+    cookieStore.set(REFRESH_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieOptions())
   } catch (err) {
     console.error('[BFF callback] Không ghi được cookie session:', err)
     return htmlResponse(

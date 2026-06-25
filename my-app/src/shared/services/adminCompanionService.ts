@@ -5,6 +5,7 @@
  */
 
 import { serverFetch } from '@/shared/lib/apiClient';
+import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
 import type {
   AdminCompanionDetail,
   AdminCompanionListParams,
@@ -18,6 +19,7 @@ export const adminCompanionService = {
     params: AdminCompanionListParams = {},
     options?: ServiceRequestOptions,
   ): Promise<AdminCompanionListResponse> {
+    const req = await getRequestCookieHeader(options?.req);
     const sp = new URLSearchParams();
     if (params.status) sp.set('status', params.status);
     if (params.q) sp.set('q', params.q);
@@ -25,7 +27,7 @@ export const adminCompanionService = {
     if (params.pageSize) sp.set('pageSize', String(params.pageSize));
     return serverFetch<AdminCompanionListResponse>('/admin/companions', {
       searchParams: sp,
-      req: options?.req,
+      req,
     });
   },
 
@@ -34,9 +36,10 @@ export const adminCompanionService = {
     options?: ServiceRequestOptions,
   ): Promise<AdminCompanionDetail | null> {
     try {
+      const req = await getRequestCookieHeader(options?.req);
       return await serverFetch<AdminCompanionDetail>(
         `/admin/companions/${companionId}`,
-        { req: options?.req },
+        { req },
       );
     } catch (err) {
       console.error('[adminCompanionService] getById error:', err);
@@ -81,10 +84,11 @@ async function mutateMoc(
   reason: string | undefined,
   options?: ServiceRequestOptions,
 ): Promise<AdminModerationActionResult> {
+  const req = await getRequestCookieHeader(options?.req);
   const path = `/admin/companions/${companionId}/${action.toLowerCase()}`;
   return serverFetch<AdminModerationActionResult>(path, {
     method: 'POST',
     body: reason ? { reason } : undefined,
-    req: options?.req,
+    req,
   });
 }

@@ -1,5 +1,5 @@
-import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
+import { notificationFetch } from '@/shared/lib/notificationApiClient';
 import type {
   Notification,
   NotificationType,
@@ -28,7 +28,7 @@ export const notificationService = {
       senderName?: string;
       senderAvatar?: string;
     };
-    const raw = await serverFetch<{
+    const raw = await notificationFetch<{
       data: WireItem[];
       paging?: { nextCursor?: string | null; hasMore?: boolean };
     }>('/notifications', {
@@ -64,7 +64,7 @@ export const notificationService = {
     const req = await getRequestCookieHeader(options?.req);
 
     try {
-      await serverFetch<unknown>(`/notifications/${notifId}/read`, {
+      await notificationFetch<unknown>(`/notifications/${notifId}/read`, {
         req,
         method: 'PATCH',
       });
@@ -84,7 +84,7 @@ export const notificationService = {
   ): Promise<{ success: boolean; affectedRows: number }> {
     const req = await getRequestCookieHeader(options?.req);
 
-    const raw = await serverFetch<{ affectedRows?: number }>('/notifications/read-all', {
+    const raw = await notificationFetch<{ affectedRows?: number }>('/notifications/read-all', {
       req,
       method: 'PATCH',
     });

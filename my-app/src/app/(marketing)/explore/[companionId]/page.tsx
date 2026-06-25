@@ -18,15 +18,29 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { companionId } = await params
   const companion = await companionService.getCompanionDetail(companionId)
-  if (!companion) return { title: 'Companion not found' }
+  if (!companion) return { title: 'Không tìm thấy người đồng hành', robots: { index: false } }
   const c = companion
+  const title = `${c.displayName} · Sổ tay hẹn hò`
+  const description = c.biography?.slice(0, 200) || `Đặt lịch hẹn cùng ${c.displayName} trên Mỗi Bước Một Duyên.`
+  const url = `/explore/${companionId}`
+
+  // OG image được generate động bởi opengraph-image.tsx cùng thư mục — không override images ở đây.
   return {
-    title: `${c.displayName} · Sổ tay hẹn hò`,
-    description: c.biography,
+    title,
+    description,
+    alternates: { canonical: url },
     openGraph: {
-      title: c.displayName,
-      description: c.biography,
-      images: c.albumUrls[0] ? [{ url: c.albumUrls[0] }] : [],
+      type: 'profile',
+      title,
+      description,
+      url,
+      siteName: 'Mỗi Bước Một Duyên',
+      locale: 'vi_VN',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   }
 }
