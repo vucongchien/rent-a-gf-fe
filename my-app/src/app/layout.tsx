@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const SITE_NAME = "Mỗi Bước Một Duyên";
 const DEFAULT_TITLE = "Mỗi Bước Một Duyên · Sổ tay hẹn hò";
 const DEFAULT_DESCRIPTION =
