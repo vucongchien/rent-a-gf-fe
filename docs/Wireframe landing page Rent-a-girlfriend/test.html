@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RAG Next component test</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>html,body{margin:0}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+async function boot() {
+  let src = await (await fetch('./RentAGirlfriendLanding.jsx')).text();
+  // bỏ directive + import/export để chạy trong trình duyệt (không phải Next)
+  src = src.replace(/^\s*['"]use client['"];?\s*$/m, '');
+  src = src.replace(/^\s*import[^\n]*\n/gm, '');
+  src = src.replace('export default function RentAGirlfriendLanding', 'function RentAGirlfriendLanding');
+  const code = Babel.transform(src + "\nwindow.RAG = RentAGirlfriendLanding;", { presets: ['react'] }).code;
+  const { useEffect, useRef, useState } = React;
+  eval(code);
+  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.RAG));
+}
+boot().catch(e => { document.body.innerHTML = '<pre style="color:red;padding:20px">' + e.stack + '</pre>'; });
+</script>
+</body>
+</html>

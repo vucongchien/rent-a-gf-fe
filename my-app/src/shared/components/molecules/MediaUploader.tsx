@@ -41,16 +41,23 @@ export const useMediaUpload = () => {
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
 
-  const uploadFile = async (file: File, assetType: MediaAssetType): Promise<string | null> => {
+  const uploadFile = async (
+    file: File,
+    assetType: MediaAssetType,
+    customDurationSeconds?: number,
+  ): Promise<string | null> => {
     setBusy(true);
     try {
-      const durationSeconds = assetType === 'VOICE' ? await probeAudioDuration(file) : undefined;
+      const durationSeconds = assetType === 'VOICE'
+        ? (customDurationSeconds ?? await probeAudioDuration(file))
+        : undefined;
+      const contentType = file.type || (assetType === 'IMAGE' ? 'image/jpeg' : 'audio/mpeg');
 
       const localCheck = validateMediaMeta({
         assetType,
         sizeBytes: file.size,
         durationSeconds,
-        contentType: file.type,
+        contentType,
       });
       if (!localCheck.ok) {
         const first = Object.values(localCheck.fieldErrors)[0] ?? 'File không hợp lệ.';
@@ -62,7 +69,7 @@ export const useMediaUpload = () => {
         assetType,
         sizeBytes: file.size,
         durationSeconds,
-        contentType: file.type,
+        contentType,
       });
       if (presign.status !== 'success' || !presign.data) {
         toast({ message: presign.status === 'error' ? presign.message : 'Không lấy được upload URL.' });
@@ -70,11 +77,48 @@ export const useMediaUpload = () => {
       }
       const { uploadUrl, fileUrl } = presign.data as PresignResult;
 
-      const putRes = await fetch(uploadUrl, {
-        method: 'PUT',
-        headers: file.type ? { 'Content-Type': file.type } : undefined,
-        body: file,
-      });
+      let putRes: Response;
+      try {
+        putRes = await fetch(uploadUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': contentType,
+          },
+          body: file,
+        });
+      } catch (directErr) {
+        console.warn('[useMediaUpload] Direct upload failed, falling back to BFF proxy...', directErr);
+        // Fallback sang BFF proxy nếu upload trực tiếp bị lỗi (như CORS ở localhost)
+        putRes = await fetch('/api/media/upload-proxy', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': contentType,
+            'x-upload-url': uploadUrl,
+          },
+          body: file,
+        });
+      }
+
+      // Nếu Direct upload trả về lỗi (không ném Exception nhưng status không ok)
+      if (!putRes.ok && !uploadUrl.includes('mock-')) {
+        console.warn(`[useMediaUpload] Direct upload returned status ${putRes.status}, trying BFF proxy...`);
+        try {
+          const proxyRes = await fetch('/api/media/upload-proxy', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': contentType,
+              'x-upload-url': uploadUrl,
+            },
+            body: file,
+          });
+          if (proxyRes.ok) {
+            putRes = proxyRes;
+          }
+        } catch (proxyErr) {
+          console.error('[useMediaUpload] BFF proxy upload failed:', proxyErr);
+        }
+      }
+
       if (!putRes.ok && !uploadUrl.includes('mock-')) {
         toast({ message: `Tải lên thất bại (${putRes.status}).` });
         return null;

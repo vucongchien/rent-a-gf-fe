@@ -13,6 +13,7 @@ pnpm dev
 
 ## 📌 Tài liệu Hệ thống
 
+*   📑 **[Báo cáo đồ án SOA/Microservices](file:///e:/LEARN/rent-a-gf-fe/docs/bao_cao_do_an.md)**: Báo cáo tổng hợp kiến trúc backend microservices và phần Frontend Next.js, bao gồm phạm vi, UI/UX, BFF integration, SEO, performance và đánh giá Web Vitals.
 *   📑 **[Frontend Vision & Scope Document](file:///e:/LEARN/rent-a-gf-fe/docs/important/frontend_vision_scope.md)**: Ranh giới trách nhiệm FE-BE, kiến trúc monorepo 5 tầng, chiến lược rendering, responsive, SEO, a11y, i18n và Dark Mode.
 *   📑 **[Business Requirements Document (BRD)](file:///e:/LEARN/rent-a-gf-fe/docs/important/BRD.md)**: Chi tiết luồng nghiệp vụ cốt lõi, quy tắc tài chính, hủy lịch, voice intro và Booking State Machine.
 *   📑 **[Các Luồng Nghiệp Vụ Cốt Lõi](file:///e:/LEARN/rent-a-gf-fe/docs/reference/core-business.md)**: Phân tích Event Storming, Process Flow cho Booking Core Loop.

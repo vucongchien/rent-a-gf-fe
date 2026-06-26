@@ -1,9 +1,22 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, beforeAll, afterEach, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterEach, afterAll, vi } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+
+// logoutAction là Server Action — không thể chạy ngoài Next runtime.
+// Mock để khi gọi: swap MSW handler /api/auth/me → 401 (mô phỏng BFF đã xóa cookie).
+vi.mock('@/app/actions/auth', () => ({
+  logoutAction: vi.fn(async () => {
+    server.use(
+      http.get('/api/auth/me', () =>
+        HttpResponse.json({ error: 'Unauthorized' }, { status: 401 }),
+      ),
+    );
+    return { ok: true };
+  }),
+}));
 
 // Setup mock server
 const server = setupServer(

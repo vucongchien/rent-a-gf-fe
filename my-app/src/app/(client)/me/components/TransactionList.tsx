@@ -1,6 +1,7 @@
 import React from 'react';
 import { walletService } from '@/shared/services/walletService';
 import type { WalletTransaction } from '@/shared/types';
+import { CalendarIcon, ArrowUpIcon, ArrowDownIcon } from '@/shared/components/atoms/Icons';
 
 interface TransactionListProps {
   type?: string;
@@ -60,12 +61,7 @@ export const TransactionList: React.FC<TransactionListProps> = async ({ type, st
     return (
       <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
         <div className="w-12 h-12 rounded-full bg-neutral-50 flex items-center justify-center text-neutral-400 mb-3 border border-neutral-100">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-            <line x1="16" x2="16" y1="2" y2="6"/>
-            <line x1="8" x2="8" y1="2" y2="6"/>
-            <line x1="3" x2="21" y1="10" y2="10"/>
-          </svg>
+          <CalendarIcon size={20} className="text-neutral-400" />
         </div>
         <p className="font-sans font-medium text-[13.5px] text-neutral-500">
           Không có giao dịch nào phù hợp với bộ lọc đã chọn.
@@ -90,20 +86,14 @@ export const TransactionList: React.FC<TransactionListProps> = async ({ type, st
                   title="Giao dịch nạp tiền"
                   className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 border border-emerald-100"
                 >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="19" x2="12" y2="5"></line>
-                    <polyline points="5 12 12 5 19 12"></polyline>
-                  </svg>
+                  <ArrowUpIcon size={15} />
                 </div>
               ) : (
                 <div 
                   title="Giao dịch thanh toán"
                   className="w-9 h-9 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0 border border-rose-100"
                 >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <polyline points="19 12 12 19 5 12"></polyline>
-                  </svg>
+                  <ArrowDownIcon size={15} />
                 </div>
               )}
 

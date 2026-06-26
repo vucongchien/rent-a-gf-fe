@@ -21,6 +21,7 @@ export interface CompanionScenario {
   price: number
   durationMinutes: number
   publicPlace: string
+  status?: string
 }
 
 export interface CompanionDetail {
@@ -33,6 +34,7 @@ export interface CompanionDetail {
   availableCities: string[]
   averageRating: number
   totalReviews: number
+  status?: string
   scenarios: CompanionScenario[]
   recentReviews?: CompanionReview[]
   metadata?: string[]
@@ -63,22 +65,26 @@ export interface CompanionReview {
   authorAvatarUrl?: string
 }
 
-/** Request body khi Client submit review cho 1 booking đã COMPLETED */
+/** Request body khi Client submit review cho 1 booking đã COMPLETED.
+ * SSOT: POST /interaction/reviews { bookingId, clientId, companionId, rating, comment }. */
 export interface CreateReviewBody {
+  bookingId: string
+  clientId: string
+  companionId: string
   rating: number
   comment: string
 }
 
 /** Phản hồi khi submit review thành công */
-export interface CreateReviewResponse extends CompanionReview {}
+export type CreateReviewResponse = CompanionReview
 
 
+/** Body khi tạo scenario mới (SSOT: title, description, price, durationMinutes). */
 export interface CreateScenarioBody {
   title: string
   description: string
   price: number
   durationMinutes: number
-  publicPlace: string
 }
 
 export type UpdateScenarioBody = Partial<CreateScenarioBody>

@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { authService } from '@/shared/services/authService';
 import { adminUserService } from '@/shared/services/adminUserService';
@@ -85,13 +84,6 @@ export default async function AdminUsersPage({
           href={`/admin/users/${row.userId}`}
           className="inline-flex items-center gap-3 group"
         >
-          <Image
-            src={row.avatarUrl}
-            alt={row.displayName}
-            width={36}
-            height={36}
-            className="rounded-full object-cover"
-          />
           <div className="flex flex-col min-w-0">
             <span className="font-medium text-neutral-900 group-hover:underline truncate">
               {row.displayName}

@@ -111,7 +111,22 @@ describe('NotificationItem', () => {
 
     // Should route to actionUrl
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/bookings/bk-1');
+       expect(mockPush).toHaveBeenCalledWith('/bookings/bk-1');
     });
+  });
+
+  it('renders with companion variant using correct classes for unread card and indicators', () => {
+    render(
+      <NotificationItem
+        notification={mockBookingNotification}
+        onMarkAsReadLocal={mockMarkAsReadLocal}
+        variant="companion"
+      />
+    );
+
+    // Unread container should have bg-mami classes
+    const container = screen.getByRole('button');
+    expect(container).toHaveClass('bg-mami-50/10');
+    expect(container).toHaveClass('border-mami-100/20');
   });
 });

@@ -1,12 +1,3 @@
-// Project chỉ deploy demo bằng MSW (chưa có backend thật), nên luôn nạp MSW worker
-// trong mọi môi trường (localhost + Vercel preview/production).
-try {
-  importScripts('/mockServiceWorker.js');
-  console.log('[Service Worker] MSW loaded');
-} catch (e) {
-  console.warn('[Service Worker] MSW import failed, running without mock:', e);
-}
-
 const CACHE_NAME = 'rentgf-offline-cache-v1';
 const OFFLINE_URL = '/offline';
 

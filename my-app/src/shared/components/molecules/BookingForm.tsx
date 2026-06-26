@@ -26,7 +26,6 @@ export function BookingForm(props: BookingFormProps) {
     setNote,
     state,
     formAction,
-    mockFormSubmit,
     isPending,
     errorMessage,
     handleNextStep,
@@ -57,11 +56,8 @@ export function BookingForm(props: BookingFormProps) {
   }
 
   return (
-    // Production: action={formAction} → Server Action
-    // Mock: onSubmit={mockFormSubmit} → browser fetch → MSW intercepts
     <form
       action={formAction}
-      onSubmit={mockFormSubmit}
       className="space-y-5"
     >
       {/* Các trường ẩn để submit qua Server Action (production) */}

@@ -17,10 +17,10 @@
  */
 
 import { ApiError } from './apiError'
+import { AUTH_COOKIE_NAME } from './authCookies'
 import type { ApiErrorDetail } from '@/shared/types'
 
 const TIMEOUT_MS = 10_000
-const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? 'access_token'
 
 export interface ServerFetchOptions {
   /** NextRequest để extract JWT từ Cookie header */
@@ -90,6 +90,10 @@ export async function serverFetch<T = unknown>(
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }
+  for (const name of ['user-id', 'user-role', 'user-email']) {
+    const value = req?.headers.get(name)
+    if (value) headers[name] = value
+  }
   if (extraHeaders) {
     for (const [k, v] of Object.entries(extraHeaders)) headers[k] = v
   }
@@ -115,6 +119,14 @@ export async function serverFetch<T = unknown>(
     }
 
     if (!res.ok) {
+      // Refresh được dồn về middleware (single refresh point). Nếu BE vẫn trả 401
+      // tại đây nghĩa là token thực sự bị revoke (BE force-logout, password change…)
+      // — không thể cứu ở tầng serverFetch. Throw thẳng, caller (route handler)
+      // map sang 401 cho client; client AuthContext sẽ thử POST /api/auth/refresh.
+      if (res.status === 401) {
+        throw ApiError.unauthorized(`Phiên đăng nhập đã hết hạn (${method} ${path})`)
+      }
+
       // Parse Naked JSON Error format ở root level: { code, message, details }
       let code: string | number = `HTTP_${res.status}`
       let message = `Backend trả về ${res.status} cho ${method} ${path}`

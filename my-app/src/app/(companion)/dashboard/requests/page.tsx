@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
 import { bookingService } from '@/shared/services/bookingService';
 import { PendingRequests } from '@/shared/components/organisms/PendingRequests';
 
@@ -28,6 +29,7 @@ export default function DashboardRequestsPage() {
 }
 
 async function RequestsLoader() {
+  await connection();
   let bookings;
   try {
     const data = await bookingService.getBookings();

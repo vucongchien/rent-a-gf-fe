@@ -25,6 +25,21 @@ const nextConfig: NextConfig = {
         hostname: "**.gravatar.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "mcuoaizrolhegsvdckna.supabase.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.moibuocmotduyen.site",
+        pathname: "/**",
+      },
     ],
   },
   async headers() {
@@ -33,11 +48,12 @@ const nextConfig: NextConfig = {
       "https://images.unsplash.com",
       "https://i.pravatar.cc",
       "https://*.gravatar.com",
+      "https://*.supabase.co",
+      "https://*.moibuocmotduyen.site",
     ].join(" ");
 
     return [
       {
-        // CSP cho Service Worker - cần cho phép external domains để MSW passthrough hoạt động
         source: "/sw.js",
         headers: [
           {
@@ -60,7 +76,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: ${imageDomains}; connect-src 'self' ${imageDomains}; worker-src 'self' blob:`,
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: ${imageDomains}; media-src 'self' https: blob:; connect-src 'self' ${imageDomains}; worker-src 'self' blob:`,
           },
         ],
       },

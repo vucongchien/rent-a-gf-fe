@@ -9,6 +9,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+  usePathname: () => '/',
 }));
 
 // Mock hook useAuth
@@ -30,18 +31,19 @@ describe('AvatarDropdown', () => {
       isLoading: false,
       login: mockLogin,
       logout: mockLogout,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+      refreshSession: vi.fn().mockResolvedValue(undefined),
+      handleUnauthorized: vi.fn().mockResolvedValue(undefined),
     });
 
     render(<AvatarDropdown />);
 
-    const signInBtn = screen.getByText('Sign in');
+    const signInBtn = screen.getByText('Đăng nhập');
     expect(signInBtn).toBeInTheDocument();
-
-    fireEvent.click(signInBtn);
-    expect(mockLogin).toHaveBeenCalledWith('client');
+    expect(signInBtn.getAttribute('id')).toBe('avatar-dropdown-signin-btn');
   });
 
-  it('renders user avatar and switch options when logged in as CLIENT', () => {
+  it('renders user avatar and logout only when logged in', () => {
     vi.mocked(useAuth).mockReturnValue({
       user: {
         userId: 'u-client-1',
@@ -53,6 +55,9 @@ describe('AvatarDropdown', () => {
       isLoading: false,
       login: mockLogin,
       logout: mockLogout,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+      refreshSession: vi.fn().mockResolvedValue(undefined),
+      handleUnauthorized: vi.fn().mockResolvedValue(undefined),
     });
 
     render(<AvatarDropdown />);
@@ -65,46 +70,14 @@ describe('AvatarDropdown', () => {
     expect(screen.getByText('Minh Khách')).toBeInTheDocument();
     expect(screen.getByText('CLIENT')).toBeInTheDocument();
 
-    // Should show other role switch buttons
-    const compBtn = screen.getByText('👧 Bạn gái (Linh)');
-    const adminBtn = screen.getByText('🔑 Admin');
-
-    expect(compBtn).toBeInTheDocument();
-    expect(adminBtn).toBeInTheDocument();
+    // Should not show dev role switch buttons
+    expect(screen.queryByText('Đóng vai (Dev)')).not.toBeInTheDocument();
+    expect(screen.queryByText('👧 Bạn gái (Linh)')).not.toBeInTheDocument();
+    expect(screen.queryByText('🔑 Admin')).not.toBeInTheDocument();
     expect(screen.queryByText('👤 Khách hàng (Minh)')).not.toBeInTheDocument();
 
-    // Click to switch role
-    fireEvent.click(compBtn);
-    expect(mockLogin).toHaveBeenCalledWith('companion');
-  });
-
-  it('renders correct switch options when logged in as COMPANION', () => {
-    vi.mocked(useAuth).mockReturnValue({
-      user: {
-        userId: 'u-comp-1',
-        displayName: 'Nguyễn Thị Linh',
-        email: 'linh@example.com',
-        avatarUrl: 'https://example.com/avatar.jpg',
-        role: 'COMPANION',
-      },
-      isLoading: false,
-      login: mockLogin,
-      logout: mockLogout,
-    });
-
-    render(<AvatarDropdown />);
-
-    const avatarBtn = screen.getByLabelText('Account menu');
-    fireEvent.click(avatarBtn);
-
-    const clientBtn = screen.getByText('👤 Khách hàng (Minh)');
-    const adminBtn = screen.getByText('🔑 Admin');
-
-    expect(clientBtn).toBeInTheDocument();
-    expect(adminBtn).toBeInTheDocument();
-    expect(screen.queryByText('👧 Đóng vai Bạn gái')).not.toBeInTheDocument();
-
-    fireEvent.click(clientBtn);
-    expect(mockLogin).toHaveBeenCalledWith('client');
+    const logoutBtn = screen.getByText('Đăng xuất');
+    fireEvent.click(logoutBtn);
+    expect(mockLogout).toHaveBeenCalled();
   });
 });

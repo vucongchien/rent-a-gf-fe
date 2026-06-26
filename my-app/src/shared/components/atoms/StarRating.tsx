@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { IconButton } from './IconButton';
+import { StarSolidIcon } from './Icons';
 
 interface StarRatingProps {
   value: number;
@@ -40,7 +42,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
           const star = i + 1;
           const active = star <= display;
           return (
-            <button
+            <IconButton
               key={star}
               type="button"
               role="radio"
@@ -51,28 +53,17 @@ export const StarRating: React.FC<StarRatingProps> = ({
               onFocus={() => !disabled && setHover(star)}
               onBlur={() => setHover(null)}
               onClick={() => !disabled && onChange(star)}
-              className={`p-1 rounded-md transition-transform ${
-                disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-110 active:scale-95'
+              className={`p-1 rounded-md ${
+                disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-110'
               } focus:outline-none focus-visible:ring-2 focus-visible:ring-chizuru-400`}
             >
-              <svg
-                width={size}
-                height={size}
-                viewBox="0 0 24 24"
-                aria-hidden="true"
+              <StarSolidIcon
+                size={size}
                 className={`transition-colors ${
                   active ? 'text-chizuru-500' : 'text-neutral-200'
                 }`}
-              >
-                <path
-                  d="M12 2.5 C12.8 5.5 15.5 6.5 19 7 C16 9 15.5 12.5 17 16 C14 14.5 10 14.5 7 16 C8.5 12.5 8 9 5 7 C8.5 6.5 11.2 5.5 12 2.5 Z"
-                  fill="currentColor"
-                  stroke="currentColor"
-                  strokeWidth="0.5"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
+              />
+            </IconButton>
           );
         })}
       </div>

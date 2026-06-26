@@ -25,8 +25,8 @@ vi.mock('@/shared/contexts/AuthContext', () => ({
 
 describe('useChat hook', () => {
   const mockRooms = [
-    { chatRoomId: 'room-1', bookingId: 'bk-1', companionName: 'Linh', companionAvatarUrl: '', status: 'ACTIVE', lastMessage: 'Hi', lastMessageAt: '', unreadCount: 1 },
-    { chatRoomId: 'room-2', bookingId: 'bk-2', companionName: 'My', companionAvatarUrl: '', status: 'INACTIVE', lastMessage: 'Bye', lastMessageAt: '', unreadCount: 0 },
+    { chatRoomId: 'room-1', bookingId: 'bk-1', clientId: 'u-client-1', companionId: 'u-comp-1', companionName: 'Linh', companionAvatarUrl: '', status: 'ACTIVE', lastMessage: 'Hi', lastMessageAt: '', unreadCount: 1 },
+    { chatRoomId: 'room-2', bookingId: 'bk-2', clientId: 'u-client-1', companionId: 'u-comp-2', companionName: 'My', companionAvatarUrl: '', status: 'INACTIVE', lastMessage: 'Bye', lastMessageAt: '', unreadCount: 0 },
   ];
 
   const mockMessages = [
@@ -56,7 +56,7 @@ describe('useChat hook', () => {
   });
 
   it('khởi tạo state mặc định và fetch rooms thành công', async () => {
-    const { result } = renderHook(() => useChat('CLIENT'));
+    const { result } = renderHook(() => useChat('CLIENT', 'u-client-1'));
 
     expect(result.current.isLoadingRooms).toBe(true);
     expect(result.current.activeRoomId).toBe('');
@@ -72,7 +72,7 @@ describe('useChat hook', () => {
 
   it('fetch tin nhắn khi activeRoomId được set', async () => {
     mockSearchRoomId = 'room-1';
-    const { result } = renderHook(() => useChat('CLIENT'));
+    const { result } = renderHook(() => useChat('CLIENT', 'u-client-1'));
 
     await waitFor(() => {
       expect(result.current.isLoadingRooms).toBe(false);
@@ -111,7 +111,7 @@ describe('useChat hook', () => {
       return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
     }) as unknown as typeof global.fetch;
 
-    const { result } = renderHook(() => useChat('CLIENT'));
+    const { result } = renderHook(() => useChat('CLIENT', 'u-client-1'));
 
     await waitFor(() => {
       expect(result.current.isLoadingRooms).toBe(false);
@@ -148,7 +148,7 @@ describe('useChat hook', () => {
       return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
     }) as unknown as typeof global.fetch;
 
-    const { result } = renderHook(() => useChat('CLIENT'));
+    const { result } = renderHook(() => useChat('CLIENT', 'u-client-1'));
 
     await waitFor(() => {
       expect(result.current.isLoadingRooms).toBe(false);

@@ -38,6 +38,7 @@ const SEVERITY_CONFIG: Record<AdminDisputeSeverity, { label: string; bg: string;
 
 function formatDateTime(iso: string): string {
   const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 'Chưa có dữ liệu';
   const days = Math.floor((Date.now() - d.getTime()) / (24 * 60 * 60 * 1000));
   if (days === 0) return 'Hôm nay';
   if (days === 1) return 'Hôm qua';

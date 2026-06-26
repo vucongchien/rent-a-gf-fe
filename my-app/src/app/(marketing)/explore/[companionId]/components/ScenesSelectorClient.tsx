@@ -76,6 +76,29 @@ export function ScenesSelectorClient({
 }: ScenesSelectorClientProps) {
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [selectedScenario, setSelectedScenario] = useState<CompanionScenario | null>(null)
+  const [isRestored, setIsRestored] = useState(false)
+
+  // Phục hồi kịch bản từ draft trong sessionStorage sau khi mount (client-side only)
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const raw = sessionStorage.getItem('rentagf.booking.draft')
+      if (raw) {
+        try {
+          const draft = JSON.parse(raw)
+          if (draft.companionId === companionId) {
+            const matchedScenario = scenarios.find((s) => s.scenarioId === draft.scenarioId)
+            if (matchedScenario) {
+              setSelectedScenario(matchedScenario)
+              setIsBookingOpen(true)
+            }
+          }
+        } catch (e) {
+          console.error('Failed to parse booking draft in selector', e)
+        }
+      }
+      setIsRestored(true)
+    }
+  }, [companionId, scenarios])
 
   return (
     <div className="space-y-6">
@@ -111,6 +134,7 @@ export function ScenesSelectorClient({
           onClose={() => {
             setIsBookingOpen(false)
             setSelectedScenario(null)
+            sessionStorage.removeItem('rentagf.booking.draft')
           }}
           companionId={companionId}
           companionName={companionName}

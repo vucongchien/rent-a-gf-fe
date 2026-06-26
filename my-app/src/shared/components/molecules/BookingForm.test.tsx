@@ -60,6 +60,8 @@ describe('BookingForm Integration', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    localStorage.clear()
+    sessionStorage.clear()
     mockBalance = 500
     mockUser = { name: 'Test User' }
     mockActionStatus = 'idle'

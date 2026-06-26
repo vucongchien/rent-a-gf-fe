@@ -78,7 +78,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         }
 
         const file = new File([blob], 'voice-intro.mp3', { type: 'audio/mp3' });
-        const fileUrl = await uploadFile(file, 'VOICE');
+        const fileUrl = await uploadFile(file, 'VOICE', duration);
         if (fileUrl) {
           onRecorded(fileUrl);
         }

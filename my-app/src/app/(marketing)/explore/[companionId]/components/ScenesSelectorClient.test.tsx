@@ -1,6 +1,27 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ScenesSelectorClient } from './ScenesSelectorClient'
+
+// Mock sessionStorage
+const sessionStorageMock = (() => {
+  let store: Record<string, string> = {}
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString()
+    },
+    removeItem: (key: string) => {
+      delete store[key]
+    },
+    clear: () => {
+      store = {}
+    },
+  }
+})()
+
+Object.defineProperty(window, 'sessionStorage', {
+  value: sessionStorageMock,
+})
 
 // Mock next/navigation
 const mockPush = vi.fn()
@@ -56,6 +77,11 @@ describe('ScenesSelectorClient', () => {
     scenarios: mockScenarios,
   }
 
+  beforeEach(() => {
+    vi.clearAllMocks()
+    sessionStorage.clear()
+  })
+
   it('renders all active scenarios correctly', () => {
     render(<ScenesSelectorClient {...defaultProps} />)
 
@@ -97,5 +123,50 @@ describe('ScenesSelectorClient', () => {
 
     // Đảm bảo modal đã được đóng (biến mất khỏi DOM)
     expect(screen.queryByTestId('mock-booking-modal')).not.toBeInTheDocument()
+  })
+
+  it('tự động mở modal với kịch bản được lưu trong sessionStorage khi mount', () => {
+    const draft = {
+      companionId: 'comp-1',
+      scenarioId: 'sc-2',
+    }
+    sessionStorage.setItem('rentagf.booking.draft', JSON.stringify(draft))
+
+    render(<ScenesSelectorClient {...defaultProps} />)
+
+    // Đảm bảo modal đã tự động mở với kịch bản sc-2
+    expect(screen.getByTestId('mock-booking-modal')).toBeInTheDocument()
+  })
+
+  it('không tự động mở modal nếu companionId của draft khác biệt', () => {
+    const draft = {
+      companionId: 'comp-other',
+      scenarioId: 'sc-2',
+    }
+    sessionStorage.setItem('rentagf.booking.draft', JSON.stringify(draft))
+
+    render(<ScenesSelectorClient {...defaultProps} />)
+
+    expect(screen.queryByTestId('mock-booking-modal')).not.toBeInTheDocument()
+  })
+
+  it('xóa draft khỏi sessionStorage khi click close modal', () => {
+    const draft = {
+      companionId: 'comp-1',
+      scenarioId: 'sc-2',
+    }
+    sessionStorage.setItem('rentagf.booking.draft', JSON.stringify(draft))
+
+    render(<ScenesSelectorClient {...defaultProps} />)
+
+    expect(screen.getByTestId('mock-booking-modal')).toBeInTheDocument()
+
+    // Click nút Close để đóng
+    const closeBtn = screen.getByRole('button', { name: /close/i })
+    fireEvent.click(closeBtn)
+
+    // Đảm bảo modal đóng và draft bị xóa
+    expect(screen.queryByTestId('mock-booking-modal')).not.toBeInTheDocument()
+    expect(sessionStorage.getItem('rentagf.booking.draft')).toBeNull()
   })
 })

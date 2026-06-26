@@ -1,0 +1,7 @@
+packages:
+  - '.'
+
+allowBuilds:
+  msw: false
+  sharp: false
+  unrs-resolver: false

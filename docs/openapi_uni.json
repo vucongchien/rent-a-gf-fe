@@ -1,0 +1,3172 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Rent-a-Girlfriend Unified API",
+    "description": "Unified REST API Documentation for Rent-a-Girlfriend Microservices",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/companions": {
+      "get": {
+        "tags": [
+          "Catalogue Query"
+        ],
+        "summary": "Search Companions",
+        "operationId": "search_companions_api_v1_companions_get",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Name"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "City"
+            }
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Minprice"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Maxprice"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 10,
+              "title": "Pagesize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/companions/{companion_id}": {
+      "get": {
+        "tags": [
+          "Catalogue Query"
+        ],
+        "summary": "Get Companion Detail",
+        "operationId": "get_companion_detail_api_v1_companions__companion_id__get",
+        "parameters": [
+          {
+            "name": "companion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Companion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profile/me": {
+      "get": {
+        "tags": [
+          "Profile Management Query"
+        ],
+        "summary": "Get My Profile",
+        "operationId": "get_my_profile_api_v1_profile_me_get",
+        "parameters": [
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-status",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Status"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profile/me/media/presigned-urls": {
+      "post": {
+        "tags": [
+          "Media Management"
+        ],
+        "summary": "Request Presigned Url",
+        "operationId": "request_presigned_url_api_v1_profile_me_media_presigned_urls_post",
+        "parameters": [
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-status",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Status"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresignedUrlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresignedUrlResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profile/me/scenarios": {
+      "post": {
+        "tags": [
+          "Scenario Management"
+        ],
+        "summary": "Create Scenario",
+        "operationId": "create_scenario_api_v1_profile_me_scenarios_post",
+        "parameters": [
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-status",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Status"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateScenarioRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateScenarioResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profile/me/scenarios/{scenario_id}": {
+      "put": {
+        "tags": [
+          "Scenario Management"
+        ],
+        "summary": "Update Scenario",
+        "operationId": "update_scenario_api_v1_profile_me_scenarios__scenario_id__put",
+        "parameters": [
+          {
+            "name": "scenario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scenario Id"
+            }
+          },
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-status",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Status"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateScenarioRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Scenario Management"
+        ],
+        "summary": "Delete Scenario",
+        "operationId": "delete_scenario_api_v1_profile_me_scenarios__scenario_id__delete",
+        "parameters": [
+          {
+            "name": "scenario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scenario Id"
+            }
+          },
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-status",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Status"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/topup": {
+      "post": {
+        "tags": [
+          "Finance"
+        ],
+        "summary": "Initiate Topup",
+        "description": "Initiates a wallet top-up by creating a pending transaction and returning a signed VNPay URL.",
+        "operationId": "initiate_topup_api_v1_finance_topup_post",
+        "parameters": [
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopupResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/vnpay-ipn": {
+      "get": {
+        "tags": [
+          "Finance"
+        ],
+        "summary": "Vnpay Ipn",
+        "description": "VNPay IPN Webhook callback. Handles secure verification, credits wallet, and commits ledger.\nEnsures absolute transaction Idempotency.",
+        "operationId": "vnpay_ipn_api_v1_finance_vnpay_ipn_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/vnpay-return": {
+      "get": {
+        "tags": [
+          "Finance"
+        ],
+        "summary": "Vnpay Return",
+        "description": "User redirected here after VNPay payment process.\nVerifies signature and returns simple visually premium success/fail HTML.",
+        "operationId": "vnpay_return_api_v1_finance_vnpay_return_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/wallet": {
+      "get": {
+        "tags": [
+          "Finance"
+        ],
+        "summary": "Get Wallet",
+        "description": "Query current wallet balances. Uses lazy-initialization fallback if the wallet does not exist yet.",
+        "operationId": "get_wallet_api_v1_finance_wallet_get",
+        "parameters": [
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/disputes": {
+      "get": {
+        "tags": [
+          "Admin Dispute Management"
+        ],
+        "summary": "List Disputes",
+        "operationId": "list_disputes_api_v1_disputes_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 10,
+              "title": "Pagesize"
+            }
+          },
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response List Disputes Api V1 Disputes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Dispute Management"
+        ],
+        "summary": "Create Dispute",
+        "operationId": "create_dispute_api_v1_disputes_post",
+        "parameters": [
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateReportResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/disputes/{dispute_id}": {
+      "get": {
+        "tags": [
+          "Admin Dispute Management"
+        ],
+        "summary": "Get Dispute Detail",
+        "operationId": "get_dispute_detail_api_v1_disputes__dispute_id__get",
+        "parameters": [
+          {
+            "name": "dispute_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dispute Id"
+            }
+          },
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisputeDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/disputes/{dispute_id}/saga": {
+      "get": {
+        "tags": [
+          "Admin Dispute Management"
+        ],
+        "summary": "Get Saga State",
+        "operationId": "get_saga_state_api_v1_disputes__dispute_id__saga_get",
+        "parameters": [
+          {
+            "name": "dispute_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dispute Id"
+            }
+          },
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SagaStateDTO"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Get Saga State Api V1 Disputes  Dispute Id  Saga Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/disputes/{dispute_id}/resolve": {
+      "post": {
+        "tags": [
+          "Admin Dispute Management"
+        ],
+        "summary": "Resolve Dispute",
+        "operationId": "resolve_dispute_api_v1_disputes__dispute_id__resolve_post",
+        "parameters": [
+          {
+            "name": "dispute_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dispute Id"
+            }
+          },
+          {
+            "name": "user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Id"
+            }
+          },
+          {
+            "name": "user-role",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Role"
+            }
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveDisputeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bookings": {
+      "get": {
+        "operationId": "BookingService_ListBookings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1ListBookingsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "pageToken",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "BookingService"
+        ]
+      },
+      "post": {
+        "operationId": "BookingService_RequestBooking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1RequestBookingResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/v1RequestBookingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "BookingService"
+        ]
+      }
+    },
+    "/api/v1/bookings/{bookingId}": {
+      "get": {
+        "operationId": "BookingService_GetBooking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1BookingDetailResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "BookingService"
+        ]
+      }
+    },
+    "/api/v1/bookings/{bookingId}/accept": {
+      "post": {
+        "operationId": "BookingService_AcceptBooking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1AcceptBookingResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingServiceAcceptBookingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "BookingService"
+        ]
+      }
+    },
+    "/api/v1/bookings/{bookingId}/cancel": {
+      "post": {
+        "operationId": "BookingService_CancelBooking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1CancelBookingResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingServiceCancelBookingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "BookingService"
+        ]
+      }
+    },
+    "/api/v1/bookings/{bookingId}/complete": {
+      "post": {
+        "operationId": "BookingService_CompleteBooking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1CompleteBookingResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingServiceCompleteBookingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "BookingService"
+        ]
+      }
+    },
+    "/api/v1/bookings/{bookingId}/reject": {
+      "post": {
+        "operationId": "BookingService_RejectBooking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1RejectBookingResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingServiceRejectBookingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "BookingService"
+        ]
+      }
+    },
+    "/api/v1/admin/accounts/{id}": {
+      "get": {
+        "summary": "Queries\nGetAccount — lấy thông tin account theo ID (Admin only).",
+        "operationId": "IdentityService_GetAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1AccountResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/admin/accounts/{id}/lock": {
+      "post": {
+        "summary": "LockAccount — Admin khóa tài khoản người dùng.",
+        "operationId": "IdentityService_LockAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1MessageResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityServiceLockAccountBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/admin/accounts/{id}/unlock": {
+      "post": {
+        "summary": "UnlockAccount — Admin mở khóa tài khoản người dùng.",
+        "operationId": "IdentityService_UnlockAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1MessageResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityServiceUnlockAccountBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/admin/upgrade-requests": {
+      "get": {
+        "summary": "ListUpgradeRequests — danh sách yêu cầu nâng cấp Companion (Admin only).",
+        "operationId": "IdentityService_ListUpgradeRequests",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1ListUpgradeRequestsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "status",
+            "description": "optional filter: PENDING | APPROVED | REJECTED",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "UPGRADE_STATUS_UNSPECIFIED",
+                "UPGRADE_STATUS_PENDING",
+                "UPGRADE_STATUS_APPROVED",
+                "UPGRADE_STATUS_REJECTED"
+              ],
+              "default": "UPGRADE_STATUS_UNSPECIFIED"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/admin/upgrade-requests/{id}/approve": {
+      "post": {
+        "summary": "ApproveUpgrade — Admin duyệt yêu cầu nâng cấp.",
+        "operationId": "IdentityService_ApproveUpgrade",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1MessageResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityServiceApproveUpgradeBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/admin/upgrade-requests/{id}/reject": {
+      "post": {
+        "summary": "RejectUpgrade — Admin từ chối yêu cầu nâng cấp.",
+        "operationId": "IdentityService_RejectUpgrade",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1MessageResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityServiceRejectUpgradeBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/auth/google/callback": {
+      "get": {
+        "summary": "LoginGoogle — xử lý OAuth2 callback, trả về JWT tokens.",
+        "operationId": "IdentityService_LoginGoogle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1TokenResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/auth/google/init": {
+      "get": {
+        "summary": "Auth Commands\nInitGoogleAuth — khởi tạo flow Google OAuth2, trả về auth URL.",
+        "operationId": "IdentityService_InitGoogleAuth",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1InitGoogleAuthResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "summary": "Logout — thu hồi refresh token.",
+        "operationId": "IdentityService_Logout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1MessageResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/v1LogoutRequest"
+              }
+            }
+          },
+          "description": "LogoutRequest — thu hồi refresh token, kết thúc phiên đăng nhập.",
+          "required": true
+        },
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "summary": "RefreshToken — đổi refresh token lấy access token mới.",
+        "operationId": "IdentityService_RefreshToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1TokenResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/v1RefreshTokenRequest"
+              }
+            }
+          },
+          "description": "RefreshTokenRequest — đổi refresh token lấy access token mới.",
+          "required": true
+        },
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/upgrade-requests": {
+      "post": {
+        "summary": "Commands\nRequestUpgrade — Client gửi yêu cầu nâng cấp thành Companion.",
+        "operationId": "IdentityService_RequestUpgrade",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1MessageResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/v1RequestUpgradeRequest"
+              }
+            }
+          },
+          "description": "RequestUpgradeRequest — Client gửi yêu cầu nâng cấp thành Companion.",
+          "required": true
+        },
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateScenarioRequest": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Scenario title",
+            "example": "A walk in the park"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Detailed description",
+            "example": "We will walk in the central park"
+          },
+          "price": {
+            "type": "integer",
+            "title": "Price",
+            "description": "Price in Kano-Coin",
+            "example": 100
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "title": "Durationminutes",
+            "description": "Duration in minutes (e.g., 60, 120)",
+            "example": 60
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "price",
+          "durationMinutes"
+        ],
+        "title": "CreateScenarioRequest"
+      },
+      "CreateScenarioResponse": {
+        "properties": {
+          "scenarioId": {
+            "type": "string",
+            "title": "Scenarioid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenarioId"
+        ],
+        "title": "CreateScenarioResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "PresignedUrlRequest": {
+        "properties": {
+          "assetType": {
+            "type": "string",
+            "title": "Assettype",
+            "description": "IMAGE or VOICE",
+            "example": "VOICE"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "title": "Sizebytes",
+            "description": "File size in bytes",
+            "example": 1048576
+          },
+          "durationSeconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Durationseconds",
+            "description": "Required for VOICE type",
+            "example": 25
+          },
+          "contentType": {
+            "type": "string",
+            "title": "Contenttype",
+            "description": "MIME content type",
+            "example": "audio/mp3"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assetType",
+          "sizeBytes",
+          "contentType"
+        ],
+        "title": "PresignedUrlRequest"
+      },
+      "PresignedUrlResponse": {
+        "properties": {
+          "uploadUrl": {
+            "type": "string",
+            "title": "Uploadurl"
+          },
+          "fileUrl": {
+            "type": "string",
+            "title": "Fileurl"
+          }
+        },
+        "type": "object",
+        "required": [
+          "uploadUrl",
+          "fileUrl"
+        ],
+        "title": "PresignedUrlResponse"
+      },
+      "SuccessResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "SuccessResponse"
+      },
+      "UpdateScenarioRequest": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Scenario title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Detailed description"
+          },
+          "price": {
+            "type": "integer",
+            "title": "Price",
+            "description": "Price in Kano-Coin"
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "title": "Durationminutes",
+            "description": "Duration in minutes"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "ACTIVE or INACTIVE",
+            "example": "ACTIVE"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "price",
+          "durationMinutes",
+          "status"
+        ],
+        "title": "UpdateScenarioRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "TopupRequest": {
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Amount",
+            "description": "Amount of Kano-Coins to buy (1 Coin = 1,000 VND)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "amount"
+        ],
+        "title": "TopupRequest"
+      },
+      "TopupResponse": {
+        "properties": {
+          "paymentUrl": {
+            "type": "string",
+            "title": "Paymenturl",
+            "description": "VNPay Sandbox checkout redirect URL"
+          }
+        },
+        "type": "object",
+        "required": [
+          "paymentUrl"
+        ],
+        "title": "TopupResponse"
+      },
+      "WalletResponse": {
+        "properties": {
+          "walletId": {
+            "type": "string",
+            "title": "Walletid"
+          },
+          "userId": {
+            "type": "string",
+            "title": "Userid"
+          },
+          "availableBalance": {
+            "type": "integer",
+            "title": "Availablebalance"
+          },
+          "frozenBalance": {
+            "type": "integer",
+            "title": "Frozenbalance"
+          }
+        },
+        "type": "object",
+        "required": [
+          "walletId",
+          "userId",
+          "availableBalance",
+          "frozenBalance"
+        ],
+        "title": "WalletResponse"
+      },
+      "CreateReportEvidence": {
+        "properties": {
+          "evidenceType": {
+            "type": "string",
+            "title": "Evidencetype"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "evidenceType",
+          "content"
+        ],
+        "title": "CreateReportEvidence"
+      },
+      "CreateReportRequest": {
+        "properties": {
+          "bookingId": {
+            "type": "string",
+            "title": "Bookingid"
+          },
+          "accusedId": {
+            "type": "string",
+            "title": "Accusedid"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "evidences": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CreateReportEvidence"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidences"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bookingId",
+          "accusedId",
+          "reason"
+        ],
+        "title": "CreateReportRequest"
+      },
+      "CreateReportResponse": {
+        "properties": {
+          "disputeId": {
+            "type": "string",
+            "title": "Disputeid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "disputeId"
+        ],
+        "title": "CreateReportResponse"
+      },
+      "DisputeDTO": {
+        "properties": {
+          "disputeId": {
+            "type": "string",
+            "title": "Disputeid"
+          },
+          "bookingId": {
+            "type": "string",
+            "title": "Bookingid"
+          },
+          "reporterId": {
+            "type": "string",
+            "title": "Reporterid"
+          },
+          "accusedId": {
+            "type": "string",
+            "title": "Accusedid"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "adminId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adminid"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "evidences": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceDTO"
+            },
+            "type": "array",
+            "title": "Evidences"
+          }
+        },
+        "type": "object",
+        "required": [
+          "disputeId",
+          "bookingId",
+          "reporterId",
+          "accusedId",
+          "reason",
+          "status",
+          "version",
+          "evidences"
+        ],
+        "title": "DisputeDTO"
+      },
+      "EvidenceDTO": {
+        "properties": {
+          "evidenceId": {
+            "type": "string",
+            "title": "Evidenceid"
+          },
+          "evidenceType": {
+            "type": "string",
+            "title": "Evidencetype"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "evidenceId",
+          "evidenceType",
+          "content"
+        ],
+        "title": "EvidenceDTO"
+      },
+      "ResolveDisputeRequest": {
+        "properties": {
+          "resolution": {
+            "type": "string",
+            "title": "Resolution"
+          },
+          "notes": {
+            "type": "string",
+            "title": "Notes",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "resolution"
+        ],
+        "title": "ResolveDisputeRequest"
+      },
+      "SagaStateDTO": {
+        "properties": {
+          "sagaId": {
+            "type": "string",
+            "title": "Sagaid"
+          },
+          "disputeId": {
+            "type": "string",
+            "title": "Disputeid"
+          },
+          "bookingId": {
+            "type": "string",
+            "title": "Bookingid"
+          },
+          "sagaType": {
+            "type": "string",
+            "title": "Sagatype"
+          },
+          "currentState": {
+            "type": "string",
+            "title": "Currentstate"
+          },
+          "retryCount": {
+            "type": "integer",
+            "title": "Retrycount"
+          },
+          "lastError": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lasterror"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sagaId",
+          "disputeId",
+          "bookingId",
+          "sagaType",
+          "currentState",
+          "retryCount",
+          "version"
+        ],
+        "title": "SagaStateDTO"
+      },
+      "BookingServiceAcceptBookingBody": {
+        "type": "object"
+      },
+      "BookingServiceCancelBookingBody": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "$ref": "#/components/schemas/v1CancellationReason"
+          }
+        }
+      },
+      "BookingServiceCompleteBookingBody": {
+        "type": "object"
+      },
+      "BookingServiceRejectBookingBody": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "protobufAny": {
+        "type": "object",
+        "properties": {
+          "@type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {}
+      },
+      "rpcStatus": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/protobufAny"
+            }
+          }
+        }
+      },
+      "v1AcceptBookingResponse": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/v1BookingStatus"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "v1BookingDetailResponse": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "companionId": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string",
+            "format": "int64"
+          },
+          "durationMinutes": {
+            "type": "string",
+            "format": "int64"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "$ref": "#/components/schemas/v1BookingStatus"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "v1BookingStatus": {
+        "type": "string",
+        "enum": [
+          "BOOKING_STATUS_UNSPECIFIED",
+          "BOOKING_STATUS_PENDING_RESERVING",
+          "BOOKING_STATUS_PENDING",
+          "BOOKING_STATUS_ACCEPTED",
+          "BOOKING_STATUS_COMPLETED",
+          "BOOKING_STATUS_CANCELLED",
+          "BOOKING_STATUS_DISPUTED",
+          "BOOKING_STATUS_RESOLVED"
+        ],
+        "default": "BOOKING_STATUS_UNSPECIFIED"
+      },
+      "v1CancelBookingResponse": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/v1BookingStatus"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "v1CancellationReason": {
+        "type": "string",
+        "enum": [
+          "CANCELLATION_REASON_UNSPECIFIED",
+          "CANCELLATION_REASON_CLIENT_EARLY",
+          "CANCELLATION_REASON_CLIENT_LATE",
+          "CANCELLATION_REASON_COMPANION_EARLY",
+          "CANCELLATION_REASON_COMPANION_LATE",
+          "CANCELLATION_REASON_SYSTEM_TIMEOUT"
+        ],
+        "default": "CANCELLATION_REASON_UNSPECIFIED"
+      },
+      "v1CompleteBookingResponse": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/v1BookingStatus"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "v1ListBookingsResponse": {
+        "type": "object",
+        "properties": {
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/v1BookingDetailResponse"
+            }
+          },
+          "nextPageToken": {
+            "type": "string"
+          }
+        }
+      },
+      "v1RejectBookingResponse": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/v1BookingStatus"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "v1RequestBookingRequest": {
+        "type": "object",
+        "properties": {
+          "companionId": {
+            "type": "string"
+          },
+          "scenarioId": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "v1RequestBookingResponse": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/v1BookingStatus"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "IdentityServiceApproveUpgradeBody": {
+        "type": "object",
+        "description": "ApproveUpgradeRequest — Admin duyệt yêu cầu nâng cấp Companion."
+      },
+      "IdentityServiceLockAccountBody": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "description": "LockAccountRequest — Admin khóa tài khoản người dùng."
+      },
+      "IdentityServiceRejectUpgradeBody": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "description": "RejectUpgradeRequest — Admin từ chối yêu cầu nâng cấp Companion."
+      },
+      "IdentityServiceUnlockAccountBody": {
+        "type": "object",
+        "description": "UnlockAccountRequest — Admin mở khóa tài khoản người dùng."
+      },
+      "v1AccountResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/v1AccountRole"
+          },
+          "status": {
+            "$ref": "#/components/schemas/v1AccountStatus"
+          },
+          "violationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "AccountResponse — thông tin account trả về cho Admin."
+      },
+      "v1AccountRole": {
+        "type": "string",
+        "enum": [
+          "ACCOUNT_ROLE_UNSPECIFIED",
+          "ACCOUNT_ROLE_CLIENT",
+          "ACCOUNT_ROLE_COMPANION",
+          "ACCOUNT_ROLE_ADMIN"
+        ],
+        "default": "ACCOUNT_ROLE_UNSPECIFIED",
+        "description": "AccountRole — các vai trò khả dụng trên hệ thống."
+      },
+      "v1AccountStatus": {
+        "type": "string",
+        "enum": [
+          "ACCOUNT_STATUS_UNSPECIFIED",
+          "ACCOUNT_STATUS_ACTIVE",
+          "ACCOUNT_STATUS_LOCKED"
+        ],
+        "default": "ACCOUNT_STATUS_UNSPECIFIED",
+        "description": "AccountStatus — trạng thái kích hoạt của tài khoản."
+      },
+      "v1InitGoogleAuthResponse": {
+        "type": "object",
+        "properties": {
+          "authUrl": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "codeChallenge": {
+            "type": "string"
+          }
+        },
+        "description": "InitGoogleAuthResponse — trả về URL redirect Google OAuth2 và PKCE state."
+      },
+      "v1ListUpgradeRequestsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/v1UpgradeRequestItem"
+            }
+          },
+          "total": {
+            "type": "string",
+            "format": "int64"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "ListUpgradeRequestsResponse — danh sách yêu cầu nâng cấp có phân trang."
+      },
+      "v1LogoutRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "description": "LogoutRequest — thu hồi refresh token, kết thúc phiên đăng nhập."
+      },
+      "v1MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "description": "MessageResponse là response chung cho tất cả command không trả dữ liệu."
+      },
+      "v1RefreshTokenRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "description": "RefreshTokenRequest — đổi refresh token lấy access token mới."
+      },
+      "v1RequestUpgradeRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "description": "RequestUpgradeRequest — Client gửi yêu cầu nâng cấp thành Companion."
+      },
+      "v1TokenResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "expiresIn": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "description": "TokenResponse — JWT access token + refresh token trả về sau đăng nhập hoặc refresh."
+      },
+      "v1UpgradeRequestItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/v1UpgradeStatus"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "rejectReason": {
+            "type": "string"
+          },
+          "reviewedBy": {
+            "type": "string"
+          },
+          "reviewedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "UpgradeRequestItem — một bản ghi yêu cầu nâng cấp Companion."
+      },
+      "v1UpgradeStatus": {
+        "type": "string",
+        "enum": [
+          "UPGRADE_STATUS_UNSPECIFIED",
+          "UPGRADE_STATUS_PENDING",
+          "UPGRADE_STATUS_APPROVED",
+          "UPGRADE_STATUS_REJECTED"
+        ],
+        "default": "UPGRADE_STATUS_UNSPECIFIED",
+        "description": "UpgradeStatus — trạng thái của yêu cầu nâng cấp Companion."
+      }
+    },
+    "securitySchemes": {}
+  },
+  "tags": [
+    {
+      "name": "BookingService"
+    },
+    {
+      "name": "IdentityService"
+    }
+  ]
+}

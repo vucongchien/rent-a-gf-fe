@@ -5,24 +5,28 @@ import { NotificationItem } from './NotificationItem';
 import { useNotifications } from '@/shared/contexts/NotificationContext';
 import { SakuraIcon, SpinnerIcon } from '@/shared/components/atoms/Icons';
 import { Button } from '@/shared/components/atoms/Button';
-import type { Notification, NotificationCategory } from '@/shared/types';
+import type { Notification, NotificationCategory, NotificationsResponse } from '@/shared/types';
 
 interface NotificationListClientProps {
   initialNotifications: Notification[];
-  total: number;
+  initialNextCursor: string | null;
+  initialHasMore: boolean;
+  variant?: 'client' | 'companion';
 }
 
 type TabType = 'ALL' | NotificationCategory;
 
 export const NotificationListClient: React.FC<NotificationListClientProps> = ({
   initialNotifications,
-  total,
+  initialNextCursor,
+  initialHasMore,
+  variant = 'client',
 }) => {
   const { resetUnreadCount } = useNotifications();
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
   const [activeTab, setActiveTab] = useState<TabType>('ALL');
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(initialNotifications.length < total);
+  const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor);
+  const [hasMore, setHasMore] = useState<boolean>(initialHasMore);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
   // 1. Lắng nghe thông báo realtime phát ra từ SSE Connection thông qua Custom Event
@@ -30,7 +34,7 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
     const handleNewNotification = (event: Event) => {
       const customEvent = event as CustomEvent<Notification>;
       const newNotif = customEvent.detail;
-      
+
       // Chèn lên đầu danh sách, tránh trùng lặp id
       setNotifications((prev) => {
         if (prev.some((n) => n.id === newNotif.id)) return prev;
@@ -72,28 +76,26 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
     }
   };
 
-  // 5. Tải thêm thông báo (Manual Load More)
+  // 5. Tải thêm thông báo (cursor-based)
   const handleLoadMore = async () => {
-    if (isLoadingMore) return;
+    if (isLoadingMore || !hasMore || !nextCursor) return;
     setIsLoadingMore(true);
-    const nextPage = page + 1;
 
     try {
-      const res = await fetch(`/api/notifications?page=${nextPage}`);
+      const qs = new URLSearchParams({ cursor: nextCursor });
+      const res = await fetch(`/api/notifications?${qs.toString()}`);
       if (res.ok) {
-        const data = await res.json();
-        const newItems = data.items as Notification[];
-        
-        let addedCount = 0;
+        const data = (await res.json()) as NotificationsResponse;
+        const newItems = data.items ?? [];
+
         setNotifications((prev) => {
           const existingIds = new Set(prev.map((n) => n.id));
           const filteredNew = newItems.filter((n) => !existingIds.has(n.id));
-          addedCount = filteredNew.length;
           return [...prev, ...filteredNew];
         });
 
-        setPage(nextPage);
-        setHasMore(notifications.length + addedCount < data.total);
+        setNextCursor(data.nextCursor ?? null);
+        setHasMore(Boolean(data.hasMore));
       }
     } catch (err) {
       console.error('[NotificationListClient] Lỗi fetch load more:', err);
@@ -117,6 +119,9 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
         <div className="flex w-full justify-between gap-1.5">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
+            const activeClass = variant === 'companion'
+              ? 'bg-mami-50/50 text-amber-600 border border-mami-100/30 shadow-sm'
+              : 'bg-chizuru-50/50 text-chizuru-600 border border-chizuru-100/30 shadow-sm';
             return (
               <Button
                 key={tab.id}
@@ -124,7 +129,7 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
                 variant="unstyled"
                 className={`py-1.5 px-1 text-[11px] sm:text-xs md:text-sm font-medium transition-all duration-200 rounded-xl flex-1 text-center truncate cursor-pointer ${
                   isActive
-                    ? 'bg-chizuru-50/50 text-chizuru-600 border border-chizuru-100/30 shadow-sm'
+                    ? activeClass
                     : 'text-neutral-500 hover:text-neutral-700 border border-transparent'
                 }`}
               >
@@ -140,7 +145,11 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
             <Button
               onClick={handleMarkAllAsRead}
               variant="unstyled"
-              className="text-xs font-semibold text-chizuru-600 hover:text-chizuru-700 transition-colors px-1 cursor-pointer"
+              className={`text-xs font-semibold transition-colors px-1 cursor-pointer ${
+                variant === 'companion'
+                  ? 'text-amber-600 hover:text-amber-700'
+                  : 'text-chizuru-600 hover:text-chizuru-700'
+              }`}
             >
               Đánh dấu tất cả đã đọc
             </Button>
@@ -156,6 +165,7 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
               key={notif.id}
               notification={notif}
               onMarkAsReadLocal={handleMarkAsReadLocal}
+              variant={variant}
             />
           ))}
 
@@ -177,8 +187,10 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
       ) : (
         /* Empty State */
         <div className="flex flex-col items-center justify-center py-16 px-4 text-center mx-4 md:mx-0 rounded-2xl border border-dashed border-neutral-200 bg-white shadow-sm">
-          <div className="w-16 h-16 rounded-full bg-chizuru-50/30 flex items-center justify-center mb-4">
-            <SakuraIcon size={32} className="text-chizuru-300 opacity-80" />
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+            variant === 'companion' ? 'bg-mami-50/30' : 'bg-chizuru-50/30'
+          }`}>
+            <SakuraIcon size={32} className={variant === 'companion' ? 'text-amber-500 opacity-80' : 'text-chizuru-300 opacity-80'} />
           </div>
           <h3 className="text-sm font-semibold text-neutral-800">Không có thông báo</h3>
           <p className="text-xs text-neutral-400 mt-1 max-w-[260px] leading-relaxed">

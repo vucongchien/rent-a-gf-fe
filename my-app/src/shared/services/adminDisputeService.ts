@@ -3,83 +3,81 @@
  */
 
 import { serverFetch } from '@/shared/lib/apiClient';
-import { currentMockUser } from '@/mocks/fixtures/data';
-import {
-  adminDisputeOverlay,
-  appendAuditEntry,
-  getAdminDispute,
-  listAdminDisputes,
-} from '@/mocks/fixtures/admin';
+import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
 import type {
+  AdminAuditLogEntry,
   AdminDisputeDetail,
   AdminDisputeListParams,
   AdminDisputeListResponse,
   AdminDisputeOutcome,
-  AdminDisputeResolveResult,
+  AdminDisputeRow,
   AdminDisputeStatus,
+  AdminDisputeResolveResult,
   ServiceRequestOptions,
 } from '@/shared/types';
 
-const isMock = () =>
-  process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
+interface ApiDisputeDTO {
+  disputeId: string;
+  bookingId: string;
+  reporterId: string;
+  accusedId: string;
+  reason: string;
+  status: string;
+  adminId?: string | null;
+  resolution?: string | null;
+  notes?: string | null;
+  version: number;
+  evidences: Array<{
+    evidenceId: string;
+    evidenceType: string;
+    content: string;
+  }>;
+  createdAt?: string;
+  openedAt?: string;
+}
+
+interface ApiDisputeListResponse {
+  disputes?: ApiDisputeDTO[];
+  data?: ApiDisputeDTO[];
+  rows?: ApiDisputeDTO[];
+  total?: number | string;
+  page?: number;
+  pageSize?: number;
+}
+
+interface ApiResolveDisputeResponse {
+  success?: boolean;
+}
 
 export const adminDisputeService = {
   async list(
     params: AdminDisputeListParams = {},
     options?: ServiceRequestOptions,
   ): Promise<AdminDisputeListResponse> {
-    if (isMock()) {
-      const rows = listAdminDisputes();
-      const counts: Record<AdminDisputeStatus, number> = {
-        OPEN: 0,
-        INVESTIGATING: 0,
-        RESOLVED: 0,
-      };
-      rows.forEach((r) => {
-        counts[r.status]++;
-      });
-
-      const status = params.status ?? 'ALL';
-      const q = (params.q ?? '').trim().toLowerCase();
-      const page = Math.max(1, params.page ?? 1);
-      const pageSize = Math.max(1, Math.min(100, params.pageSize ?? 20));
-
-      let filtered = rows;
-      if (status !== 'ALL') filtered = filtered.filter((r) => r.status === status);
-      if (q)
-        filtered = filtered.filter(
-          (r) =>
-            r.disputeId.toLowerCase().includes(q) ||
-            r.bookingId.toLowerCase().includes(q) ||
-            r.clientName.toLowerCase().includes(q) ||
-            r.companionName.toLowerCase().includes(q),
-        );
-
-      const total = filtered.length;
-      const sliced = filtered.slice((page - 1) * pageSize, page * pageSize);
-      return { rows: sliced, total, page, pageSize, counts };
-    }
-
+    const req = await getRequestCookieHeader(options?.req);
     const sp = new URLSearchParams();
-    if (params.status) sp.set('status', params.status);
-    if (params.q) sp.set('q', params.q);
+    if (params.status && params.status !== 'ALL') {
+      sp.set('status', params.status === 'INVESTIGATING' ? 'RESOLVING' : params.status);
+    }
     if (params.page) sp.set('page', String(params.page));
     if (params.pageSize) sp.set('pageSize', String(params.pageSize));
-    return serverFetch<AdminDisputeListResponse>('/admin/disputes', {
+    const raw = await serverFetch<ApiDisputeListResponse>('/disputes', {
       searchParams: sp,
-      req: options?.req,
+      req,
     });
+    return normalizeList(raw, params);
   },
 
   async getById(
     disputeId: string,
     options?: ServiceRequestOptions,
   ): Promise<AdminDisputeDetail | null> {
-    if (isMock()) return getAdminDispute(disputeId);
     try {
-      return await serverFetch<AdminDisputeDetail>(`/admin/disputes/${disputeId}`, {
-        req: options?.req,
+      const req = await getRequestCookieHeader(options?.req);
+      const raw = await serverFetch<ApiDisputeDTO>(`/disputes/${disputeId}`, {
+        req,
       });
+      return normalizeDetail(raw);
     } catch (err) {
       console.error('[adminDisputeService] getById error:', err);
       return null;
@@ -95,42 +93,133 @@ export const adminDisputeService = {
     if (!note || note.trim().length < 5) {
       throw new Error('Phải nhập ghi chú giải quyết (≥ 5 ký tự)');
     }
-    if (isMock()) {
-      const ov = adminDisputeOverlay[disputeId];
-      if (!ov) throw new Error('Không tìm thấy dispute');
-      if (ov.status === 'RESOLVED') {
-        throw new Error('Dispute đã được giải quyết, không thể thay đổi');
-      }
-      const actor = currentMockUser!;
-      ov.status = 'RESOLVED';
-      ov.outcome = {
-        type: outcome,
-        note: note.trim(),
-        resolvedBy: actor?.displayName ?? 'Admin',
-        resolvedAt: new Date().toISOString(),
-      };
-      const auditEntry = appendAuditEntry({
-        actorId: actor?.userId ?? 'u-admin-1',
-        actorName: actor?.displayName ?? 'Admin',
-        action: 'RESOLVE_DISPUTE',
-        targetType: 'DISPUTE',
-        targetId: disputeId,
-        reason: `${outcome} · ${note.trim()}`,
-      });
-      return {
-        success: true,
-        status: ov.status,
-        outcome: ov.outcome,
-        auditEntry,
-      };
-    }
-    return serverFetch<AdminDisputeResolveResult>(
-      `/admin/disputes/${disputeId}/resolve`,
+    // SSOT body: `{ resolution, notes }` với resolution ∈ REFUND_CLIENT | PAYOUT_COMPANION | REJECT_DISPUTE.
+    const resolution =
+      outcome === 'REFUND' ? 'REFUND_CLIENT'
+      : outcome === 'CHARGE' ? 'PAYOUT_COMPANION'
+      : 'REJECT_DISPUTE';
+    const req = await getRequestCookieHeader(options?.req);
+    const result = await serverFetch<ApiResolveDisputeResponse>(
+      `/disputes/${disputeId}/resolve`,
       {
         method: 'POST',
-        body: { outcome, note },
-        req: options?.req,
+        body: { resolution, notes: note },
+        req,
       },
     );
+    return {
+      success: result.success ?? true,
+      status: 'RESOLVED',
+      outcome: {
+        type: outcome,
+        note,
+        resolvedBy: '',
+        resolvedAt: new Date().toISOString(),
+      },
+      auditEntry: createAuditEntry('RESOLVE_DISPUTE', disputeId, note),
+    };
   },
 };
+
+function normalizeList(
+  raw: ApiDisputeListResponse,
+  params: AdminDisputeListParams,
+): AdminDisputeListResponse {
+  const apiRows = raw.disputes ?? raw.data ?? raw.rows ?? [];
+  let rows = apiRows.map(normalizeRow);
+  if (params.q) {
+    const q = params.q.toLowerCase();
+    rows = rows.filter((row) =>
+      [row.disputeId, row.bookingId, row.reason, row.clientName, row.companionName]
+        .some((value) => value.toLowerCase().includes(q)),
+    );
+  }
+  return {
+    rows,
+    total: Number(raw.total ?? rows.length),
+    page: raw.page ?? params.page ?? 1,
+    pageSize: raw.pageSize ?? params.pageSize ?? 10,
+    counts: countStatuses(rows),
+  };
+}
+
+function normalizeDetail(raw: ApiDisputeDTO): AdminDisputeDetail {
+  const row = normalizeRow(raw);
+  const resolvedAt = raw.status === 'RESOLVED' ? row.openedAt : '';
+  return {
+    ...row,
+    description: raw.notes ?? raw.reason,
+    bookingSnapshot: {
+      scenarioTitle: 'Chưa có trong API',
+      startTime: '',
+      price: 0,
+    },
+    evidence: raw.evidences.map((item) => ({
+      evidenceId: item.evidenceId,
+      label: `${item.evidenceType}: ${item.content}`,
+      submittedBy: raw.reporterId,
+      createdAt: '',
+    })),
+    outcome: raw.resolution
+      ? {
+          type: normalizeOutcome(raw.resolution),
+          note: raw.notes ?? '',
+          resolvedBy: raw.adminId ?? '',
+          resolvedAt,
+        }
+      : null,
+    auditLog: [],
+  };
+}
+
+function normalizeRow(raw: ApiDisputeDTO): AdminDisputeRow {
+  return {
+    disputeId: raw.disputeId,
+    bookingId: raw.bookingId,
+    clientName: raw.reporterId,
+    companionName: raw.accusedId,
+    reason: raw.reason,
+    status: normalizeStatus(raw.status),
+    severity: 'MEDIUM',
+    openedAt: raw.openedAt ?? raw.createdAt ?? '',
+  };
+}
+
+function normalizeStatus(status: string): AdminDisputeStatus {
+  if (status === 'RESOLVED') return 'RESOLVED';
+  if (status === 'RESOLVING' || status === 'INVESTIGATING') return 'INVESTIGATING';
+  return 'OPEN';
+}
+
+function normalizeOutcome(resolution: string): AdminDisputeOutcome {
+  if (resolution === 'REFUND_CLIENT') return 'REFUND';
+  if (resolution === 'PAYOUT_COMPANION') return 'CHARGE';
+  return 'DISMISS';
+}
+
+function countStatuses(rows: AdminDisputeRow[]): Record<AdminDisputeStatus, number> {
+  return rows.reduce<Record<AdminDisputeStatus, number>>(
+    (acc, row) => {
+      acc[row.status] += 1;
+      return acc;
+    },
+    { OPEN: 0, INVESTIGATING: 0, RESOLVED: 0 },
+  );
+}
+
+function createAuditEntry(
+  action: AdminAuditLogEntry['action'],
+  targetId: string,
+  reason: string,
+): AdminAuditLogEntry {
+  return {
+    entryId: `local-${Date.now()}`,
+    actorId: '',
+    actorName: '',
+    action,
+    targetType: 'DISPUTE',
+    targetId,
+    reason,
+    createdAt: new Date().toISOString(),
+  };
+}

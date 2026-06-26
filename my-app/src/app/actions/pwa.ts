@@ -17,10 +17,9 @@ let keys = {
   privateKey: process.env.VAPID_PRIVATE_KEY || '',
 };
 
-// Nếu thiếu key và đang chạy local/mock -> Tự động sinh key hợp lệ để dev không bị crash
+// Nếu thiếu key và đang chạy local dev -> Tự động sinh key hợp lệ để dev không bị crash
 if (!keys.publicKey || !keys.privateKey) {
-  const isMock = process.env.NEXT_PUBLIC_MOCK_ENABLED === 'true' || !process.env.API_URL;
-  if (process.env.NODE_ENV === 'development' || isMock) {
+  if (process.env.NODE_ENV === 'development') {
     try {
       const generated = webpush.generateVAPIDKeys();
       keys = {

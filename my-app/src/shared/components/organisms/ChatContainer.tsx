@@ -15,8 +15,8 @@ interface ChatContainerProps {
 export const ChatContainer: React.FC<ChatContainerProps> = ({ role }) => {
   const { user } = useAuth();
   
-  // Xác định ID người dùng hiện tại, mặc định fallback nếu chưa đăng nhập/mock
-  const currentUserId = user?.userId || (role === 'CLIENT' ? 'u-client-1' : 'u-comp-1');
+  // currentUserId từ auth — page đã guard trước nên user không null khi đến đây
+  const currentUserId = user?.userId ?? '';
 
   const {
     rooms,
@@ -29,7 +29,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ role }) => {
     selectRoom,
     sendMessage,
     retryMessage,
-  } = useChat(role);
+  } = useChat(role, currentUserId);
 
   // Đang tải dữ liệu phòng lần đầu
   if (isLoadingRooms) {

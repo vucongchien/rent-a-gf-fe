@@ -1,27 +1,25 @@
-import { cookies } from 'next/headers';
+import type { NextRequest } from 'next/server';
+import {
+  buildNotificationHeaders,
+  buildNotificationUrl,
+} from '@/shared/lib/notificationApiClient';
 
 /**
  * Gọi API backend thực và lấy ReadableStream proxy về cho Client.
  */
 export async function createProxyNotificationStream(
-  apiUrl: string,
+  req: NextRequest,
   reqSignal: AbortSignal
 ): Promise<ReadableStream | null> {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(process.env.AUTH_COOKIE_NAME ?? 'access_token')?.value;
-
     const headers: HeadersInit = {
-      'Accept': 'text/event-stream',
+      ...buildNotificationHeaders(req),
+      Accept: 'text/event-stream',
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
     };
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const backendRes = await fetch(`${apiUrl.replace(/\/$/, '')}/notifications/stream`, {
+    const backendRes = await fetch(buildNotificationUrl('/notifications/stream'), {
       headers,
       signal: reqSignal,
     });
@@ -32,8 +30,12 @@ export async function createProxyNotificationStream(
     }
 
     return backendRes.body;
-  } catch (err) {
-    console.error('[SSE Proxy Error] Lỗi kết nối:', err);
+  } catch (err: any) {
+    if (err.name === 'AbortError' || err.message?.includes('aborted') || reqSignal.aborted) {
+      console.log('[SSE Proxy] Kết nối bị ngắt do Client abort (reload hoặc chuyển trang)');
+    } else {
+      console.error('[SSE Proxy Error] Lỗi kết nối:', err);
+    }
     return null;
   }
 }

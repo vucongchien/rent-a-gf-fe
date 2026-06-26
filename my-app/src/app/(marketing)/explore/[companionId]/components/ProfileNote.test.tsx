@@ -15,7 +15,7 @@ vi.mock('@/shared/components/atoms/VoiceButton', () => ({
 const mockCompanion: CompanionDetail = {
   companionId: 'comp-1',
   displayName: 'Mochi',
-  availableCities: ['TP.HCM'],
+  availableCities: ['HCM'],
   averageRating: 4.8,
   totalReviews: 12,
   avatarUrl: '/avatar.jpg',
@@ -34,7 +34,7 @@ describe('ProfileNote', () => {
     expect(screen.getByText('Mochi')).toBeInTheDocument()
     
     // City
-    expect(screen.getByText('TP.HCM')).toBeInTheDocument()
+    expect(screen.getByText('TP. Hồ Chí Minh')).toBeInTheDocument()
 
     // Rating & Review count
     expect(screen.getByText('4.8')).toBeInTheDocument()

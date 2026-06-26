@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authService } from '@/shared/services/authService'
-import { toErrorPayload } from '@/shared/lib/apiClient'
+import { getUserFromRequest } from '@/shared/lib/authSession'
 
-/** GET /api/auth/me — Lấy thông tin user hiện tại từ session */
+/**
+ * GET /api/auth/me — thin reader.
+ *
+ * Trả về current user dựa trên access_token cookie hiện tại. Middleware đã
+ * refresh + patch cookie header trước khi tới đây (xem middleware.ts), nên
+ * route này KHÔNG tự refresh, KHÔNG Set-Cookie. Trả `null` nếu không có session.
+ *
+ * Client cần ép rotation → POST /api/auth/refresh (riêng biệt).
+ */
 export async function GET(req: NextRequest) {
-  try {
-    const data = await authService.getMe({ req })
-    return NextResponse.json(data)
-  } catch (err) {
-    const payload = toErrorPayload(err)
-    return NextResponse.json(payload, { status: payload.status })
-  }
+  const user = getUserFromRequest(req)
+  return NextResponse.json(user)
 }

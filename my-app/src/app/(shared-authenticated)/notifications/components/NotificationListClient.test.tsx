@@ -63,7 +63,7 @@ describe('NotificationListClient', () => {
   });
 
   it('renders all notifications and filter tabs', () => {
-    render(<NotificationListClient initialNotifications={mockNotifications} total={3} />);
+    render(<NotificationListClient initialNotifications={mockNotifications} initialNextCursor={null} initialHasMore={false} />);
 
     expect(screen.getByText('Booking được xác nhận!')).toBeInTheDocument();
     expect(screen.getByText('Tin nhắn mới')).toBeInTheDocument();
@@ -77,7 +77,7 @@ describe('NotificationListClient', () => {
   });
 
   it('filters notifications when clicking tabs', () => {
-    render(<NotificationListClient initialNotifications={mockNotifications} total={3} />);
+    render(<NotificationListClient initialNotifications={mockNotifications} initialNextCursor={null} initialHasMore={false} />);
 
     // Click on "Tương tác" tab
     const interactionTab = screen.getByText('Tương tác');
@@ -90,7 +90,7 @@ describe('NotificationListClient', () => {
   });
 
   it('calls markAllAsRead API and updates local state on clicking mark all read button', () => {
-    render(<NotificationListClient initialNotifications={mockNotifications} total={3} />);
+    render(<NotificationListClient initialNotifications={mockNotifications} initialNextCursor={null} initialHasMore={false} />);
 
     const markAllReadBtn = screen.getByText('Đánh dấu tất cả đã đọc');
     fireEvent.click(markAllReadBtn);
@@ -102,14 +102,14 @@ describe('NotificationListClient', () => {
   });
 
   it('renders empty state when no notifications are present', () => {
-    render(<NotificationListClient initialNotifications={[]} total={0} />);
+    render(<NotificationListClient initialNotifications={[]} initialNextCursor={null} initialHasMore={false} />);
 
     expect(screen.getByText('Không có thông báo')).toBeInTheDocument();
     expect(screen.getByText('Bạn không có thông báo nào trong danh mục này hoặc chưa phát sinh hoạt động nào.')).toBeInTheDocument();
   });
 
   it('prepends a new notification when custom event new-notification is dispatched', () => {
-    render(<NotificationListClient initialNotifications={mockNotifications} total={3} />);
+    render(<NotificationListClient initialNotifications={mockNotifications} initialNextCursor={null} initialHasMore={false} />);
 
     // Dispatch custom event
     const newNotif: Notification = {
@@ -129,5 +129,21 @@ describe('NotificationListClient', () => {
     // Check if new notification is in the document
     expect(screen.getByText('Giao dịch thành công')).toBeInTheDocument();
     expect(screen.getByText('Bạn vừa nạp 500 coin.')).toBeInTheDocument();
+  });
+
+  it('renders with companion variant using correct amber/mami classes', () => {
+    render(
+      <NotificationListClient
+        initialNotifications={mockNotifications}
+        initialNextCursor={null}
+        initialHasMore={false}
+        variant="companion"
+      />
+    );
+
+    // Active tab "Tất cả" should have companion style classes
+    const activeTab = screen.getByText('Tất cả');
+    expect(activeTab).toHaveClass('bg-mami-50/50');
+    expect(activeTab).toHaveClass('text-amber-600');
   });
 });

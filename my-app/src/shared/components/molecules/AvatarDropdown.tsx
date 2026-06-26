@@ -1,14 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/shared/contexts/AuthContext';
+import { useOAuthPopup } from '@/shared/hooks/useOAuthPopup';
 import { Button } from '../atoms/Button';
 import { Avatar } from '../atoms/Avatar';
 import { LogOutIcon } from '../atoms/Icons';
 
 
 export const AvatarDropdown: React.FC = () => {
-  const { user, logout, login, isLoading } = useAuth();
+  const { user, logout, isLoading, refreshUser } = useAuth();
   const router = useRouter();
+  const { login: openOAuthPopup } = useOAuthPopup({
+    onSuccess: async () => { await refreshUser(); },
+  });
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -31,10 +35,11 @@ export const AvatarDropdown: React.FC = () => {
   if (!user) {
     return (
       <Button
-        onClick={() => login('client')}
-        className="h-9 px-3.5 rounded-md bg-neutral-900 text-white font-sans font-semibold text-[13.5px] border-none shadow-none hover:bg-neutral-900/90 active:scale-95"
+        id="avatar-dropdown-signin-btn"
+        onClick={() => openOAuthPopup()}
+        className="h-9 px-3.5 rounded-md bg-neutral-900 text-white font-sans font-semibold text-[13.5px] border-none shadow-none hover:bg-neutral-900/90 active:scale-95 transition-all"
       >
-        Sign in
+        Đăng nhập
       </Button>
     );
   }
@@ -65,56 +70,14 @@ export const AvatarDropdown: React.FC = () => {
             <p className="font-sans font-semibold text-[13.5px] text-neutral-900 truncate">{user.displayName}</p>
             <p className="font-mono text-[11px] text-neutral-500 capitalize mt-[1px]">{user.role}</p>
           </div>
-          {/* Quick Switch Roles */}
-          <div className="px-1.5 py-1 border-b border-neutral-100 flex flex-col gap-0.5">
-            <p className="px-2 py-0.5 text-[9.5px] font-bold text-neutral-400 uppercase tracking-wider font-sans select-none">
-              Đóng vai (Dev)
-            </p>
-            {user.role !== 'CLIENT' && (
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  setOpen(false);
-                  await login('client');
-                  router.push('/explore');
-                }}
-                className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
-              >
-                👤 Khách hàng (Minh)
-              </Button>
-            )}
-            {user.role !== 'COMPANION' && (
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  setOpen(false);
-                  await login('companion');
-                  router.push('/bookings');
-                }}
-                className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
-              >
-                👧 Bạn gái (Linh)
-              </Button>
-            )}
-            {user.role !== 'ADMIN' && (
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  setOpen(false);
-                  await login('admin');
-                  router.push('/admin');
-                }}
-                className="w-full justify-start px-2 py-1.5 text-left text-[12.5px] font-sans text-neutral-700 hover:bg-neutral-50 border-none shadow-none font-medium rounded-lg"
-              >
-                🔑 Admin
-              </Button>
-            )}
-
-          </div>
           {/* Actions */}
           <Button
             variant="ghost"
-            onClick={() => { logout(); setOpen(false); }}
+            onClick={async () => {
+              setOpen(false);
+              await logout();
+              router.push('/explore');
+            }}
             className="w-full justify-start gap-2.5 px-3.5 py-2 text-left text-[13.5px] font-sans text-rose-500 hover:bg-rose-50 border-none shadow-none font-medium"
           >
             <LogOutIcon size={15} className="flex-none" />

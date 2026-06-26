@@ -12,13 +12,13 @@ describe('validateProfile', () => {
     const res = validateProfile({
       displayName: 'Chizuru',
       biography: 'Hello',
-      availableCities: ['TP.HCM'],
+      availableCities: ['HCM'],
     })
     expect(res.ok).toBe(true)
   })
 
   it('rejects short displayName', () => {
-    const res = validateProfile({ displayName: 'A', biography: '', availableCities: ['TP.HCM'] })
+    const res = validateProfile({ displayName: 'A', biography: '', availableCities: ['HCM'] })
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.fieldErrors.displayName).toBeTruthy()
   })
@@ -27,7 +27,7 @@ describe('validateProfile', () => {
     const res = validateProfile({
       displayName: 'Chizuru',
       biography: 'a'.repeat(MAX_BIO_LEN + 1),
-      availableCities: ['TP.HCM'],
+      availableCities: ['HCM'],
     })
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.fieldErrors.biography).toBeTruthy()

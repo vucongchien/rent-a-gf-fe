@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { Button } from '@/shared/components/atoms/Button';
 
 export const TransactionFilters: React.FC = () => {
   const router = useRouter();
@@ -51,7 +52,8 @@ export const TransactionFilters: React.FC = () => {
         {types.map((t) => {
           const isActive = currentType === t.key;
           return (
-            <button
+            <Button
+              variant="unstyled"
               key={t.key}
               onClick={() => updateFilters(t.key, currentStatus)}
               className={`px-3 py-1 font-sans text-[12.5px] font-semibold rounded-full border transition-all active:scale-95 ${
@@ -61,7 +63,7 @@ export const TransactionFilters: React.FC = () => {
               }`}
             >
               {t.label}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -72,7 +74,8 @@ export const TransactionFilters: React.FC = () => {
         {statuses.map((s) => {
           const isActive = currentStatus === s.key;
           return (
-            <button
+            <Button
+              variant="unstyled"
               key={s.key}
               onClick={() => updateFilters(currentType, s.key)}
               className={`px-3 py-1 font-sans text-[12.5px] font-semibold rounded-full border transition-all active:scale-95 ${
@@ -82,7 +85,7 @@ export const TransactionFilters: React.FC = () => {
               }`}
             >
               {s.label}
-            </button>
+            </Button>
           );
         })}
       </div>
