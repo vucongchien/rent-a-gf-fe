@@ -54,8 +54,12 @@ export default async function CompanionDetailPage({ params }: PageProps) {
     console.log(`[analytics] view:companion/${companionId}`)
   })
 
-  const albumUrls = companion.albumUrls.length > 0
-    ? companion.albumUrls : ['/placeholder.png']
+  const albumUrls = [
+    companion.avatarUrl,
+    ...companion.albumUrls
+  ].filter(Boolean)
+
+  const displayAlbum = albumUrls.length > 0 ? albumUrls : ['/placeholder.png']
 
   return (
       <main className="max-w-[1180px] mx-auto px-4 md:px-8 py-10 space-y-16 pb-32">
@@ -65,7 +69,7 @@ export default async function CompanionDetailPage({ params }: PageProps) {
           <PolaroidGallery
             companionId={companionId}
             companionName={companion.displayName}
-            albumUrls={albumUrls}
+            albumUrls={displayAlbum}
           />
           <ProfileNote companion={companion} />
         </div>
