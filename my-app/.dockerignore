@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+README.md
+Dockerfile
+docker-compose*
+.env*.local
+.vercel
+out
+build
+*.tsbuildinfo
+pnpm-lock.yaml
+pnpm-workspace.yaml
+certificates
