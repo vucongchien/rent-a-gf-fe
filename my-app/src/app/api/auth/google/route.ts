@@ -7,7 +7,7 @@ import { NextRequest, NextResponse, connection } from 'next/server'
  * server-to-server lấy authUrl rồi 302 popup sang IdP. FE không sinh
  * state / PKCE / lưu gì.
  */
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   await connection()
 
   const apiUrl = process.env.API_URL
@@ -18,11 +18,25 @@ export async function GET(_req: NextRequest) {
     )
   }
 
-  const backendInitUrl = `${apiUrl.replace(/\/$/, '')}/auth/google/init`
+  // Tự động phát hiện origin thực tế của frontend (hỗ trợ reverse proxy/Vercel)
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || '';
+  const protocol = req.headers.get('x-forwarded-proto') || 'https';
+  const origin = host ? `${protocol}://${host}` : req.nextUrl.origin;
+  const callbackUrl = `${origin}/api/auth/callback`;
+
+  // Gắn redirect_uri vào query parameter (hỗ trợ cả redirect_uri và redirectUri)
+  const backendInitUrl = new URL(`${apiUrl.replace(/\/$/, '')}/auth/google/init`);
+  backendInitUrl.searchParams.set('redirect_uri', callbackUrl);
+  backendInitUrl.searchParams.set('redirectUri', callbackUrl);
+
   try {
-    const beRes = await fetch(backendInitUrl, {
+    const beRes = await fetch(backendInitUrl.toString(), {
       method: 'GET',
-      headers: { Accept: 'application/json' },
+      headers: { 
+        Accept: 'application/json',
+        Origin: origin,
+        Referer: origin
+      },
       cache: 'no-store',
     })
     if (!beRes.ok) {
