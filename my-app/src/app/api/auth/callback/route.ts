@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { getAppOrigin, getCallbackUrl } from '@/shared/lib/authHelper'
 import {
   accessTokenCookieOptions,
   AUTH_COOKIE_NAME,
@@ -120,7 +121,8 @@ function htmlResponse(body: string, status = 200): NextResponse {
  * BFF KHÔNG sinh state/PKCE, KHÔNG đổi code với IdP. Tất cả BE lo.
  */
 export async function GET(req: NextRequest) {
-  const targetOrigin = req.nextUrl.origin
+  const targetOrigin = getAppOrigin(req)
+  const callbackUrl = getCallbackUrl(req)
   const { searchParams } = req.nextUrl
   const code = searchParams.get('code')
   const state = searchParams.get('state')
@@ -144,6 +146,8 @@ export async function GET(req: NextRequest) {
     const beUrl = new URL(`${apiUrl.replace(/\/$/, '')}/auth/google/callback`)
     beUrl.searchParams.set('code', code)
     if (state) beUrl.searchParams.set('state', state)
+    beUrl.searchParams.set('redirect_uri', callbackUrl)
+    beUrl.searchParams.set('redirectUri', callbackUrl)
 
     const res = await fetch(beUrl.toString(), {
       method: 'GET',

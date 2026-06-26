@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse, connection } from 'next/server'
+import { getCallbackUrl, getAppOrigin } from '@/shared/lib/authHelper'
 
 /**
  * GET /api/auth/google — Init endpoint cho popup OAuth flow.
@@ -18,11 +19,8 @@ export async function GET(req: NextRequest) {
     )
   }
 
-  // Tự động phát hiện origin thực tế của frontend (hỗ trợ reverse proxy/Vercel)
-  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || '';
-  const protocol = req.headers.get('x-forwarded-proto') || 'https';
-  const origin = host ? `${protocol}://${host}` : req.nextUrl.origin;
-  const callbackUrl = `${origin}/api/auth/callback`;
+  const origin = getAppOrigin(req)
+  const callbackUrl = getCallbackUrl(req)
 
   // Gắn redirect_uri vào query parameter (hỗ trợ cả redirect_uri và redirectUri)
   const backendInitUrl = new URL(`${apiUrl.replace(/\/$/, '')}/auth/google/init`);

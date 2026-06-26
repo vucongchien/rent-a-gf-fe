@@ -44,6 +44,14 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
     onError: (err) => {
       setErrorMsg(err.message ?? 'Đăng nhập thất bại, thử lại nhé.');
     },
+    onPopupClosedFallback: async () => {
+      const u = await refreshUser();
+      if (u) {
+        onClose();
+        return true;
+      }
+      return false;
+    },
   });
 
   // Điều khiển đóng/mở dialog native

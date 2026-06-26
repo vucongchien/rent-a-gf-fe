@@ -12,6 +12,10 @@ export const AvatarDropdown: React.FC = () => {
   const router = useRouter();
   const { login: openOAuthPopup } = useOAuthPopup({
     onSuccess: async () => { await refreshUser(); },
+    onPopupClosedFallback: async () => {
+      const u = await refreshUser();
+      return !!u;
+    },
   });
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);

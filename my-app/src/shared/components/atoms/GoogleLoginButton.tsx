@@ -29,6 +29,10 @@ export default function GoogleLoginButton({ onSuccess, onError }: GoogleLoginBut
       if (onError) onError(msg)
       else console.error('[GoogleLoginButton] OAuth error:', err)
     },
+    onPopupClosedFallback: async () => {
+      const u = await refreshUser()
+      return !!u
+    },
   })
 
   const handleLogin = () => {

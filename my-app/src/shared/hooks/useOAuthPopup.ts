@@ -18,6 +18,8 @@ export interface UseOAuthPopupOptions {
   /** Width/height popup */
   width?: number;
   height?: number;
+  /** Callback chạy khi popup bị đóng trước khi nhận được message. Trả về true nếu thực chất đã login thành công (fallback check). */
+  onPopupClosedFallback?: () => Promise<boolean>;
 }
 
 export interface UseOAuthPopupReturn {
@@ -65,6 +67,7 @@ export function useOAuthPopup(options: UseOAuthPopupOptions = {}): UseOAuthPopup
   const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const resolvedRef = useRef(false);
   const bcRef = useRef<BroadcastChannel | null>(null);
+  const isOpeningRef = useRef(false);
 
   const cleanup = useCallback(() => {
     if (pollTimerRef.current) {
@@ -77,6 +80,7 @@ export function useOAuthPopup(options: UseOAuthPopupOptions = {}): UseOAuthPopup
     }
     popupRef.current = null;
     resolvedRef.current = false;
+    isOpeningRef.current = false;
     setIsLoading(false);
   }, []);
 
@@ -138,6 +142,8 @@ export function useOAuthPopup(options: UseOAuthPopupOptions = {}): UseOAuthPopup
   useEffect(() => () => cleanup(), [cleanup]);
 
   const login = useCallback((): boolean => {
+    if (isOpeningRef.current) return false;
+
     // Nếu popup cũ còn mở thì focus lại, không mở thêm
     try {
       if (popupRef.current && !popupRef.current.closed) {
@@ -155,12 +161,14 @@ export function useOAuthPopup(options: UseOAuthPopupOptions = {}): UseOAuthPopup
       typeof window !== 'undefined' ? window.screenY + (window.outerHeight - height) / 2 : 0;
     const features = `width=${width},height=${height},left=${left},top=${top},popup=1,noopener=0`;
 
+    isOpeningRef.current = true;
     const popup = window.open(initPath, popupName, features);
 
     if (!popup) {
       // Browser chặn popup → fallback full-page redirect
       console.warn('[useOAuthPopup] Popup bị chặn, fallback redirect');
       window.location.href = initPath;
+      isOpeningRef.current = false;
       return false;
     }
 
@@ -168,14 +176,35 @@ export function useOAuthPopup(options: UseOAuthPopupOptions = {}): UseOAuthPopup
     resolvedRef.current = false;
     setIsLoading(true);
 
-    // Poll detect popup bị đóng mà chưa nhận message → user huỷ
+    // Poll detect popup bị đóng mà chưa nhận message → user huỷ hoặc tự đóng sớm
     // Bọc try/catch vì COOP có thể block p.closed khi popup ở Google domain
     pollTimerRef.current = setInterval(() => {
       try {
         const p = popupRef.current;
         if (!p || p.closed) {
           if (!resolvedRef.current) {
-            // User đóng popup trước khi flow hoàn tất → không báo lỗi
+            // User đóng popup trước khi flow hoàn tất → kiểm tra fallback session check
+            if (options.onPopupClosedFallback) {
+              console.log('[useOAuthPopup] Popup đóng trước khi nhận message, chạy fallback check...');
+              if (pollTimerRef.current) {
+                clearInterval(pollTimerRef.current);
+                pollTimerRef.current = null;
+              }
+              options.onPopupClosedFallback().then((isSuccess) => {
+                if (isSuccess) {
+                  console.log('[useOAuthPopup] Fallback check báo thành công! Hoàn tất login.');
+                  resolvedRef.current = true;
+                  Promise.resolve(onSuccess?.()).finally(cleanup);
+                } else {
+                  console.log('[useOAuthPopup] Fallback check báo thất bại.');
+                  cleanup();
+                }
+              }).catch((err) => {
+                console.error('[useOAuthPopup] Fallback check gặp lỗi:', err);
+                cleanup();
+              });
+              return;
+            }
             console.log('[useOAuthPopup] Popup đóng trước khi hoàn tất (user huỷ)');
           }
           cleanup();
