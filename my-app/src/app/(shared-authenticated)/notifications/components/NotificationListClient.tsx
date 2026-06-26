@@ -5,7 +5,7 @@ import { NotificationItem } from './NotificationItem';
 import { useNotifications } from '@/shared/contexts/NotificationContext';
 import { SakuraIcon, SpinnerIcon } from '@/shared/components/atoms/Icons';
 import { Button } from '@/shared/components/atoms/Button';
-import type { Notification, NotificationCategory, NotificationsResponse } from '@/shared/types';
+import type { Notification, NotificationsResponse } from '@/shared/types';
 
 interface NotificationListClientProps {
   initialNotifications: Notification[];
@@ -14,7 +14,7 @@ interface NotificationListClientProps {
   variant?: 'client' | 'companion';
 }
 
-type TabType = 'ALL' | NotificationCategory;
+type TabType = 'ALL' | 'TRANSACTIONAL' | 'MARKETING';
 
 export const NotificationListClient: React.FC<NotificationListClientProps> = ({
   initialNotifications,
@@ -107,8 +107,7 @@ export const NotificationListClient: React.FC<NotificationListClientProps> = ({
   const tabs: { id: TabType; label: string }[] = [
     { id: 'ALL', label: 'Tất cả' },
     { id: 'TRANSACTIONAL', label: 'Giao dịch' },
-    { id: 'INTERACTION', label: 'Tương tác' },
-    { id: 'PROMOTIONAL', label: 'Hệ thống' },
+    { id: 'MARKETING', label: 'Marketing' },
   ];
 
   return (

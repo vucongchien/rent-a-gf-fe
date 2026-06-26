@@ -28,12 +28,18 @@ global.fetch = mockFetch;
 describe('NotificationItem', () => {
   const mockMarkAsReadLocal = vi.fn();
 
+  /**
+   * Fixture: booking notification với senderAvatar.
+   * eventKind = 'BOOKING_ACCEPTED' → icon là CheckIcon, nhưng có senderAvatar
+   * nên shouldRenderAvatar = false (chỉ BOOKING_REQUESTED | CHAT_MESSAGE | NEW_REVIEW mới show avatar).
+   */
   const mockBookingNotification: Notification = {
     id: 'notif-1',
     title: 'Booking được xác nhận!',
     body: 'Linh đã xác nhận lịch hẹn Cà phê của bạn.',
-    type: 'BOOKING_ACCEPTED',
+    eventKind: 'BOOKING_ACCEPTED',
     category: 'TRANSACTIONAL',
+    priority: 'HIGH',
     isRead: false,
     actionUrl: '/bookings/bk-1',
     bookingId: 'bk-1',
@@ -42,12 +48,34 @@ describe('NotificationItem', () => {
     createdAt: new Date().toISOString(),
   };
 
+  /**
+   * Fixture: booking_requested notification — loại này MỚI hiển thị avatar.
+   */
+  const mockBookingRequestedWithAvatar: Notification = {
+    id: 'notif-0',
+    title: 'Yêu cầu đặt lịch mới',
+    body: 'Kazuya muốn hẹn xem phim.',
+    eventKind: 'BOOKING_REQUESTED',
+    category: 'TRANSACTIONAL',
+    priority: 'HIGH',
+    isRead: false,
+    actionUrl: '/dashboard/requests/bk-0',
+    bookingId: 'bk-0',
+    senderName: 'Kazuya',
+    senderAvatar: 'https://example.com/kazuya.jpg',
+    createdAt: new Date().toISOString(),
+  };
+
+  /**
+   * Fixture: system notification đã đọc, không có senderAvatar.
+   */
   const mockSystemNotification: Notification = {
     id: 'notif-2',
     title: 'Hệ thống bảo trì',
     body: 'Bảo trì từ 2h-4h sáng.',
-    type: 'SYSTEM_MAINTENANCE',
-    category: 'PROMOTIONAL',
+    eventKind: 'SYSTEM_MAINTENANCE',
+    category: 'TRANSACTIONAL',
+    priority: 'LOW',
     isRead: true,
     createdAt: new Date().toISOString(),
   };
@@ -56,77 +84,111 @@ describe('NotificationItem', () => {
     vi.clearAllMocks();
   });
 
-  it('renders avatar for booking notifications when senderAvatar is provided', () => {
+  it('renders title and body correctly', () => {
     render(
-      <NotificationItem
-        notification={mockBookingNotification}
-        onMarkAsReadLocal={mockMarkAsReadLocal}
-      />
+      <NotificationItem notification={mockBookingNotification} onMarkAsReadLocal={mockMarkAsReadLocal} />,
     );
 
     expect(screen.getByText('Booking được xác nhận!')).toBeInTheDocument();
     expect(screen.getByText('Linh đã xác nhận lịch hẹn Cà phê của bạn.')).toBeInTheDocument();
-    
-    // Check if Avatar is rendered with the correct alt text
-    const avatarImg = screen.getByAltText('Nguyễn Thị Linh');
+  });
+
+  it('renders Avatar for BOOKING_REQUESTED when senderAvatar is provided', () => {
+    render(
+      <NotificationItem
+        notification={mockBookingRequestedWithAvatar}
+        onMarkAsReadLocal={mockMarkAsReadLocal}
+      />,
+    );
+
+    const avatarImg = screen.getByAltText('Kazuya');
     expect(avatarImg).toBeInTheDocument();
   });
 
-  it('renders icon instead of avatar for system/promotional notifications', () => {
+  it('renders icon (not avatar) for BOOKING_ACCEPTED even when senderAvatar is set', () => {
     render(
-      <NotificationItem
-        notification={mockSystemNotification}
-        onMarkAsReadLocal={mockMarkAsReadLocal}
-      />
+      <NotificationItem notification={mockBookingNotification} onMarkAsReadLocal={mockMarkAsReadLocal} />,
+    );
+
+    // BOOKING_ACCEPTED không thuộc danh sách show avatar
+    expect(screen.queryByAltText('Nguyễn Thị Linh')).not.toBeInTheDocument();
+  });
+
+  it('renders icon instead of avatar for SYSTEM_MAINTENANCE (no avatar)', () => {
+    render(
+      <NotificationItem notification={mockSystemNotification} onMarkAsReadLocal={mockMarkAsReadLocal} />,
     );
 
     expect(screen.getByText('Hệ thống bảo trì')).toBeInTheDocument();
-    expect(screen.getByText('Bảo trì từ 2h-4h sáng.')).toBeInTheDocument();
-    
-    // Avatar should NOT be in the document
     expect(screen.queryByAltText('Nguyễn Thị Linh')).not.toBeInTheDocument();
-    // Dot indicator should NOT be rendered since it's already read (isRead: true)
+  });
+
+  it('does NOT render unread dot indicator for read notifications', () => {
+    render(
+      <NotificationItem notification={mockSystemNotification} onMarkAsReadLocal={mockMarkAsReadLocal} />,
+    );
+
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
-  it('calls onMarkAsReadLocal, decrementUnreadCount, calls fetch API and redirects on click', async () => {
+  it('calls onMarkAsReadLocal, decrementUnreadCount, fetch PATCH, and redirects on click', async () => {
     render(
-      <NotificationItem
-        notification={mockBookingNotification}
-        onMarkAsReadLocal={mockMarkAsReadLocal}
-      />
+      <NotificationItem notification={mockBookingNotification} onMarkAsReadLocal={mockMarkAsReadLocal} />,
     );
 
     const container = screen.getByRole('button');
     fireEvent.click(container);
 
-    // Should call local update callback immediately (Optimistic UI)
+    // Optimistic UI: gọi ngay không cần await
     expect(mockMarkAsReadLocal).toHaveBeenCalledWith('notif-1');
     expect(mockDecrement).toHaveBeenCalled();
 
-    // Should call fetch PATCH API
+    // Gọi fetch PATCH đánh dấu đã đọc
     expect(mockFetch).toHaveBeenCalledWith('/api/notifications/notif-1/read', {
       method: 'PATCH',
     });
 
-    // Should route to actionUrl
+    // Redirect về actionUrl
     await waitFor(() => {
-       expect(mockPush).toHaveBeenCalledWith('/bookings/bk-1');
+      expect(mockPush).toHaveBeenCalledWith('/bookings/bk-1');
     });
   });
 
-  it('renders with companion variant using correct classes for unread card and indicators', () => {
+  it('does NOT call fetch or redirect when notification is already read', async () => {
+    render(
+      <NotificationItem notification={mockSystemNotification} onMarkAsReadLocal={mockMarkAsReadLocal} />,
+    );
+
+    fireEvent.click(screen.getByRole('button'));
+
+    expect(mockMarkAsReadLocal).not.toHaveBeenCalled();
+    expect(mockDecrement).not.toHaveBeenCalled();
+    expect(mockFetch).not.toHaveBeenCalled();
+    // isRead + no actionUrl → không redirect
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('renders with companion variant applying correct mami/amber classes for unread card', () => {
     render(
       <NotificationItem
         notification={mockBookingNotification}
         onMarkAsReadLocal={mockMarkAsReadLocal}
         variant="companion"
-      />
+      />,
     );
 
-    // Unread container should have bg-mami classes
     const container = screen.getByRole('button');
     expect(container).toHaveClass('bg-mami-50/10');
     expect(container).toHaveClass('border-mami-100/20');
+  });
+
+  it('renders with client variant (default) applying chizuru classes for unread card', () => {
+    render(
+      <NotificationItem notification={mockBookingNotification} onMarkAsReadLocal={mockMarkAsReadLocal} />,
+    );
+
+    const container = screen.getByRole('button');
+    expect(container).toHaveClass('bg-chizuru-50/10');
+    expect(container).toHaveClass('border-chizuru-100/20');
   });
 });

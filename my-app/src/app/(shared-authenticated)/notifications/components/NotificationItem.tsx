@@ -4,14 +4,14 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useNotifications } from '@/shared/contexts/NotificationContext';
 import { Avatar } from '@/shared/components/atoms/Avatar';
-import { 
-  ChatIcon, 
-  CalendarIcon, 
-  CalendarXIcon, 
-  CoinIcon, 
-  InfoIcon, 
+import {
+  ChatIcon,
+  CalendarIcon,
+  CalendarXIcon,
+  CoinIcon,
+  InfoIcon,
   SakuraIcon,
-  CheckIcon
+  CheckIcon,
 } from '@/shared/components/atoms/Icons';
 import type { Notification } from '@/shared/types';
 
@@ -21,7 +21,7 @@ interface NotificationItemProps {
   variant?: 'client' | 'companion';
 }
 
-// Helper định dạng thời gian thân thiện bằng tiếng Việt
+// ─── Helper định dạng thời gian thân thiện bằng tiếng Việt ──────────────────
 function formatTimeAgo(dateStr?: string) {
   if (!dateStr) return '';
   const date = new Date(dateStr);
@@ -35,13 +35,13 @@ function formatTimeAgo(dateStr?: string) {
   if (diffMins < 60) return `${diffMins} phút trước`;
   if (diffHours < 24) return `${diffHours} giờ trước`;
   if (diffDays < 7) return `${diffDays} ngày trước`;
-  
+
   return date.toLocaleDateString('vi-VN', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 }
 
@@ -52,48 +52,91 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
 }) => {
   const router = useRouter();
   const { decrementUnreadCount } = useNotifications();
-  const { isRead, title, body, createdAt, senderAvatar, senderName, type } = notification;
+  const { isRead, title, body, createdAt, senderAvatar, senderName, eventKind } = notification;
 
-  // 1. Phân định xem có hiển thị Avatar hay không (Chỉ hiển thị Avatar cho các tương tác người dùng)
+  // 1. Hiển thị Avatar chỉ khi eventKind liên quan đến tương tác người dùng và có avatar
   const shouldRenderAvatar =
-    (type.startsWith('BOOKING_') || type === 'CHAT_MESSAGE' || type === 'NEW_REVIEW') &&
+    (eventKind === 'BOOKING_REQUESTED' ||
+      eventKind === 'CHAT_MESSAGE' ||
+      eventKind === 'NEW_REVIEW') &&
     !!senderAvatar;
 
-  // 2. Fallback sang các Icon màu nước vẽ tay tinh tế theo từng loại
-  const getIconAndStyle = () => {
-    switch (type) {
+  // 2. Chọn icon và màu nền dựa trên eventKind (derive từ eventId của API)
+  const getIconAndStyle = (): { icon: React.ReactNode; bg: string } => {
+    switch (eventKind) {
       case 'CHAT_MESSAGE':
         return {
           icon: <ChatIcon size={20} className="text-blue-500" />,
-          bg: 'bg-blue-50/60 text-blue-500'
+          bg: 'bg-blue-50/60 text-blue-500',
         };
+
       case 'BOOKING_REQUESTED':
         return {
-          icon: <CalendarIcon size={20} className={variant === 'companion' ? 'text-amber-500' : 'text-chizuru-500'} />,
-          bg: variant === 'companion' ? 'bg-mami-50/60 text-amber-500' : 'bg-chizuru-50/60 text-chizuru-500'
+          icon: (
+            <CalendarIcon
+              size={20}
+              className={variant === 'companion' ? 'text-amber-500' : 'text-chizuru-500'}
+            />
+          ),
+          bg:
+            variant === 'companion'
+              ? 'bg-mami-50/60 text-amber-500'
+              : 'bg-chizuru-50/60 text-chizuru-500',
         };
+
       case 'BOOKING_ACCEPTED':
       case 'BOOKING_COMPLETED':
         return {
           icon: <CheckIcon size={20} className="text-emerald-500" />,
-          bg: 'bg-emerald-50/60 text-emerald-500'
+          bg: 'bg-emerald-50/60 text-emerald-500',
         };
+
       case 'BOOKING_REJECTED':
       case 'BOOKING_CANCELLED':
         return {
           icon: <CalendarXIcon size={20} className="text-rose-500" />,
-          bg: 'bg-rose-50/60 text-rose-500'
+          bg: 'bg-rose-50/60 text-rose-500',
         };
+
       case 'PAYMENT_SUCCESS':
         return {
           icon: <CoinIcon size={20} className="text-amber-500" />,
-          bg: 'bg-amber-50/60 text-amber-500'
+          bg: 'bg-amber-50/60 text-amber-500',
         };
+
+      case 'PAYMENT_FAILED':
+        return {
+          icon: <CoinIcon size={20} className="text-rose-500" />,
+          bg: 'bg-rose-50/60 text-rose-500',
+        };
+
       case 'PROMOTION_VOUCHER':
         return {
-          icon: <SakuraIcon size={20} className={variant === 'companion' ? 'text-amber-500' : 'text-chizuru-500'} />,
-          bg: variant === 'companion' ? 'bg-mami-50/30 text-amber-500' : 'bg-chizuru-50/30 text-chizuru-500'
+          icon: (
+            <SakuraIcon
+              size={20}
+              className={variant === 'companion' ? 'text-amber-500' : 'text-chizuru-500'}
+            />
+          ),
+          bg:
+            variant === 'companion'
+              ? 'bg-mami-50/30 text-amber-500'
+              : 'bg-chizuru-50/30 text-chizuru-500',
         };
+
+      case 'DISPUTE_OPENED':
+      case 'DISPUTE_RESOLVED':
+        return {
+          icon: <InfoIcon size={20} className="text-orange-500" />,
+          bg: 'bg-orange-50/60 text-orange-500',
+        };
+
+      case 'NEW_REVIEW':
+        return {
+          icon: <CheckIcon size={20} className="text-violet-500" />,
+          bg: 'bg-violet-50/60 text-violet-500',
+        };
+
       case 'OTP_CODE':
       case 'SYSTEM_MAINTENANCE':
       case 'PROFILE_REMINDER':
@@ -101,17 +144,17 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
       default:
         return {
           icon: <InfoIcon size={20} className="text-neutral-500" />,
-          bg: 'bg-neutral-100/70 text-neutral-500'
+          bg: 'bg-neutral-100/70 text-neutral-500',
         };
     }
   };
 
   const { icon, bg } = getIconAndStyle();
 
-  // 3. Xử lý khi click vào thông báo (Optimistic Update & Redirect)
+  // 3. Xử lý khi click (Optimistic Update & Redirect)
   const handleClick = async () => {
     if (!isRead) {
-      // Optimistic update biến mất dấu chấm đỏ trên UI ngay lập tức
+      // Optimistic update: biến mất dấu chấm đỏ ngay lập tức
       onMarkAsReadLocal(notification.id);
       decrementUnreadCount();
 
@@ -167,14 +210,18 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
       {/* Cột 2: Nội dung văn bản */}
       <div className="flex-1 min-w-0 mt-0.5">
         <div className="flex justify-between items-start gap-2">
-          <h4 className={`text-sm leading-tight truncate ${isRead ? 'font-medium text-neutral-800' : 'font-semibold text-neutral-900'}`}>
+          <h4
+            className={`text-sm leading-tight truncate ${isRead ? 'font-medium text-neutral-800' : 'font-semibold text-neutral-900'}`}
+          >
             {title}
           </h4>
           <span className="text-[11px] text-neutral-400 font-normal shrink-0 whitespace-nowrap">
             {formatTimeAgo(createdAt)}
           </span>
         </div>
-        <p className={`text-xs mt-1 leading-relaxed ${isRead ? 'text-neutral-500 font-normal' : 'text-neutral-700 font-medium'}`}>
+        <p
+          className={`text-xs mt-1 leading-relaxed ${isRead ? 'text-neutral-500 font-normal' : 'text-neutral-700 font-medium'}`}
+        >
           {body}
         </p>
       </div>

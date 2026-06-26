@@ -3,7 +3,55 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useToast } from '@/shared/components/atoms/ToastNotification';
-import type { Notification } from '@/shared/types';
+import type { Notification, NotificationEventKind, NotificationCategory, NotificationPriority } from '@/shared/types';
+
+// ─── Normalize SSE wire payload → Notification shape ────────────────────────
+// SSE event từ BE gửi raw wire format (không qua service layer),
+// nên phải normalize ở đây trước khi dispatch vào UI.
+function deriveEventKindFromId(eventId?: string): NotificationEventKind {
+  if (!eventId) return 'SYSTEM';
+  const id = eventId.toLowerCase();
+  if (id.includes('booking_requested') || id.includes('booking_request')) return 'BOOKING_REQUESTED';
+  if (id.includes('booking_accepted') || id.includes('booking_accept')) return 'BOOKING_ACCEPTED';
+  if (id.includes('booking_rejected') || id.includes('booking_reject')) return 'BOOKING_REJECTED';
+  if (id.includes('booking_cancelled') || id.includes('booking_cancel')) return 'BOOKING_CANCELLED';
+  if (id.includes('booking_completed') || id.includes('booking_complete')) return 'BOOKING_COMPLETED';
+  if (id.includes('chat')) return 'CHAT_MESSAGE';
+  if (id.includes('payment_success') || id.includes('payment_ok')) return 'PAYMENT_SUCCESS';
+  if (id.includes('payment_fail')) return 'PAYMENT_FAILED';
+  if (id.includes('dispute_open')) return 'DISPUTE_OPENED';
+  if (id.includes('dispute_resolv')) return 'DISPUTE_RESOLVED';
+  if (id.includes('review')) return 'NEW_REVIEW';
+  if (id.includes('otp')) return 'OTP_CODE';
+  if (id.includes('maintenance')) return 'SYSTEM_MAINTENANCE';
+  if (id.includes('promotion') || id.includes('voucher')) return 'PROMOTION_VOUCHER';
+  if (id.includes('profile')) return 'PROFILE_REMINDER';
+  return 'SYSTEM';
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function normalizeSSEPayload(raw: any): Notification {
+  // Nếu đã là shape nội bộ (có eventKind) thì dùng luôn
+  if (raw?.eventKind) return raw as Notification;
+
+  // Wire format từ BE: { id, eventId, type, priority, payload, status, ... }
+  const payload = raw?.payload ?? {};
+  const eventKind = deriveEventKindFromId(raw?.eventId);
+  return {
+    id: raw?.id ?? '',
+    eventKind,
+    category: (raw?.type ?? 'TRANSACTIONAL') as NotificationCategory,
+    priority: (raw?.priority ?? 'MEDIUM') as NotificationPriority,
+    title: payload?.title ?? raw?.title ?? '',
+    body: payload?.body ?? raw?.body ?? '',
+    bookingId: payload?.bookingId,
+    isRead: (raw?.readAt !== null && raw?.readAt !== undefined) || raw?.status === 'READ' || raw?.isRead === true,
+    createdAt: raw?.createdAt,
+    actionUrl: raw?.actionUrl,
+    senderName: raw?.senderName,
+    senderAvatar: raw?.senderAvatar,
+  };
+}
 
 interface NotificationContextProps {
   unreadCount: number;
@@ -166,7 +214,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         const handleEvent = (event: MessageEvent) => {
           try {
-            const data = JSON.parse(event.data) as Notification;
+            const raw = JSON.parse(event.data);
+            // normalize wire format → Notification shape nội bộ
+            const data = normalizeSSEPayload(raw);
             handleNewNotification(data);
           } catch (err) {
             console.error('[NotificationContext] Lỗi parse dữ liệu event:', err);
