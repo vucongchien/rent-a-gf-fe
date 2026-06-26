@@ -10,6 +10,4 @@ docker-compose*
 out
 build
 *.tsbuildinfo
-pnpm-lock.yaml
-pnpm-workspace.yaml
 certificates
