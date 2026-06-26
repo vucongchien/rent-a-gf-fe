@@ -84,23 +84,29 @@ export default function RentAGirlfriendLanding({ companions }: Props) {
 
     let cleanupListeners: (() => void) | undefined;
 
-    // Thử phát video có tiếng ngay từ đầu
-    video.play().catch((err) => {
-      console.warn('[LandingPage] Autoplay with audio was blocked, falling back to muted:', err);
-      setIsMuted(true);
+    // Khởi đầu tắt tiếng để đảm bảo trình duyệt cho phép autoplay mượt mà 100%
+    video.muted = true;
+    setIsMuted(true);
 
+    video.play().then(() => {
+      // Đăng ký sự kiện tương tác của người dùng để bật tiếng khi họ click/tap lần đầu
       const enableAudio = () => {
-        setIsMuted(false);
+        if (videoRef.current) {
+          videoRef.current.muted = false;
+          setIsMuted(false);
+        }
         removeListeners();
       };
 
-      const events = ['click', 'scroll', 'touchstart', 'keydown'];
+      const events = ['click', 'touchstart'];
       const removeListeners = () => {
         events.forEach((ev) => window.removeEventListener(ev, enableAudio));
       };
 
       events.forEach((ev) => window.addEventListener(ev, enableAudio, { passive: true }));
       cleanupListeners = removeListeners;
+    }).catch((err) => {
+      console.error('[LandingPage] Video play failed:', err);
     });
 
     return () => {

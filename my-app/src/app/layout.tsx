@@ -42,6 +42,7 @@ export const metadata: Metadata = {
     title: "RentGF",
   },
   icons: {
+    icon: "/icon-192.png",
     apple: "/icon-192.png",
   },
   openGraph: {
