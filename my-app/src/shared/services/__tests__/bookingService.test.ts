@@ -37,6 +37,7 @@ describe('bookingService.getBookings', () => {
     vi.mocked(headers).mockResolvedValue({
       get: () => null,
     } as never);
+    vi.clearAllMocks();
   });
 
   afterEach(() => {

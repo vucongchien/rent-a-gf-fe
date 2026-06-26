@@ -84,6 +84,6 @@ describe('POST /api/auth/refresh', () => {
     const setCookie = res.headers.get('set-cookie') ?? ''
     expect(setCookie).toContain('access_token=')
     expect(setCookie).toContain('refresh_token=')
-    expect(setCookie).toContain('Max-Age=0')
+    expect(setCookie).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT')
   })
 })
