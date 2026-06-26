@@ -58,7 +58,6 @@ const mockScenarios = [
     description: 'Gặp gỡ tại quán cà phê yên tĩnh, cùng chia sẻ câu chuyện thú vị.',
     durationMinutes: 60,
     price: 150,
-    publicPlace: 'Quận 1, TP.HCM',
   },
   {
     scenarioId: 'sc-2',
@@ -66,7 +65,6 @@ const mockScenarios = [
     description: 'Khám phá các con phố đẹp cùng nhau.',
     durationMinutes: 120,
     price: 300,
-    publicPlace: 'Bến Nhà Rồng, TP.HCM',
   },
 ]
 

@@ -24,7 +24,6 @@ const DEFAULTS: ScenarioInput = {
   description: '',
   price: 100,
   durationMinutes: 60,
-  publicPlace: '',
 };
 
 export const ScenarioFormModal: React.FC<ScenarioFormModalProps> = ({
@@ -40,7 +39,6 @@ export const ScenarioFormModal: React.FC<ScenarioFormModalProps> = ({
           description: initial.description,
           price: initial.price,
           durationMinutes: initial.durationMinutes,
-          publicPlace: initial.publicPlace,
         }
       : DEFAULTS,
   );
@@ -112,14 +110,6 @@ export const ScenarioFormModal: React.FC<ScenarioFormModalProps> = ({
               </select>
             </Field>
           </div>
-
-          <Field label="Địa điểm công cộng" error={errors.publicPlace}>
-            <input
-              value={form.publicPlace}
-              onChange={(e) => setForm({ ...form, publicPlace: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-300 focus:border-neutral-900 outline-none font-sans text-[14px]"
-            />
-          </Field>
 
           <div className="flex gap-2 pt-2">
             <Button type="button" variant="ghost" size="md" onClick={onClose} className="flex-1">

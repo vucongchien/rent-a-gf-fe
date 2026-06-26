@@ -37,7 +37,6 @@ type BackendCompanionScenario = {
   price?: number;
   duration?: number;
   durationMinutes?: number;
-  publicPlace?: string;
   status?: string;
 };
 
@@ -76,7 +75,6 @@ function normalizeScenario(item: BackendCompanionScenario): CompanionDetail['sce
     description: item.description ?? '',
     price: item.price ?? 0,
     durationMinutes: item.durationMinutes ?? item.duration ?? 0,
-    publicPlace: item.publicPlace ?? '',
     ...(item.status ? { status: item.status } : {}),
   };
 }
@@ -109,9 +107,30 @@ function normalizeCompanionsResponse(raw: BackendCompanionsResponse, fallbackPag
   };
 }
 
+/** Kiểu dữ liệu thô trả về từ Backend cho GET /profile/me — trường bio (không phải biography). */
+type BackendCompanionProfileMe = Omit<Partial<CompanionProfileMe>, 'biography'> & {
+  bio?: string | null;
+  biography?: string | null;
+};
+
+function normalizeCompanionProfileMe(raw: BackendCompanionProfileMe): CompanionProfileMe {
+  return {
+    companionId: raw.companionId ?? '',
+    displayName: raw.displayName ?? '',
+    biography: raw.biography ?? raw.bio ?? '',
+    avatarUrl: raw.avatarUrl ?? '',
+    albumUrls: raw.albumUrls ?? [],
+    voiceIntroUrl: raw.voiceIntroUrl ?? null,
+    availableCities: raw.availableCities ?? [],
+    status: raw.status ?? 'PENDING',
+  };
+}
+
 async function getMyProfileImpl(options?: ServiceRequestOptions): Promise<CompanionProfileMe> {
   const req = await getRequestCookieHeader(options?.req);
-  return serverFetch<CompanionProfileMe>('/profile/me', { method: 'GET', req });
+  const raw = await serverFetch<BackendCompanionProfileMe>('/profile/me', { method: 'GET', req });
+  console.log('[companionService.getMyProfile] raw response:', raw);
+  return normalizeCompanionProfileMe(raw);
 }
 
 /**
@@ -220,14 +239,29 @@ export const companionService = {
     return getMyProfileCached();
   },
 
+  /**
+   * Cập nhật hồ sơ cá nhân — dùng PATCH để partial update.
+   * Map key `biography` (Frontend) -> `bio` (Backend) theo SSOT API v1.
+   */
   async updateMyProfile(body: Partial<CompanionProfileMe>, options?: ServiceRequestOptions) {
     const req = await getRequestCookieHeader(options?.req);
-    return serverFetch('/profile/me', { method: 'PUT', body, req });
+    const { biography, availableCities, displayName, avatarUrl, voiceIntroUrl, albumUrls } = body;
+    // Backend chỉ nhận các field được gửi, không gửi field undefined để đúng partial-update.
+    const patchBody: Record<string, unknown> = {};
+    if (displayName !== undefined) patchBody.displayName = displayName;
+    if (biography !== undefined) patchBody.bio = biography;  // map biography -> bio
+    if (availableCities !== undefined) patchBody.availableCities = availableCities;
+    if (avatarUrl !== undefined) patchBody.avatarUrl = avatarUrl;
+    if (voiceIntroUrl !== undefined) patchBody.voiceIntroUrl = voiceIntroUrl;
+    if (albumUrls !== undefined) patchBody.albumUrls = albumUrls;
+    console.log('[companionService.updateMyProfile] PATCH body:', patchBody);
+    return serverFetch('/profile/me', { method: 'PATCH', body: patchBody, req });
   },
 
   async createMyScenario(body: CreateScenarioBody, options?: ServiceRequestOptions) {
     const req = await getRequestCookieHeader(options?.req);
     const { title, description, price, durationMinutes } = body;
+    console.log('[companionService.createMyScenario] body:', { title, description, price, durationMinutes });
     return serverFetch('/profile/me/scenarios', {
       method: 'POST',
       body: { title, description, price, durationMinutes },
@@ -237,6 +271,7 @@ export const companionService = {
 
   async updateMyScenario(scenarioId: string, body: UpdateScenarioBody, options?: ServiceRequestOptions) {
     const req = await getRequestCookieHeader(options?.req);
+    console.log('[companionService.updateMyScenario]', scenarioId, body);
     return serverFetch(`/profile/me/scenarios/${scenarioId}`, { method: 'PUT', body, req });
   },
 

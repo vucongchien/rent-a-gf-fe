@@ -14,7 +14,6 @@ export interface ScenarioSnapshot {
   title: string
   price: number
   durationMinutes: number
-  publicPlace: string
 }
 
 /** Item trong danh sách booking (dùng cho GET /bookings) */

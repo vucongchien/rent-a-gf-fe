@@ -1,5 +1,7 @@
 import { serverFetch } from '@/shared/lib/apiClient';
 import { getRequestCookieHeader } from '@/shared/lib/cookieHelper';
+import { cookies } from 'next/headers';
+import { AUTH_COOKIE_NAME } from '@/shared/lib/authCookies';
 import type { ChatRoom, ChatMessage, RawChatRoom, ServiceRequestOptions } from '@/shared/types';
 
 /**
@@ -12,13 +14,32 @@ async function fetchClientProfile(
   req: { headers: { get(name: string): string | null } } | undefined
 ): Promise<{ displayName: string; avatarUrl: string | null } | null> {
   try {
+    let token: string | null = null;
+    try {
+      const cookieStore = await cookies();
+      if (typeof cookieStore.get === 'function') {
+        token = cookieStore.get(AUTH_COOKIE_NAME)?.value || null;
+      } else {
+        const cookieStr = cookieStore.toString();
+        const match = cookieStr.split(';').map(c => c.trim()).find(c => c.startsWith(`${AUTH_COOKIE_NAME}=`));
+        token = match ? match.slice(AUTH_COOKIE_NAME.length + 1) : null;
+      }
+    } catch {
+      // ignore
+    }
+
+    const extraHeaders: Record<string, string> = {};
+    if (token) {
+      extraHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
     const data = await serverFetch<{ clientId: string; displayName: string; avatarUrl: string | null }>(
       `/profiles/${clientId}`,
-      { req }
+      { req, extraHeaders }
     );
     return { displayName: data.displayName, avatarUrl: data.avatarUrl };
   } catch (err) {
-    console.debug(`[chatService] client profile 404 cho ${clientId} — dùng fallback`);
+    console.warn(`[chatService] Không fetch được client profile cho ${clientId} (sử dụng fallback):`, (err as Error).message);
     return null;
   }
 }
@@ -33,13 +54,32 @@ async function fetchCompanionProfile(
   req: { headers: { get(name: string): string | null } } | undefined
 ): Promise<{ displayName: string; avatarUrl: string | null } | null> {
   try {
+    let token: string | null = null;
+    try {
+      const cookieStore = await cookies();
+      if (typeof cookieStore.get === 'function') {
+        token = cookieStore.get(AUTH_COOKIE_NAME)?.value || null;
+      } else {
+        const cookieStr = cookieStore.toString();
+        const match = cookieStr.split(';').map(c => c.trim()).find(c => c.startsWith(`${AUTH_COOKIE_NAME}=`));
+        token = match ? match.slice(AUTH_COOKIE_NAME.length + 1) : null;
+      }
+    } catch {
+      // ignore
+    }
+
+    const extraHeaders: Record<string, string> = {};
+    if (token) {
+      extraHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
     const data = await serverFetch<{ companionId: string; displayName: string; avatarUrl: string | null }>(
       `/companions/${companionId}`,
-      { req }
+      { req, extraHeaders }
     );
     return { displayName: data.displayName, avatarUrl: data.avatarUrl };
   } catch (err) {
-    console.debug(`[chatService] companion profile 404 cho ${companionId} — dùng fallback`);
+    console.warn(`[chatService] Không fetch được companion profile cho ${companionId} (sử dụng fallback):`, (err as Error).message);
     return null;
   }
 }
@@ -82,7 +122,7 @@ export const chatService = {
     const req = await getRequestCookieHeader(options?.req);
     const rawRooms = await serverFetch<RawChatRoom[]>('/interaction/rooms', { req });
 
-    console.log(`[chatService.getChatRooms] role=${role}, rooms=${rawRooms.length}`, rawRooms.map(r => ({ roomId: r.roomId, clientId: r.clientId, companionId: r.companionId })));
+    console.log(`[chatService.getChatRooms] role=${role}, rooms=${rawRooms.length}`, JSON.stringify(rawRooms[0], null, 2));
 
     // Fetch profile người đối diện song song, đúng endpoint theo role
     const profiles = await Promise.all(

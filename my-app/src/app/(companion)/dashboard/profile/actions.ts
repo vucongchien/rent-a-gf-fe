@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { companionService } from '@/shared/services/companionService';
 import { ApiError } from '@/shared/lib/apiError';
 import type { ActionState } from '@/shared/types';
-import type { CompanionProfileMe, CompanionScenario } from '@/shared/types/companion';
+import type { CompanionProfileMe, CompanionScenario, UpdateScenarioBody } from '@/shared/types/companion';
 import {
   validateProfile,
   validateScenario,
@@ -71,12 +71,14 @@ export async function updateProfileAction(
 }
 
 function parseScenarioFromForm(formData: FormData) {
+  const rawStatus = String(formData.get('status') ?? 'ACTIVE');
+  const status: 'ACTIVE' | 'INACTIVE' = rawStatus === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE';
   return {
     title: String(formData.get('title') ?? ''),
     description: String(formData.get('description') ?? ''),
     price: Number(formData.get('price') ?? 0),
     durationMinutes: Number(formData.get('durationMinutes') ?? 0),
-    publicPlace: String(formData.get('publicPlace') ?? ''),
+    status,
   };
 }
 
@@ -109,8 +111,9 @@ export async function updateScenarioAction(
   if (!v.ok) {
     return { status: 'error', message: 'Vui lòng kiểm tra lại thông tin.', fieldErrors: v.fieldErrors };
   }
+  const body: UpdateScenarioBody = { ...v.value, status: parsed.status };
   try {
-    const data = (await companionService.updateMyScenario(scenarioId, v.value)) as CompanionScenario;
+    const data = (await companionService.updateMyScenario(scenarioId, body)) as CompanionScenario;
     revalidatePath('/dashboard/profile/scenarios');
     return { status: 'success', data, message: 'Đã cập nhật kịch bản.' };
   } catch (err) {

@@ -120,9 +120,6 @@ function BookingDetailView({ booking, companion, isClient }: BookingDetailViewPr
         </h2>
 
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <MetaRow icon={<MapPinIcon size={16} className="text-chizuru-500" />} label="Địa điểm">
-            {booking.scenarioSnapshot.publicPlace}
-          </MetaRow>
           <MetaRow icon={<ClockIcon size={16} className="text-mami-500" />} label="Thời lượng">
             {booking.scenarioSnapshot.durationMinutes} phút
           </MetaRow>

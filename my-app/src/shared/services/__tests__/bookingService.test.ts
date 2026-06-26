@@ -58,7 +58,6 @@ describe('bookingService.getBookings', () => {
           description: '',
           price: 100,
           durationMinutes: 60,
-          publicPlace: 'The Coffee House',
         },
       ],
       biography: '',

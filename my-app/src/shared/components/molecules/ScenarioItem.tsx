@@ -32,7 +32,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({ scenario, onEdit, on
       <div className="flex items-center gap-3 font-sans text-[11.5px] text-neutral-500">
         <span>{scenario.durationMinutes} phút</span>
         <span aria-hidden>•</span>
-        <span className="truncate">{scenario.publicPlace}</span>
+        <span className="truncate">{scenario.description}</span>
       </div>
       <div className="flex gap-2 pt-1">
         <Button type="button" variant="outline" size="sm" onClick={onEdit} disabled={pending}>

@@ -126,7 +126,6 @@ export const bookingService = {
           title: scenario?.title || 'Kịch bản hẹn hò',
           price: priceNum,
           durationMinutes: durationMinNum,
-          publicPlace: scenario?.publicPlace || 'Địa điểm công cộng',
         };
       } catch (err) {
         console.warn(`[bookingService.getBookingDetail] Lỗi dựng scenarioSnapshot cho booking ${bookingId}:`, err);
@@ -134,7 +133,6 @@ export const bookingService = {
           title: 'Kịch bản hẹn hò',
           price: priceNum,
           durationMinutes: durationMinNum,
-          publicPlace: 'Địa điểm công cộng',
         };
       }
     } else {
@@ -142,7 +140,6 @@ export const bookingService = {
         title: scenarioSnapshot.title || 'Kịch bản hẹn hò',
         price: Number(scenarioSnapshot.price || 0),
         durationMinutes: Number(scenarioSnapshot.durationMinutes || 0),
-        publicPlace: scenarioSnapshot.publicPlace || 'Địa điểm công cộng',
       };
     }
 

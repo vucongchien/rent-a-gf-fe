@@ -56,7 +56,6 @@ describe('validateScenario', () => {
     description: 'Mô tả ngắn',
     price: 100,
     durationMinutes: 60,
-    publicPlace: 'The Coffee House Q1',
   }
 
   it('accepts valid scenario', () => {

@@ -20,7 +20,6 @@ export interface CompanionScenario {
   description: string
   price: number
   durationMinutes: number
-  publicPlace: string
   status?: string
 }
 
@@ -79,7 +78,7 @@ export interface CreateReviewBody {
 export type CreateReviewResponse = CompanionReview
 
 
-/** Body khi tạo scenario mới (SSOT: title, description, price, durationMinutes). */
+/** Body khi tạo/cập nhật scenario (SSOT: title, description, price, durationMinutes, publicPlace). */
 export interface CreateScenarioBody {
   title: string
   description: string
@@ -87,7 +86,13 @@ export interface CreateScenarioBody {
   durationMinutes: number
 }
 
-export type UpdateScenarioBody = Partial<CreateScenarioBody>
+/**
+ * Body khi cập nhật scenario — PUT yêu cầu `status` bắt buộc.
+ * SSOT: PUT /api/v1/profile/me/scenarios/{scenarioId}.
+ */
+export interface UpdateScenarioBody extends CreateScenarioBody {
+  status: 'ACTIVE' | 'INACTIVE'
+}
 
 /** Phản hồi danh sách companion có phân trang */
 import type { PaginatedMeta } from './api'

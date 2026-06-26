@@ -42,13 +42,13 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({ initial }) => 
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const buildFormData = (input: ScenarioInput) => {
+  const buildFormData = (input: ScenarioInput, status: 'ACTIVE' | 'INACTIVE' = 'ACTIVE') => {
     const fd = new FormData();
     fd.set('title', input.title);
     fd.set('description', input.description);
     fd.set('price', String(input.price));
     fd.set('durationMinutes', String(input.durationMinutes));
-    fd.set('publicPlace', input.publicPlace);
+    fd.set('status', status);
     return fd;
   };
 
@@ -79,9 +79,11 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({ initial }) => 
     setSubmitting(true);
     setPendingId(scenarioId);
     const optimistic: CompanionScenario = { scenarioId, ...input };
+    // Giữ nguyên status của kịch bản hiện tại (ACTIVE | INACTIVE).
+    const currentStatus = editing?.status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE';
     startTransition(async () => {
       optimisticDispatch({ kind: 'update', scenario: optimistic });
-      const res = await updateScenarioAction(scenarioId, { status: 'idle' }, buildFormData(input));
+      const res = await updateScenarioAction(scenarioId, { status: 'idle' }, buildFormData(input, currentStatus));
       setSubmitting(false);
       setPendingId(null);
       if (res.status === 'success') {

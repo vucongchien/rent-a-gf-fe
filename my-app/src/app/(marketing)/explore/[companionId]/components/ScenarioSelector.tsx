@@ -43,7 +43,6 @@ export const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
             </div>
 
             <div className="flex justify-between items-baseline mt-2 pt-2 border-t border-dashed border-neutral-100">
-              <span className="text-[10px] font-mono text-neutral-400">{sc.publicPlace}</span>
               <span className="font-sans font-black text-sm text-rose-600">
                 {sc.price} C
               </span>

@@ -67,7 +67,6 @@ export interface ScenarioInput {
   description: string
   price: number
   durationMinutes: number
-  publicPlace: string
 }
 
 export function validateScenario(input: ScenarioInput): ValidationResult<ScenarioInput> {
@@ -91,11 +90,6 @@ export function validateScenario(input: ScenarioInput): ValidationResult<Scenari
     fieldErrors.durationMinutes = `Thời lượng chỉ chấp nhận ${DURATION_OPTIONS.join(' / ')} phút.`
   }
 
-  const place = input.publicPlace?.trim() ?? ''
-  if (place.length < MIN_PUBLIC_PLACE_LEN || place.length > MAX_PUBLIC_PLACE_LEN) {
-    fieldErrors.publicPlace = `Địa điểm từ ${MIN_PUBLIC_PLACE_LEN}–${MAX_PUBLIC_PLACE_LEN} ký tự.`
-  }
-
   if (Object.keys(fieldErrors).length > 0) return { ok: false, fieldErrors }
   return {
     ok: true,
@@ -104,7 +98,6 @@ export function validateScenario(input: ScenarioInput): ValidationResult<Scenari
       description,
       price: input.price,
       durationMinutes: input.durationMinutes,
-      publicPlace: place,
     },
   }
 }
