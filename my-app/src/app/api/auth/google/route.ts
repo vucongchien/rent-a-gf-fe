@@ -54,7 +54,26 @@ export async function GET(req: NextRequest) {
         { status: 502 },
       )
     }
-    return NextResponse.redirect(data.authUrl)
+
+    // BFF tự override redirect_uri trong authUrl mà BE trả về.
+    // Lý do: BE có thể hardcode redirect_uri (vd: localhost) trong config của nó.
+    // BFF là người duy nhất biết origin thực tế (prod, staging, localhost...).
+    // → Parse authUrl, ghi đè redirect_uri = callbackUrl đúng, rồi mới redirect.
+    let finalAuthUrl: string
+    try {
+      const parsedAuthUrl = new URL(data.authUrl)
+      const originalRedirectUri = parsedAuthUrl.searchParams.get('redirect_uri')
+      parsedAuthUrl.searchParams.set('redirect_uri', callbackUrl)
+      finalAuthUrl = parsedAuthUrl.toString()
+      console.log('[BFF init] authUrl origin redirect_uri:', originalRedirectUri)
+      console.log('[BFF init] authUrl overridden redirect_uri:', callbackUrl)
+    } catch {
+      // Nếu parse URL thất bại (authUrl không hợp lệ), dùng nguyên bản
+      console.warn('[BFF init] Không parse được authUrl, dùng nguyên bản:', data.authUrl)
+      finalAuthUrl = data.authUrl
+    }
+
+    return NextResponse.redirect(finalAuthUrl)
   } catch (err) {
     console.error('[BFF init] Lỗi gọi BE init:', err)
     return NextResponse.json(
