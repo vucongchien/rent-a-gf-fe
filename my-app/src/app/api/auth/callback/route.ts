@@ -24,30 +24,72 @@ function escapeForScript(value: string): string {
   return value.replace(/[<>&'"`]/g, ch => `\\u${ch.charCodeAt(0).toString(16).padStart(4, '0')}`)
 }
 
+/**
+ * BROADCAST_CHANNEL_NAME phải khớp với giá trị trong useOAuthPopup.ts.
+ * Dùng BroadcastChannel thay vì postMessage để bypass COOP của Google OAuth.
+ * Google set header Cross-Origin-Opener-Policy: same-origin → window.opener = null.
+ */
+const BROADCAST_CHANNEL_NAME = 'rentagf_oauth'
+
 function bridgeHtml(targetOrigin: string, message: BridgeMessage): string {
   const safeOrigin = escapeForScript(targetOrigin)
   const safePayload = JSON.stringify(message).replace(/</g, '\\u003c')
+  const safeChannelName = escapeForScript(BROADCAST_CHANNEL_NAME)
   return `<!doctype html>
 <html lang="vi">
   <head><meta charset="utf-8" /><title>Đang hoàn tất đăng nhập...</title></head>
-  <body class="font-sans">
-    <p>Đang hoàn tất đăng nhập...</p>
+  <body>
+    <p style="font-family:sans-serif;text-align:center;margin-top:40px">Đang hoàn tất đăng nhập...</p>
     <script>
       (function () {
         var msg = ${safePayload};
         var origin = "${safeOrigin}";
-        try {
-          if (window.opener && !window.opener.closed) {
-            window.opener.postMessage(msg, origin);
-            window.close();
-            return;
+        var sent = false;
+
+        // PRIMARY: BroadcastChannel — không bị block bởi COOP của Google
+        // Google OAuth set Cross-Origin-Opener-Policy: same-origin → window.opener = null
+        // BroadcastChannel hoạt động xuyên tab/popup cùng origin, không cần opener
+        if (typeof BroadcastChannel !== 'undefined') {
+          try {
+            var bc = new BroadcastChannel("${safeChannelName}");
+            bc.postMessage(msg);
+            bc.close();
+            sent = true;
+            console.log('[BFF bridge] Gửi qua BroadcastChannel thành công');
+          } catch (e) {
+            console.warn('[BFF bridge] BroadcastChannel lỗi:', e);
           }
-        } catch (e) { /* opener cross-origin: bỏ qua, fallback redirect */ }
-        // Fallback: popup bị chặn hoặc user mở full-page
-        if (msg.status === "success") {
-          window.location.href = "/";
+        }
+
+        // FALLBACK: window.postMessage (chạy được ở local dev khi không có COOP)
+        if (!sent) {
+          try {
+            if (window.opener && !window.opener.closed) {
+              window.opener.postMessage(msg, origin);
+              sent = true;
+              console.log('[BFF bridge] Gửi qua postMessage thành công');
+            }
+          } catch (e) {
+            console.warn('[BFF bridge] postMessage lỗi (COOP):', e);
+          }
+        }
+
+        // Đóng popup hoặc redirect nếu không có opener
+        if (sent) {
+          try { window.close(); } catch (e) { /* ignore */ }
+          // Nếu window.close() không đóng được (vd: không phải popup)
+          setTimeout(function() {
+            if (!window.closed) {
+              window.location.href = msg.status === "success" ? "/" : "/login?error=" + encodeURIComponent(msg.code || "oauth_failed");
+            }
+          }, 500);
         } else {
-          window.location.href = "/login?error=" + encodeURIComponent(msg.code || "oauth_failed");
+          // Không gửi được gì → redirect full-page
+          if (msg.status === "success") {
+            window.location.href = "/";
+          } else {
+            window.location.href = "/login?error=" + encodeURIComponent(msg.code || "oauth_failed");
+          }
         }
       })();
     </script>
